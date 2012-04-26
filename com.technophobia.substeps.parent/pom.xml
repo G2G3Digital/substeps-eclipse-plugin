@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>com.technophobia.substeps</groupId>
+	<artifactId>com.technophobia.substeps.parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	<properties>
+		<tycho.version>0.12.0</tycho.version>
+	</properties>
+	
+	<repositories> 
+ 	  <!--repository> 
+	    <id>indigo</id> 
+ 	    <layout>p2</layout> 
+	    <url>http://download.eclipse.org/releases/indigo</url> 
+	  </repository--> 
+	  <!--repository>
+            <id>indigo-local</id> 
+            <layout>p2</layout> 
+            <url>file:/home/sforbes/Desktop/repo/repo</url>
+          </repository-->
+      <repository> 
+	    <id>indigo</id> 
+ 	    <layout>p2</layout> 
+	    <url>http://download.eclipse.org/releases/indigo</url> 
+	  </repository>
+	  <repository>
+	  	<id>swtbot</id>
+	  	<layout>p2</layout>
+	  	<url>http://download.eclipse.org/technology/swtbot/helios/dev-build/update-site</url>
+	  </repository> 
+	</repositories>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+					<target>
+						<artifact>
+							<groupId>com.technophobia.substeps</groupId>
+							<artifactId>com.technophobia.substeps.target</artifactId>
+							<version>0.0.1-SNAPSHOT</version>
+							<classifier>substeps</classifier>
+						</artifact>
+					</target>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<modules>
+		<module>../com.technophobia.substeps.target</module>
+		<module>../com.technophobia.substeps.editor</module>
+		<module>../com.technophobia.substeps.feature</module>
+		<module>../com.technophobia.substeps.repository</module>
+	</modules>
+	
+</project>

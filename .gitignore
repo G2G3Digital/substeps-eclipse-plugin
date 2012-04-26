@@ -1,0 +1,17 @@
+target/
+.project
+.classpath
+.settings
+logs/
+*.log
+.tomcatplugin
+*.dump
+classes/
+.gwt-log
+*.class
+*jacoco.exec
+bin/
+antlrplugin/
+javaTextEditor/
+features/
+plugins/
