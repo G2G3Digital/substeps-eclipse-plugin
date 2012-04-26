@@ -70,8 +70,11 @@
 	</build>
 	
 	<modules>
+		<module>../com.technophobia.substeps.testingtools</module>
 		<module>../com.technophobia.substeps.target</module>
 		<module>../com.technophobia.substeps.editor</module>
+		<module>../com.technophobia.substeps.editor.tests.unit</module>
+		<module>../com.technophobia.substeps.editor.tests.integration</module>
 		<module>../com.technophobia.substeps.feature</module>
 		<module>../com.technophobia.substeps.repository</module>
 	</modules>
