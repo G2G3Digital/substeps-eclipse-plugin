@@ -1,7 +1,10 @@
-package com.technophobia.substeps.document.content;
+package com.technophobia.substeps.document.content.partition;
 
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
+
+import com.technophobia.substeps.document.content.ContentTypeDefinition;
+import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 
 public class ContentTypeRuleBasedPartitionScanner extends
 		RuleBasedPartitionScanner {

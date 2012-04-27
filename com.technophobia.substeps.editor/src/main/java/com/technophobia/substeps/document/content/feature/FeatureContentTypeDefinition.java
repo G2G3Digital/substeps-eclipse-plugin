@@ -1,4 +1,4 @@
-package com.technophobia.substeps.editor;
+package com.technophobia.substeps.document.content.feature;
 
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.formatter.IFormattingStrategy;

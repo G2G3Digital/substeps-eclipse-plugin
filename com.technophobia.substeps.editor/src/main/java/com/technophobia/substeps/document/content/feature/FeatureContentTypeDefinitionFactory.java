@@ -1,4 +1,4 @@
-package com.technophobia.substeps.editor;
+package com.technophobia.substeps.document.content.feature;
 
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;

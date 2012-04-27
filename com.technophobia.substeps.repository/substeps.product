@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Substeps" uid="com.technophobia.substeps" id="uk.co.stuforbes.atclipse.editor.atclipse_product3" application="org.eclipse.ui.ide.workbench" version="0.0.1.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="Substeps" uid="com.technophobia.substeps" id="com.technophobia.substeps.editor.substeps_product" application="org.eclipse.ui.ide.workbench" version="0.0.1.qualifier" useFeatures="true" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
@@ -16,7 +16,6 @@
    <features>
       <feature id="org.eclipse.sdk" version="3.7.2.r37x_v20111213-7Q7xALDPb32vCjY6UACVPdFTz-icPtJkUadz0lMmk4z-8"/>
       <feature id="org.eclipse.platform" version="3.7.2.v20120207-1839-9gF7UHPDFxGjd-PqDr2jX_4yKaumkoHTz04_q-q"/>
-      <feature id="uk.co.stuforbes.thirdparty.feature" version="0.0.5.201203162103"/>
    </features>
 
    <configurations>

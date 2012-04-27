@@ -1,7 +1,9 @@
-package com.technophobia.substeps.document.content;
+package com.technophobia.substeps.document.content.partition;
 
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
+import com.technophobia.substeps.document.content.ContentTypeDefinition;
+import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.partition.PartitionScannerFactory;
 
 public class ContentTypeRuleBasedPartitionScannerFactory implements

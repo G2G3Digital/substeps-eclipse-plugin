@@ -1,4 +1,4 @@
-package com.technophobia.substeps.document;
+package com.technophobia.substeps.document.content.partition;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -11,9 +11,9 @@ import org.eclipse.jface.text.rules.FastPartitioner;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.technophobia.substeps.document.content.ContentTypeRuleBasedPartitionScanner;
-import com.technophobia.substeps.editor.FeatureContentTypeDefinition;
-import com.technophobia.substeps.editor.FeatureContentTypeDefinitionFactory;
+import com.technophobia.substeps.document.content.feature.FeatureContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.FeatureContentTypeDefinitionFactory;
+import com.technophobia.substeps.document.content.partition.ContentTypeRuleBasedPartitionScanner;
 
 public class ContentTypeRuleBasedPartitionScannerTest {
 

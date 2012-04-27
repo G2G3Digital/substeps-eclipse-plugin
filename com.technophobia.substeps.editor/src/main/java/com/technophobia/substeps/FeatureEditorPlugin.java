@@ -11,7 +11,7 @@ import org.osgi.framework.BundleContext;
 
 public class FeatureEditorPlugin implements BundleActivator {
 
-	private static final String PLUGIN_ID = "uk.co.stuforbes.atclipse.editor";
+	private static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
 	private static FeatureEditorPlugin pluginInstance;
 
@@ -30,7 +30,7 @@ public class FeatureEditorPlugin implements BundleActivator {
 		log = Platform.getLog(bundleContext.getBundle());
 		try {
 			resourceBundle = ResourceBundle
-					.getBundle("uk.co.stuforbes.atclipse.FeatureEditorResources");
+					.getBundle("com.technophobia.substeps.FeatureEditorResources");
 		} catch (final MissingResourceException x) {
 			resourceBundle = null;
 		}
