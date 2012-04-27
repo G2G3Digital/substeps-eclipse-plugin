@@ -9,13 +9,11 @@ import com.technophobia.substeps.document.partition.PartitionScannerFactory;
 public class ContentTypeRuleBasedPartitionScannerFactory implements
 		PartitionScannerFactory {
 
-	private final String[] legalContentTypes;
 	private final ContentTypeDefinitionFactory contentTypeDefinitionFactory;
 
 	public ContentTypeRuleBasedPartitionScannerFactory(
 			final ContentTypeDefinitionFactory contentTypeDefinitionFactory) {
 		this.contentTypeDefinitionFactory = contentTypeDefinitionFactory;
-		this.legalContentTypes = idsFrom(contentTypeDefinitionFactory);
 	}
 
 	@Override
@@ -26,7 +24,7 @@ public class ContentTypeRuleBasedPartitionScannerFactory implements
 
 	@Override
 	public String[] legalContentTypes() {
-		return legalContentTypes;
+		return idsFrom(contentTypeDefinitionFactory);
 	}
 
 	private String[] idsFrom(

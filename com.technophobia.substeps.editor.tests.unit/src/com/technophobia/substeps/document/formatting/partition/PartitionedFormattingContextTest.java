@@ -1,4 +1,4 @@
-package com.technophobia.substeps.document.formatting;
+package com.technophobia.substeps.document.formatting.partition;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
@@ -18,6 +18,8 @@ import org.junit.runner.RunWith;
 
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
+import com.technophobia.substeps.document.formatting.FormattingContext;
+import com.technophobia.substeps.document.formatting.InvalidFormatPositionException;
 
 @RunWith(JMock.class)
 public class PartitionedFormattingContextTest {
@@ -36,11 +38,9 @@ public class PartitionedFormattingContextTest {
 
 		this.document = context.mock(IDocument.class);
 		this.region = context.mock(IRegion.class, "currentRegion");
-		this.contentTypeDefinitionFactory = context
-				.mock(ContentTypeDefinitionFactory.class);
+		this.contentTypeDefinitionFactory = context.mock(ContentTypeDefinitionFactory.class);
 
-		this.formattingContext = new PartitionedFormattingContext(document,
-				region, contentTypeDefinitionFactory);
+		this.formattingContext = new PartitionedFormattingContext(document, region, contentTypeDefinitionFactory);
 	}
 
 	@Test
@@ -87,8 +87,7 @@ public class PartitionedFormattingContextTest {
 		});
 		try {
 			formattingContext.previousLine();
-			fail("Expected " + InvalidFormatPositionException.class.getName()
-					+ " to be thrown");
+			fail("Expected " + InvalidFormatPositionException.class.getName() + " to be thrown");
 		} catch (final InvalidFormatPositionException ex) {
 		}
 	}
@@ -154,8 +153,7 @@ public class PartitionedFormattingContextTest {
 		});
 		try {
 			formattingContext.nextLine();
-			fail("Expected " + InvalidFormatPositionException.class.getName()
-					+ " to be thrown");
+			fail("Expected " + InvalidFormatPositionException.class.getName() + " to be thrown");
 		} catch (final InvalidFormatPositionException ex) {
 		}
 	}
@@ -170,8 +168,7 @@ public class PartitionedFormattingContextTest {
 	}
 
 	@Test
-	public void hasPreviousContentTypeReturnsFalseForFirstLine()
-			throws Exception {
+	public void hasPreviousContentTypeReturnsFalseForFirstLine() throws Exception {
 		context.checking(new Expectations() {
 			{
 				oneOf(region).getOffset();
@@ -183,8 +180,7 @@ public class PartitionedFormattingContextTest {
 	}
 
 	@Test
-	public void hasPreviousContentTypeReturnsTrueForSecondLine()
-			throws Exception {
+	public void hasPreviousContentTypeReturnsTrueForSecondLine() throws Exception {
 		context.checking(new Expectations() {
 			{
 				oneOf(region).getOffset();
@@ -196,8 +192,7 @@ public class PartitionedFormattingContextTest {
 	}
 
 	@Test
-	public void previousContentTypeThrowsExceptionForFirstContentType()
-			throws BadLocationException {
+	public void previousContentTypeThrowsExceptionForFirstContentType() throws BadLocationException {
 		context.checking(new Expectations() {
 			{
 				oneOf(region).getOffset();
@@ -206,16 +201,14 @@ public class PartitionedFormattingContextTest {
 		});
 		try {
 			formattingContext.previousContentType();
-			fail("Expected " + InvalidFormatPositionException.class.getName()
-					+ " to be thrown");
+			fail("Expected " + InvalidFormatPositionException.class.getName() + " to be thrown");
 		} catch (final InvalidFormatPositionException ex) {
 		}
 	}
 
 	@Test
 	public void previousContentTypeReturnsCorrectContentType() throws Exception {
-		final ContentTypeDefinition previousContentType = context
-				.mock(ContentTypeDefinition.class);
+		final ContentTypeDefinition previousContentType = context.mock(ContentTypeDefinition.class);
 
 		context.checking(new Expectations() {
 			{
@@ -225,14 +218,12 @@ public class PartitionedFormattingContextTest {
 				oneOf(document).getContentType(30);
 				will(returnValue("previousContentType"));
 
-				oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName(
-						"previousContentType");
+				oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("previousContentType");
 				will(returnValue(previousContentType));
 			}
 		});
 
-		assertThat(formattingContext.previousContentType(),
-				is(previousContentType));
+		assertThat(formattingContext.previousContentType(), is(previousContentType));
 	}
 
 	@Test
@@ -272,8 +263,7 @@ public class PartitionedFormattingContextTest {
 	}
 
 	@Test
-	public void nextContentTypeThrowsExceptionForLastContentType()
-			throws Exception {
+	public void nextContentTypeThrowsExceptionForLastContentType() throws Exception {
 		context.checking(new Expectations() {
 			{
 				oneOf(region).getOffset();
@@ -288,16 +278,14 @@ public class PartitionedFormattingContextTest {
 		});
 		try {
 			formattingContext.nextContentType();
-			fail("Expected " + InvalidFormatPositionException.class.getName()
-					+ " to be thrown");
+			fail("Expected " + InvalidFormatPositionException.class.getName() + " to be thrown");
 		} catch (final InvalidFormatPositionException ex) {
 		}
 	}
 
 	@Test
 	public void nextContentTypeReturnsCorrectContentType() throws Exception {
-		final ContentTypeDefinition nextContentType = context
-				.mock(ContentTypeDefinition.class);
+		final ContentTypeDefinition nextContentType = context.mock(ContentTypeDefinition.class);
 
 		context.checking(new Expectations() {
 			{
@@ -313,8 +301,7 @@ public class PartitionedFormattingContextTest {
 				oneOf(document).getLength();
 				will(returnValue(100));
 
-				oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName(
-						"nextContentType");
+				oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("nextContentType");
 				will(returnValue(nextContentType));
 			}
 		});
@@ -322,20 +309,15 @@ public class PartitionedFormattingContextTest {
 		assertThat(formattingContext.nextContentType(), is(nextContentType));
 	}
 
-	private void prepareDocument(final int newRegionOffset,
-			final int newRegionLength, final int currentLine,
-			final int newLine, final String expectedResult) throws Exception {
-		prepareDocument(newRegionOffset, newRegionLength, currentLine, newLine,
-				Integer.MAX_VALUE, expectedResult);
+	private void prepareDocument(final int newRegionOffset, final int newRegionLength, final int currentLine, final int newLine, final String expectedResult)
+	        throws Exception {
+		prepareDocument(newRegionOffset, newRegionLength, currentLine, newLine, Integer.MAX_VALUE, expectedResult);
 	}
 
-	private void prepareDocument(final int newRegionOffset,
-			final int newRegionLength, final int currentLine,
-			final int newLine, final int numLines, final String expectedResult)
-			throws Exception {
+	private void prepareDocument(final int newRegionOffset, final int newRegionLength, final int currentLine, final int newLine, final int numLines,
+	        final String expectedResult) throws Exception {
 
-		final IRegion newLineRegion = prepareRegionFor(newRegionOffset,
-				newRegionLength);
+		final IRegion newLineRegion = prepareRegionFor(newRegionOffset, newRegionLength);
 
 		context.checking(new Expectations() {
 			{

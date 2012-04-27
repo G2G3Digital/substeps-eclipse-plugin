@@ -5,5 +5,5 @@ Bundle-SymbolicName: com.technophobia.substeps.editor.tests.unit
 Bundle-Version: 0.0.1.qualifier
 Fragment-Host: com.technophobia.substeps.editor;bundle-version="0.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit;bundle-version="4.8.2",
- com.technophobia.substeps.testingtools;bundle-version="0.0.1"
+Require-Bundle: com.technophobia.substeps.testingtools;bundle-version="0.0.1",
+ org.junit;bundle-version="4.8.2"
