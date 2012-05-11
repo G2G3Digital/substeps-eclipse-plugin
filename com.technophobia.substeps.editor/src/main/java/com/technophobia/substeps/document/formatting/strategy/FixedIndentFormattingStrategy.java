@@ -1,6 +1,6 @@
 package com.technophobia.substeps.document.formatting.strategy;
 
-public class FixedIndentFormattingStrategy extends DefaultFormattingStrategy {
+public class FixedIndentFormattingStrategy extends IndentationFormattingStrategy {
 
 	private final String indent;
 
@@ -9,19 +9,8 @@ public class FixedIndentFormattingStrategy extends DefaultFormattingStrategy {
 	}
 
 	@Override
-	public void formatterStarts(final String initialIndentation) {
-		super.formatterStarts(initialIndentation);
+	protected String indent() {
+		return indent;
 	}
 
-	@Override
-	public String format(final String content, final boolean isLineStart,
-			final String indentation, final int[] positions) {
-		final boolean hasLineBreak = content.endsWith(lineSeparator);
-
-		String indentedContent = indent + content.trim();
-		if (hasLineBreak) {
-			indentedContent = indentedContent + lineSeparator;
-		}
-		return indentedContent;
-	}
 }

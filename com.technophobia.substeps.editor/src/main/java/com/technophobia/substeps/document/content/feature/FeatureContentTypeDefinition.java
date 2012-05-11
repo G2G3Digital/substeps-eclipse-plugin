@@ -28,33 +28,28 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return fixedWordRule("Feature:",
-					colourToken(FeatureColour.BLUE, colourManager));
+			return fixedWordRule("Feature:", colourToken(FeatureColour.BLUE, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
 			return new FixedIndentFormattingStrategy("");
 		}
 	}, //
 	TAG("__feature_tag") {
 		@Override
 		public IPredicateRule partitionRule() {
-			return singleLineRule("@", id());
+			return singleLineRule("Tags:", id());
 		}
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return wordRule("@",
-					colourToken(FeatureColour.GREEN, colourManager));
+			return singleLineRule("Tags:", colourToken(FeatureColour.GREEN, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
-			return new OptionalUnitPrefixFormattingStrategy(
-					formattingContextSupplier);
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
+			return new OptionalUnitPrefixFormattingStrategy(formattingContextSupplier);
 		}
 	}, //
 	COMMENT("__feature_comment") {
@@ -65,15 +60,12 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return singleLineRule("#",
-					colourToken(FeatureColour.GREEN, colourManager));
+			return singleLineRule("#", colourToken(FeatureColour.GREEN, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
-			return new OptionalUnitPrefixFormattingStrategy(
-					formattingContextSupplier);
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
+			return new OptionalUnitPrefixFormattingStrategy(formattingContextSupplier);
 		}
 	}, //
 	BACKGROUND("__feature_background") {
@@ -84,15 +76,12 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return fixedWordRule("Background:",
-					colourToken(FeatureColour.BLUE, colourManager));
+			return fixedWordRule("Background:", colourToken(FeatureColour.BLUE, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
-			return new StartOfUnitFormattingStrategy(formattingContextSupplier,
-					new FixedIndentFormattingStrategy("  "));
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
+			return new StartOfUnitFormattingStrategy(formattingContextSupplier, new FixedIndentFormattingStrategy("  "));
 		}
 	}, //
 	SCENARIO("__feature_scenario") {
@@ -103,15 +92,12 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return fixedWordRule("Scenario:",
-					colourToken(FeatureColour.BLUE, colourManager));
+			return fixedWordRule("Scenario:", colourToken(FeatureColour.BLUE, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
-			return new StartOfUnitFormattingStrategy(formattingContextSupplier,
-					new FixedIndentFormattingStrategy("  "));
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
+			return new StartOfUnitFormattingStrategy(formattingContextSupplier, new FixedIndentFormattingStrategy("  "));
 		}
 	}, //
 	SCENARIO_OUTLINE("__feature_scenario_outline") {
@@ -122,15 +108,12 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return fixedWordRule("Scenario Outline:",
-					colourToken(FeatureColour.BLUE, colourManager));
+			return fixedWordRule("Scenario Outline:", colourToken(FeatureColour.BLUE, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
-			return new StartOfUnitFormattingStrategy(formattingContextSupplier,
-					new FixedIndentFormattingStrategy("  "));
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
+			return new StartOfUnitFormattingStrategy(formattingContextSupplier, new FixedIndentFormattingStrategy("  "));
 		}
 	}, //
 	EXAMPLE("__feature_example") {
@@ -141,15 +124,12 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return fixedWordRule("Examples:",
-					colourToken(FeatureColour.BLUE, colourManager));
+			return fixedWordRule("Examples:", colourToken(FeatureColour.BLUE, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
-			return new StartOfUnitFormattingStrategy(formattingContextSupplier,
-					new FixedIndentFormattingStrategy("  "));
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
+			return new StartOfUnitFormattingStrategy(formattingContextSupplier, new FixedIndentFormattingStrategy("  "));
 		}
 	}, //
 	EXAMPLE_ROW("__feature_example_row") {
@@ -160,13 +140,11 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return fixedWordRule("|",
-					colourToken(FeatureColour.BLACK, colourManager));
+			return fixedWordRule("|", colourToken(FeatureColour.BLACK, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
 			return new FixedIndentFormattingStrategy("\t");
 		}
 	}, //
@@ -178,13 +156,11 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return fixedWordRule("Given",
-					colourToken(FeatureColour.PINK, colourManager));
+			return fixedWordRule("Given", colourToken(FeatureColour.PINK, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
 			return new FixedIndentFormattingStrategy("\t");
 		}
 	}, //
@@ -196,13 +172,11 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return fixedWordRule("When",
-					colourToken(FeatureColour.PINK, colourManager));
+			return fixedWordRule("When", colourToken(FeatureColour.PINK, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
 			return new FixedIndentFormattingStrategy("\t ");
 		}
 	}, //
@@ -214,13 +188,11 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return fixedWordRule("Then",
-					colourToken(FeatureColour.PINK, colourManager));
+			return fixedWordRule("Then", colourToken(FeatureColour.PINK, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
 			return new FixedIndentFormattingStrategy("\t ");
 		}
 	}, //
@@ -232,13 +204,11 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 		@Override
 		public IRule damageRepairerRule(final ColourManager colourManager) {
-			return fixedWordRule("And",
-					colourToken(FeatureColour.PINK, colourManager));
+			return fixedWordRule("And", colourToken(FeatureColour.PINK, colourManager));
 		}
 
 		@Override
-		public IFormattingStrategy formattingStrategy(
-				final Supplier<FormattingContext> formattingContextSupplier) {
+		public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
 			return new FixedIndentFormattingStrategy("\t  ");
 		}
 	};
@@ -257,8 +227,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
 	private final String id;
 
-	private static IPredicateRule singleLineRule(final String startString,
-			final String tokenId) {
+	private static IPredicateRule singleLineRule(final String startString, final String tokenId) {
 		final IToken token = new Token(tokenId);
 		return new EndOfLineRule(startString, token);
 	}
@@ -298,19 +267,16 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 		};
 	}
 
-	private static IToken colourToken(final FeatureColour colour,
-			final ColourManager colourManager) {
-		return new Token(new TextAttribute(colourManager.getColor(colour
-				.colour())));
+	private static IToken colourToken(final FeatureColour colour, final ColourManager colourManager) {
+		return new Token(new TextAttribute(colourManager.getColor(colour.colour())));
 	}
 
-	private static IPredicateRule singleLineRule(final String startSequence,
-			final IToken token) {
+	private static IPredicateRule singleLineRule(final String startSequence, final IToken token) {
 		return new EndOfLineRule(startSequence, token);
 	}
 
 	private static IRule wordRule(final String startSequence, final IToken token) {
-		return new WordRule(wordStartingWith('@'), token);
+		return new WordRule(wordStartingWith(startSequence.charAt(0)), token);
 	}
 
 	private static IRule fixedWordRule(final String word, final IToken token) {

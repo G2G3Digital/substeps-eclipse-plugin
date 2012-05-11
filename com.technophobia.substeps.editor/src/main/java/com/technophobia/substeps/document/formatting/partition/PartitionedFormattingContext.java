@@ -3,6 +3,7 @@ package com.technophobia.substeps.document.formatting.partition;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.TypedPosition;
 
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
@@ -12,12 +13,12 @@ import com.technophobia.substeps.document.formatting.InvalidFormatPositionExcept
 public class PartitionedFormattingContext implements FormattingContext {
 
 	private final IDocument document;
-	private final IRegion region;
+	private final TypedPosition position;
 	private final ContentTypeDefinitionFactory contentTypeDefinitionFactory;
 
-	public PartitionedFormattingContext(final IDocument document, final IRegion region, final ContentTypeDefinitionFactory contentTypeDefinitionFactory) {
+	public PartitionedFormattingContext(final IDocument document, final TypedPosition position, final ContentTypeDefinitionFactory contentTypeDefinitionFactory) {
 		this.document = document;
-		this.region = region;
+		this.position = position;
 		this.contentTypeDefinitionFactory = contentTypeDefinitionFactory;
 	}
 
@@ -51,7 +52,7 @@ public class PartitionedFormattingContext implements FormattingContext {
 
 	@Override
 	public boolean hasPreviousContentType() {
-		return region.getOffset() > 0;
+		return position.getOffset() > 0;
 	}
 
 	@Override
@@ -59,12 +60,12 @@ public class PartitionedFormattingContext implements FormattingContext {
 		if (!hasPreviousContentType()) {
 			throw new InvalidFormatPositionException("No content type exists before current position");
 		}
-		return contentTypeFor(contentTypeAtPosition(region.getOffset() - 1));
+		return contentTypeFor(contentTypeAtPosition(position.getOffset() - 1));
 	}
 
 	@Override
 	public boolean hasNextContentType() {
-		return document.getLength() > (region.getOffset() + region.getLength());
+		return document.getLength() > (position.getOffset() + position.getLength());
 	}
 
 	@Override
@@ -72,12 +73,12 @@ public class PartitionedFormattingContext implements FormattingContext {
 		if (!hasNextContentType()) {
 			throw new InvalidFormatPositionException("No content type exists after current position");
 		}
-		return contentTypeFor(contentTypeAtPosition(region.getOffset() + region.getLength() + 1));
+		return contentTypeFor(contentTypeAtPosition(position.getOffset() + position.getLength() + 1));
 	}
 
 	private int currentLineNumber() {
 		try {
-			return document.getLineOfOffset(region.getOffset());
+			return document.getLineOfOffset(position.getOffset());
 		} catch (final BadLocationException ex) {
 			throw new InvalidFormatPositionException("Could not determine current line number", ex);
 		}

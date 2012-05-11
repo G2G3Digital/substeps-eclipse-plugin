@@ -1,7 +1,7 @@
 package com.technophobia.substeps.document.formatting.partition;
 
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.TypedPosition;
 
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.formatting.FormattingContext;
@@ -17,8 +17,8 @@ public class PartitionedFormattingContextFactory implements FormattingContextFac
 	}
 
 	@Override
-	public FormattingContext createFor(final IDocument document, final IRegion region) {
-		return new PartitionedFormattingContext(document, region, contentTypeDefinitionFactory);
+	public FormattingContext createFor(final IDocument document, final TypedPosition position) {
+		return new PartitionedFormattingContext(document, position, contentTypeDefinitionFactory);
 	}
 
 }
