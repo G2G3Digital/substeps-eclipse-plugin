@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright Technophobia.Ltd 2012 -->
 <?pde version="3.5"?>
 
 <product name="Substeps" uid="com.technophobia.substeps" id="com.technophobia.substeps.editor.substeps_product" application="org.eclipse.ui.ide.workbench" version="0.0.1.qualifier" useFeatures="true" includeLaunchers="true">
