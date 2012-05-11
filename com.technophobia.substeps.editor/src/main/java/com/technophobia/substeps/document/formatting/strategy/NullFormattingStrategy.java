@@ -16,11 +16,31 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with Substeps.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.technophobia.substeps.document.formatting;
+package com.technophobia.substeps.document.formatting.strategy;
 
-import org.eclipse.jface.text.TypedPosition;
+import org.eclipse.jface.text.formatter.IFormattingStrategy;
 
-public interface FormattingContextFactory {
+public class NullFormattingStrategy implements IFormattingStrategy {
 
-	FormattingContext createFor(TypedPosition[] position, int currentPosition);
+	protected static final String lineSeparator = System
+			.getProperty("line.separator");
+
+	public NullFormattingStrategy() {
+		super();
+	}
+
+	@Override
+	public void formatterStarts(final String initialIndentation) {
+	}
+
+	@Override
+	public String format(final String content, final boolean isLineStart,
+			final String indentation, final int[] positions) {
+		return "";
+	}
+
+	@Override
+	public void formatterStops() {
+	}
+
 }

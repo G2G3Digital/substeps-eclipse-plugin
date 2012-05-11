@@ -25,6 +25,7 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
+import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
 
@@ -38,10 +39,10 @@ import com.technophobia.substeps.supplier.Supplier;
 
 public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 
-	FEATURE("__feature_feature") {
+	FEATURE("__feature_feature", false) {
 		@Override
 		public IPredicateRule partitionRule() {
-			return singleLineRule("Feature:", id());
+			return paragraphRule("Feature:", id());
 		}
 
 		@Override
@@ -54,7 +55,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 			return new FixedIndentFormattingStrategy("");
 		}
 	}, //
-	TAG("__feature_tag") {
+	TAG("__feature_tag", true) {
 		@Override
 		public IPredicateRule partitionRule() {
 			return singleLineRule("Tags:", id());
@@ -70,7 +71,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 			return new OptionalUnitPrefixFormattingStrategy(formattingContextSupplier);
 		}
 	}, //
-	COMMENT("__feature_comment") {
+	COMMENT("__feature_comment", true) {
 		@Override
 		public IPredicateRule partitionRule() {
 			return singleLineRule("#", id());
@@ -86,7 +87,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 			return new OptionalUnitPrefixFormattingStrategy(formattingContextSupplier);
 		}
 	}, //
-	BACKGROUND("__feature_background") {
+	BACKGROUND("__feature_background", false) {
 		@Override
 		public IPredicateRule partitionRule() {
 			return singleLineRule("Background:", id());
@@ -102,7 +103,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 			return new StartOfUnitFormattingStrategy(formattingContextSupplier, new FixedIndentFormattingStrategy("  "));
 		}
 	}, //
-	SCENARIO("__feature_scenario") {
+	SCENARIO("__feature_scenario", false) {
 		@Override
 		public IPredicateRule partitionRule() {
 			return singleLineRule("Scenario:", id());
@@ -118,7 +119,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 			return new StartOfUnitFormattingStrategy(formattingContextSupplier, new FixedIndentFormattingStrategy("  "));
 		}
 	}, //
-	SCENARIO_OUTLINE("__feature_scenario_outline") {
+	SCENARIO_OUTLINE("__feature_scenario_outline", false) {
 		@Override
 		public IPredicateRule partitionRule() {
 			return singleLineRule("Scenario Outline:", id());
@@ -134,7 +135,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 			return new StartOfUnitFormattingStrategy(formattingContextSupplier, new FixedIndentFormattingStrategy("  "));
 		}
 	}, //
-	EXAMPLE("__feature_example") {
+	EXAMPLE("__feature_example", false) {
 		@Override
 		public IPredicateRule partitionRule() {
 			return singleLineRule("Examples:", id());
@@ -150,7 +151,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 			return new StartOfUnitFormattingStrategy(formattingContextSupplier, new FixedIndentFormattingStrategy("  "));
 		}
 	}, //
-	EXAMPLE_ROW("__feature_example_row") {
+	EXAMPLE_ROW("__feature_example_row", false) {
 		@Override
 		public IPredicateRule partitionRule() {
 			return singleLineRule("|", id());
@@ -166,7 +167,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 			return new FixedIndentFormattingStrategy("\t");
 		}
 	}, //
-	GIVEN("__feature_given") {
+	GIVEN("__feature_given", false) {
 		@Override
 		public IPredicateRule partitionRule() {
 			return singleLineRule("Given", id());
@@ -182,7 +183,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 			return new FixedIndentFormattingStrategy("\t");
 		}
 	}, //
-	WHEN("__feature_when") {
+	WHEN("__feature_when", false) {
 		@Override
 		public IPredicateRule partitionRule() {
 			return singleLineRule("When", id());
@@ -198,7 +199,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 			return new FixedIndentFormattingStrategy("\t ");
 		}
 	}, //
-	THEN("__feature_then") {
+	THEN("__feature_then", false) {
 		@Override
 		public IPredicateRule partitionRule() {
 			return singleLineRule("Then", id());
@@ -214,7 +215,7 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 			return new FixedIndentFormattingStrategy("\t ");
 		}
 	}, //
-	AND("__feature_and") {
+	AND("__feature_and", false) {
 		@Override
 		public IPredicateRule partitionRule() {
 			return singleLineRule("And", id());
@@ -231,23 +232,35 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
 		}
 	};
 
-	private FeatureContentTypeDefinition(final String id) {
+	private FeatureContentTypeDefinition(final String id, final boolean optional) {
 		this.id = id;
+		this.optional = optional;
 	}
 
 	@Override
 	public String id() {
 		return id;
 	}
+	
+	@Override
+	public boolean isOptional() {
+		return optional;
+	}
 
 	@Override
 	public abstract IPredicateRule partitionRule();
 
 	private final String id;
+	private final boolean optional;
 
 	private static IPredicateRule singleLineRule(final String startString, final String tokenId) {
 		final IToken token = new Token(tokenId);
 		return new EndOfLineRule(startString, token);
+	}
+	
+	private static IPredicateRule paragraphRule(final String startString, final String tokenId) {
+		final IToken token = new Token(tokenId);
+		return new MultiLineRule(startString, "\n\n", token);
 	}
 
 	private static IWordDetector wordStartingWith(final char startChar) {

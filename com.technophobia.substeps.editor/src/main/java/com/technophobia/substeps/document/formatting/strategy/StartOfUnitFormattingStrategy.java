@@ -44,6 +44,18 @@ public class StartOfUnitFormattingStrategy extends DefaultFormattingStrategy {
 		FeatureEditorPlugin.log(Status.INFO, "Formatting line: " + content
 				+ ", isLineStart: " + isLineStart + ", indentation: "
 				+ indentation);
-		return super.format(content, isLineStart, indentation, positions);
+		boolean prefixNewLine = false;
+		if (isLineStart) {
+			final FormattingContext formattingContext = formattingContextSupplier
+					.get();
+			if (formattingContext.hasPreviousContentType()) {
+				if (!formattingContext.previousContentType().isOptional()) {
+					prefixNewLine = true;
+				}
+			}
+		}
+		final String formattedContent = formattingStrategy.format(content,
+				isLineStart, indentation, positions);
+		return prefixNewLine ? "\n" + formattedContent : formattedContent;
 	}
 }

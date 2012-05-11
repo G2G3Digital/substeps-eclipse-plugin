@@ -36,7 +36,7 @@ public class DefaultFormattingStrategy implements IFormattingStrategy {
 	@Override
 	public String format(final String content, final boolean isLineStart,
 			final String indentation, final int[] positions) {
-		return "";
+		return content;
 	}
 
 	@Override

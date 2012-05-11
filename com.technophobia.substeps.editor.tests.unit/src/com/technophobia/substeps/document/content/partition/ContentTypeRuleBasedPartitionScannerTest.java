@@ -55,21 +55,19 @@ public class ContentTypeRuleBasedPartitionScannerTest {
 	}
 
 	@Test
-	@Ignore
 	public void canPartitionSingleTagOnLine() {
-		final String text = "#This is comment line 1\nBackground:\nGiven something\n\n@tag-1\nScenario:A scenario";
+		final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario:A scenario";
 		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
 		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
 		assertEquals(6, result.length);
 
-		checkType(result[4], FeatureContentTypeDefinition.TAG.id(), "@tag-1\n");
+		checkType(result[4], FeatureContentTypeDefinition.TAG.id(), "Tags: tag-1\n");
 	}
 
 	@Test
-	@Ignore
 	public void canPartitionBackground() {
-		final String text = "#This is comment line 1\nBackground:\nGiven something\n\n@tag-1\nScenario:A scenario";
+		final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario:A scenario";
 		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
 		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
@@ -79,10 +77,9 @@ public class ContentTypeRuleBasedPartitionScannerTest {
 	}
 
 	@Test
-	@Ignore
 	public void canPartitionScenario() {
 
-		final String text = "#This is comment line 1\nBackground:\nGiven something\n\n@tag-1\nScenario:A scenario";
+		final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario:A scenario";
 		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
 		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
@@ -92,9 +89,8 @@ public class ContentTypeRuleBasedPartitionScannerTest {
 	}
 
 	@Test
-	@Ignore
 	public void canPartitionScenarioOutline() {
-		final String text = "#This is comment line 1\nBackground:\nGiven something\n\n@tag-1\nScenario Outline:A scenario";
+		final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario Outline:A scenario";
 		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
 		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
@@ -104,7 +100,6 @@ public class ContentTypeRuleBasedPartitionScannerTest {
 	}
 
 	@Test
-	@Ignore
 	public void canPartitionExample() {
 		final String text = "@tag-1\nScenario Outline:A scenario\nGiven Something\nWhen something else\nThen a result\n\nExamples:\n\t|example1|example2|";
 		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
@@ -116,7 +111,6 @@ public class ContentTypeRuleBasedPartitionScannerTest {
 	}
 
 	@Test
-	@Ignore
 	public void canPartitionExampleRow() {
 		final String text = "@tag-1\nScenario Outline:A scenario\nGiven Something\nWhen something else\nThen a result\n\nExamples:\n\t|example1|example2|";
 		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);

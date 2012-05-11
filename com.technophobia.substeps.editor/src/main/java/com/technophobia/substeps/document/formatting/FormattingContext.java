@@ -22,14 +22,6 @@ import com.technophobia.substeps.document.content.ContentTypeDefinition;
 
 public interface FormattingContext {
 
-	boolean hasPreviousLine();
-
-	String previousLine() throws InvalidFormatPositionException;
-
-	boolean hasNextLine();
-
-	String nextLine() throws InvalidFormatPositionException;
-
 	boolean hasPreviousContentType();
 
 	ContentTypeDefinition previousContentType()

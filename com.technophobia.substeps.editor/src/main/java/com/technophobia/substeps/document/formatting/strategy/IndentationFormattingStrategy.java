@@ -29,7 +29,7 @@ public abstract class IndentationFormattingStrategy extends DefaultFormattingStr
 	public String format(final String content, final boolean isLineStart, final String indentation, final int[] positions) {
 		final boolean hasLineBreak = content.endsWith(lineSeparator);
 
-		String indentedContent = indent() + content.trim();
+		String indentedContent = isLineStart ? indent() + content.trim() : content.trim();	
 		if (hasLineBreak) {
 			indentedContent = indentedContent + lineSeparator;
 		}
