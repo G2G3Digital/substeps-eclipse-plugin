@@ -56,6 +56,12 @@ public class StartOfUnitFormattingStrategy extends DefaultFormattingStrategy {
 		}
 		final String formattedContent = formattingStrategy.format(content,
 				isLineStart, indentation, positions);
-		return prefixNewLine ? "\n" + formattedContent : formattedContent;
+
+		final StringBuffer sb = new StringBuffer();
+		if (prefixNewLine) {
+			sb.append("\n");
+		}
+		sb.append(formattedContent);
+		return sb.toString();
 	}
 }

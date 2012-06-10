@@ -1,0 +1,3 @@
+  Scenario Outline: A scenario with no indentation
+
+  Scenario Outline: A scenario with too much indentation

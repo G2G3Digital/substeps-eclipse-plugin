@@ -1,0 +1,2 @@
+Scenario: This is a scenario
+  Given something
