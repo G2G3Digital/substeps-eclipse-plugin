@@ -9,10 +9,12 @@
            visible="true">
         <action
               class="com.technophobia.substeps.actions.HelloWorldAction"
+              icon="src/main/resources/feature_file.gif"
               id="com.technophobia.substeps.actions.HelloWorldAction"
               label="Hello World"
               style="push"
-              toolbarPath="Normal">
+              toolbarPath="Normal"
+              tooltip="Hello World">
         </action>
      </actionSet>
      <actionSet

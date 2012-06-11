@@ -29,6 +29,8 @@ import com.technophobia.substeps.supplier.Supplier;
 public interface ContentTypeDefinition {
 
 	String id();
+	
+	boolean isOptional();
 
 	IPredicateRule partitionRule();
 

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DefaultPositionUpdater;
@@ -41,17 +42,21 @@ import org.eclipse.jface.text.formatter.ContentFormatter;
 import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.formatter.IFormattingStrategy;
 
+import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.supplier.Supplier;
 
 /**
- * Unfortunately, this is a copy and paste of {@link ContentFormatter}. We need to be able to update the {@link FormattingContext} per iteration of the
- * {@link TypedPosition}s during formatting, which in the original class is buried under 3 levels of private method. As the class contains alot of private
- * state, extending these methods is also not an option.
+ * Unfortunately, this is a copy and paste of {@link ContentFormatter}. We need
+ * to be able to update the {@link FormattingContext} per iteration of the
+ * {@link TypedPosition}s during formatting, which in the original class is
+ * buried under 3 levels of private method. As the class contains alot of
+ * private state, extending these methods is also not an option.
  * 
  * @author sforbes
  * 
  */
-public class ContextAwareContentFormatter implements IContentFormatter, Supplier<FormattingContext> {
+public class ContextAwareContentFormatter implements IContentFormatter,
+		Supplier<FormattingContext> {
 
 	private FormattingContext currentContext = null;
 	private final FormattingContextFactory formattingContextFactory;
@@ -61,12 +66,18 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 
 	/** The map of <code>IFormattingStrategy</code> objects */
 	private Map fStrategies;
-	/** The indicator of whether the formatter operates in partition aware mode or not */
+	/**
+	 * The indicator of whether the formatter operates in partition aware mode
+	 * or not
+	 */
 	private boolean fIsPartitionAware = true;
 
 	/** The partition information managing document position categories */
 	private String[] fPartitionManagingCategories;
-	/** The list of references to offset and end offset of all overlapping positions */
+	/**
+	 * The list of references to offset and end offset of all overlapping
+	 * positions
+	 */
 	private List fOverlappingPositionReferences;
 	/** Position updater used for partitioning positions */
 	private IPositionUpdater fPartitioningUpdater;
@@ -89,13 +100,15 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	 */
 	private String[] fExternalPartitonManagingCategories;
 	/**
-	 * Indicates whether <code>fPartitionManagingCategories</code> must be computed.
+	 * Indicates whether <code>fPartitionManagingCategories</code> must be
+	 * computed.
 	 * 
 	 * @since 3.0
 	 */
 	private boolean fNeedsComputation = true;
 
-	public ContextAwareContentFormatter(final FormattingContextFactory formattingContextFactory) {
+	public ContextAwareContentFormatter(
+			final FormattingContextFactory formattingContextFactory) {
 		super();
 		this.fPartitioning = IDocumentExtension3.DEFAULT_PARTITIONING;
 		this.formattingContextFactory = formattingContextFactory;
@@ -107,16 +120,20 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Registers a strategy for a particular content type. If there is already a strategy registered for this type, the new strategy is registered instead of
-	 * the old one. If the given content type is <code>null</code> the given strategy is registered for all content types as is called only once per formatting
-	 * session.
+	 * Registers a strategy for a particular content type. If there is already a
+	 * strategy registered for this type, the new strategy is registered instead
+	 * of the old one. If the given content type is <code>null</code> the given
+	 * strategy is registered for all content types as is called only once per
+	 * formatting session.
 	 * 
 	 * @param strategy
-	 *            the formatting strategy to register, or <code>null</code> to remove an existing one
+	 *            the formatting strategy to register, or <code>null</code> to
+	 *            remove an existing one
 	 * @param contentType
 	 *            the content type under which to register
 	 */
-	public void setFormattingStrategy(final IFormattingStrategy strategy, final String contentType) {
+	public void setFormattingStrategy(final IFormattingStrategy strategy,
+			final String contentType) {
 
 		Assert.isNotNull(contentType);
 
@@ -130,13 +147,16 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Informs this content formatter about the names of those position categories which are used to manage the document's partitioning information and thus
-	 * should be ignored when this formatter updates positions.
+	 * Informs this content formatter about the names of those position
+	 * categories which are used to manage the document's partitioning
+	 * information and thus should be ignored when this formatter updates
+	 * positions.
 	 * 
 	 * @param categories
 	 *            the categories to be ignored
-	 * @deprecated incompatible with an open set of document partitionings. The provided information is only used if this formatter can not compute the
-	 *             partition managing position categories.
+	 * @deprecated incompatible with an open set of document partitionings. The
+	 *             provided information is only used if this formatter can not
+	 *             compute the partition managing position categories.
 	 */
 	@Deprecated
 	public void setPartitionManagingPositionCategories(final String[] categories) {
@@ -158,7 +178,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	 * Sets the formatter's operation mode.
 	 * 
 	 * @param enable
-	 *            indicates whether the formatting process should be partition ware
+	 *            indicates whether the formatting process should be partition
+	 *            ware
 	 */
 	public void enablePartitionAwareFormatting(final boolean enable) {
 		fIsPartitionAware = enable;
@@ -199,8 +220,9 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Determines the partitioning of the given region of the document. Informs the formatting strategies of each partition about the start, the process, and
-	 * the termination of the formatting session.
+	 * Determines the partitioning of the given region of the document. Informs
+	 * the formatting strategies of each partition about the start, the process,
+	 * and the termination of the formatting session.
 	 * 
 	 * @param region
 	 *            the document region to be formatted
@@ -226,8 +248,9 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Formats the given region with the strategy registered for the default content type. The strategy is informed about the start, the process, and the
-	 * termination of the formatting session.
+	 * Formats the given region with the strategy registered for the default
+	 * content type. The strategy is informed about the start, the process, and
+	 * the termination of the formatting session.
 	 * 
 	 * @param region
 	 *            the region to be formatted
@@ -238,16 +261,22 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 		final IFormattingStrategy strategy = getFormattingStrategy(IDocument.DEFAULT_CONTENT_TYPE);
 		if (strategy != null) {
 			strategy.formatterStarts(getIndentation(region.getOffset()));
-			format(strategy, new TypedPosition(region.getOffset(), region.getLength(), IDocument.DEFAULT_CONTENT_TYPE));
+			format(strategy,
+					new TypedPosition(region.getOffset(), region.getLength(),
+							IDocument.DEFAULT_CONTENT_TYPE));
 			strategy.formatterStops();
 		}
 	}
 
 	/**
-	 * Returns the partitioning of the given region of the document to be formatted. As one partition after the other will be formatted and formatting will
-	 * probably change the length of the formatted partition, it must be kept track of the modifications in order to submit the correct partition to all
-	 * formatting strategies. For this, all partitions are remembered as positions in a dedicated position category. (As formatting strategies might rely on
-	 * each other, calling them in reversed order is not an option.)
+	 * Returns the partitioning of the given region of the document to be
+	 * formatted. As one partition after the other will be formatted and
+	 * formatting will probably change the length of the formatted partition, it
+	 * must be kept track of the modifications in order to submit the correct
+	 * partition to all formatting strategies. For this, all partitions are
+	 * remembered as positions in a dedicated position category. (As formatting
+	 * strategies might rely on each other, calling them in reversed order is
+	 * not an option.)
 	 * 
 	 * @param region
 	 *            the region for which the partitioning must be determined
@@ -256,9 +285,12 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	 *                of region is invalid in the document
 	 * @since 3.0
 	 */
-	private TypedPosition[] getPartitioning(final IRegion region) throws BadLocationException {
+	private TypedPosition[] getPartitioning(final IRegion region)
+			throws BadLocationException {
 
-		final ITypedRegion[] regions = TextUtilities.computePartitioning(fDocument, fPartitioning, region.getOffset(), region.getLength(), false);
+		final ITypedRegion[] regions = TextUtilities.computePartitioning(
+				fDocument, fPartitioning, region.getOffset(),
+				region.getLength(), false);
 		final TypedPosition[] positions = new TypedPosition[regions.length];
 
 		for (int i = 0; i < regions.length; i++) {
@@ -274,7 +306,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Fires <code>formatterStarts</code> to all formatter strategies which will be involved in the forthcoming formatting process.
+	 * Fires <code>formatterStarts</code> to all formatter strategies which will
+	 * be involved in the forthcoming formatting process.
 	 * 
 	 * @param regions
 	 *            the partitioning of the document to be formatted
@@ -283,34 +316,62 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	 */
 	private void start(final TypedPosition[] regions, final String indentation) {
 		for (int i = 0; i < regions.length; i++) {
-			final IFormattingStrategy s = getFormattingStrategy(regions[i].getType());
+			final IFormattingStrategy s = getFormattingStrategy(regions[i]
+					.getType());
 			if (s != null)
 				s.formatterStarts(indentation);
 		}
 	}
 
 	/**
-	 * Formats one partition after the other using the formatter strategy registered for the partition's content type.
+	 * Formats one partition after the other using the formatter strategy
+	 * registered for the partition's content type.
 	 * 
 	 * @param ranges
 	 *            the partitioning of the document region to be formatted
 	 * @since 3.0
 	 */
 	private void format(final TypedPosition[] ranges) {
+		final TypedPosition[] allTypedPositions = allTypedPositions();
+
 		for (int i = 0; i < ranges.length; i++) {
-			final IFormattingStrategy s = getFormattingStrategy(ranges[i].getType());
-			updateCurrentContext(fDocument, ranges[i]);
+			final IFormattingStrategy s = getFormattingStrategy(ranges[i]
+					.getType());
+			updateCurrentContext(allTypedPositions, i);
 			if (s != null) {
 				format(s, ranges[i]);
 			}
 		}
 	}
 
+	private TypedPosition[] allTypedPositions() {
+		try {
+			final ITypedRegion[] allRegions = TextUtilities
+					.computePartitioning(fDocument, fPartitioning, 0,
+							fDocument.getLength(), false);
+			final TypedPosition[] positions = new TypedPosition[allRegions.length];
+
+			for (int i = 0; i < allRegions.length; i++) {
+				positions[i] = new TypedPosition(allRegions[i]);
+			}
+			return positions;
+		} catch (final BadLocationException ex) {
+			FeatureEditorPlugin.log(Status.ERROR,
+					"Could not get all typed positions for document, message was "
+							+ ex.getMessage());
+		}
+		return new TypedPosition[0];
+	}
+
 	/**
-	 * Formats the given region of the document using the specified formatting strategy. In order to maintain positions correctly, first all affected positions
-	 * determined, after all document listeners have been informed about the coming change, the affected positions are removed to avoid that they are regularly
-	 * updated. After all position updaters have run, the affected positions are updated with the formatter's information and added back to their categories,
-	 * right before the first document listener is informed about that a change happened.
+	 * Formats the given region of the document using the specified formatting
+	 * strategy. In order to maintain positions correctly, first all affected
+	 * positions determined, after all document listeners have been informed
+	 * about the coming change, the affected positions are removed to avoid that
+	 * they are regularly updated. After all position updaters have run, the
+	 * affected positions are updated with the formatter's information and added
+	 * back to their categories, right before the first document listener is
+	 * informed about that a change happened.
 	 * 
 	 * @param strategy
 	 *            the strategy to be used
@@ -318,7 +379,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	 *            the region to be formatted
 	 * @since 3.0
 	 */
-	private void format(final IFormattingStrategy strategy, final TypedPosition region) {
+	private void format(final IFormattingStrategy strategy,
+			final TypedPosition region) {
 		try {
 
 			final int offset = region.getOffset();
@@ -326,13 +388,15 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 
 			final String content = fDocument.get(offset, length);
 			final int[] positions = getAffectedPositions(offset, length);
-			final String formatted = strategy.format(content, isLineStart(offset), getIndentation(offset), positions);
+			final String formatted = strategy.format(content,
+					isLineStart(offset), getIndentation(offset), positions);
 
 			if (formatted != null && !formatted.equals(content)) {
 
 				final IPositionUpdater first = new RemoveAffectedPositions();
 				fDocument.insertPositionUpdater(first, 0);
-				final IPositionUpdater last = new UpdateAffectedPositions(positions, offset);
+				final IPositionUpdater last = new UpdateAffectedPositions(
+						positions, offset);
 				fDocument.addPositionUpdater(last);
 
 				fDocument.replace(offset, length, formatted);
@@ -347,21 +411,24 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Fires <code>formatterStops</code> to all formatter strategies which were involved in the formatting process which is about to terminate.
+	 * Fires <code>formatterStops</code> to all formatter strategies which were
+	 * involved in the formatting process which is about to terminate.
 	 * 
 	 * @param regions
 	 *            the partitioning of the document which has been formatted
 	 */
 	private void stop(final TypedPosition[] regions) {
 		for (int i = 0; i < regions.length; i++) {
-			final IFormattingStrategy s = getFormattingStrategy(regions[i].getType());
+			final IFormattingStrategy s = getFormattingStrategy(regions[i]
+					.getType());
 			if (s != null)
 				s.formatterStops();
 		}
 	}
 
 	/**
-	 * Installs those updaters which the formatter needs to keep track of the partitions.
+	 * Installs those updaters which the formatter needs to keep track of the
+	 * partitions.
 	 * 
 	 * @since 3.0
 	 */
@@ -390,7 +457,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Returns the partition managing position categories for the formatted document.
+	 * Returns the partition managing position categories for the formatted
+	 * document.
 	 * 
 	 * @return the position managing position categories
 	 * @since 3.0
@@ -398,7 +466,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	private String[] getPartitionManagingCategories() {
 		if (fNeedsComputation) {
 			fNeedsComputation = false;
-			fPartitionManagingCategories = TextUtilities.computePartitionManagingCategories(fDocument);
+			fPartitionManagingCategories = TextUtilities
+					.computePartitionManagingCategories(fDocument);
 			if (fPartitionManagingCategories == null)
 				fPartitionManagingCategories = fExternalPartitonManagingCategories;
 		}
@@ -406,11 +475,13 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Determines whether the given document position category should be ignored by this formatter's position updating.
+	 * Determines whether the given document position category should be ignored
+	 * by this formatter's position updating.
 	 * 
 	 * @param category
 	 *            the category to check
-	 * @return <code>true</code> if the category should be ignored, <code>false</code> otherwise
+	 * @return <code>true</code> if the category should be ignored,
+	 *         <code>false</code> otherwise
 	 */
 	private boolean ignoreCategory(final String category) {
 
@@ -429,7 +500,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Determines all embracing, overlapping, and follow up positions for the given region of the document.
+	 * Determines all embracing, overlapping, and follow up positions for the
+	 * given region of the document.
 	 * 
 	 * @param offset
 	 *            the offset of the document region to be formatted
@@ -448,7 +520,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 
 				try {
 
-					final Position[] positions = fDocument.getPositions(categories[i]);
+					final Position[] positions = fDocument
+							.getPositions(categories[i]);
 
 					for (int j = 0; j < positions.length; j++) {
 
@@ -456,10 +529,14 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 						if (p.overlapsWith(offset, length)) {
 
 							if (offset < p.getOffset())
-								fOverlappingPositionReferences.add(new PositionReference(p, true, categories[i]));
+								fOverlappingPositionReferences
+										.add(new PositionReference(p, true,
+												categories[i]));
 
 							if (p.getOffset() + p.getLength() < offset + length)
-								fOverlappingPositionReferences.add(new PositionReference(p, false, categories[i]));
+								fOverlappingPositionReferences
+										.add(new PositionReference(p, false,
+												categories[i]));
 						}
 					}
 
@@ -471,7 +548,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Returns all offset and the end offset of all positions overlapping with the specified document range.
+	 * Returns all offset and the end offset of all positions overlapping with
+	 * the specified document range.
 	 * 
 	 * @param offset
 	 *            the offset of the document region to be formatted
@@ -490,7 +568,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 
 		final int[] positions = new int[fOverlappingPositionReferences.size()];
 		for (int i = 0; i < positions.length; i++) {
-			final PositionReference r = (PositionReference) fOverlappingPositionReferences.get(i);
+			final PositionReference r = (PositionReference) fOverlappingPositionReferences
+					.get(i);
 			positions[i] = r.getCharacterPosition() - offset;
 		}
 
@@ -498,7 +577,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Removes the affected positions from their categories to avoid that they are invalidly updated.
+	 * Removes the affected positions from their categories to avoid that they
+	 * are invalidly updated.
 	 * 
 	 * @param document
 	 *            the document
@@ -506,7 +586,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	private void removeAffectedPositions(final IDocument document) {
 		final int size = fOverlappingPositionReferences.size();
 		for (int i = 0; i < size; i++) {
-			final PositionReference r = (PositionReference) fOverlappingPositionReferences.get(i);
+			final PositionReference r = (PositionReference) fOverlappingPositionReferences
+					.get(i);
 			try {
 				document.removePosition(r.getCategory(), r.getPosition());
 			} catch (final BadPositionCategoryException x) {
@@ -516,16 +597,19 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Updates all the overlapping positions. Note, all other positions are automatically updated by their document position updaters.
+	 * Updates all the overlapping positions. Note, all other positions are
+	 * automatically updated by their document position updaters.
 	 * 
 	 * @param document
 	 *            the document to has been formatted
 	 * @param positions
-	 *            the adapted character positions to be used to update the document positions
+	 *            the adapted character positions to be used to update the
+	 *            document positions
 	 * @param offset
 	 *            the offset of the document region that has been formatted
 	 */
-	protected void updateAffectedPositions(final IDocument document, final int[] positions, final int offset) {
+	protected void updateAffectedPositions(final IDocument document,
+			final int[] positions, final int offset) {
 
 		if (document != fDocument)
 			return;
@@ -535,7 +619,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 
 		for (int i = 0; i < positions.length; i++) {
 
-			final PositionReference r = (PositionReference) fOverlappingPositionReferences.get(i);
+			final PositionReference r = (PositionReference) fOverlappingPositionReferences
+					.get(i);
 
 			if (r.refersToOffset())
 				r.setOffset(offset + positions[i]);
@@ -561,7 +646,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * The given position is about to be added to the given position category of the given document.
+	 * The given position is about to be added to the given position category of
+	 * the given document.
 	 * <p>
 	 * This default implementation return <code>true</code>.
 	 * 
@@ -571,9 +657,11 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	 *            the position category
 	 * @param position
 	 *            the position that will be added
-	 * @return <code>true</code> if the position can be added, <code>false</code> if it should be ignored
+	 * @return <code>true</code> if the position can be added,
+	 *         <code>false</code> if it should be ignored
 	 */
-	protected boolean positionAboutToBeAdded(final IDocument document, final String category, final Position position) {
+	protected boolean positionAboutToBeAdded(final IDocument document,
+			final String category, final Position position) {
 		return true;
 	}
 
@@ -604,7 +692,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * Determines whether the offset is the beginning of a line in the given document.
+	 * Determines whether the offset is the beginning of a line in the given
+	 * document.
 	 * 
 	 * @param offset
 	 *            the offset
@@ -619,12 +708,15 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 		return (start == offset);
 	}
 
-	private void updateCurrentContext(final IDocument document, final TypedPosition typedPosition) {
-		currentContext = formattingContextFactory.createFor(document, typedPosition);
+	private void updateCurrentContext(final TypedPosition[] ranges,
+			final int currentPosition) {
+		currentContext = formattingContextFactory.createFor(ranges,
+				currentPosition);
 	}
 
 	/**
-	 * Defines a reference to either the offset or the end offset of a particular position.
+	 * Defines a reference to either the offset or the end offset of a
+	 * particular position.
 	 */
 	static class PositionReference implements Comparable {
 
@@ -645,7 +737,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 		 * @param category
 		 *            the category the given position belongs to
 		 */
-		protected PositionReference(final Position position, final boolean refersToOffset, final String category) {
+		protected PositionReference(final Position position,
+				final boolean refersToOffset, final String category) {
 			fPosition = position;
 			fRefersToOffset = refersToOffset;
 			fCategory = category;
@@ -690,9 +783,11 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 		}
 
 		/**
-		 * Returns whether this reference points to the offset or end offset of the references position.
+		 * Returns whether this reference points to the offset or end offset of
+		 * the references position.
 		 * 
-		 * @return <code>true</code> if the offset of the position is referenced, <code>false</code> otherwise
+		 * @return <code>true</code> if the offset of the position is
+		 *         referenced, <code>false</code> otherwise
 		 */
 		protected boolean refersToOffset() {
 			return fRefersToOffset;
@@ -770,8 +865,9 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * The position updater which runs as first updater on the document's positions. Used to remove all affected positions from their categories to avoid them
-	 * from being regularly updated.
+	 * The position updater which runs as first updater on the document's
+	 * positions. Used to remove all affected positions from their categories to
+	 * avoid them from being regularly updated.
 	 * 
 	 * @see IPositionUpdater
 	 */
@@ -786,8 +882,9 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
 	}
 
 	/**
-	 * The position updater which runs as last updater on the document's positions. Used to update all affected positions and adding them back to their original
-	 * categories.
+	 * The position updater which runs as last updater on the document's
+	 * positions. Used to update all affected positions and adding them back to
+	 * their original categories.
 	 * 
 	 * @see IPositionUpdater
 	 */

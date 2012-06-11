@@ -1,0 +1,5 @@
+  Tags: unindented-tag
+  Scenario Outline: this is a scenario outline
+
+  Tags: overindented-tag
+  Scenario Outline: this is a scenario outline 2

@@ -1,0 +1,7 @@
+  Scenario Outline: This is a background
+	Given something
+	 When something
+	 Then something
+   
+     
+  Examples:

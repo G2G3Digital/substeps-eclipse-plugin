@@ -20,8 +20,11 @@ package com.technophobia.substeps.document.content.feature;
 
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
+import com.technophobia.substeps.document.content.NullContentTypeDefinition;
 
 public class FeatureContentTypeDefinitionFactory implements ContentTypeDefinitionFactory {
+
+	private static final ContentTypeDefinition DEFAULT_CONTENT_TYPEDEFINITION = new NullContentTypeDefinition();
 
 	@Override
 	public ContentTypeDefinition contentTypeDefintionByName(final String contentTypeName) {
@@ -30,7 +33,7 @@ public class FeatureContentTypeDefinitionFactory implements ContentTypeDefinitio
 				return contentTypeDefinition;
 			}
 		}
-		throw new IllegalStateException("Could not find " + FeatureContentTypeDefinition.class.getSimpleName() + " with name " + contentTypeName);
+		return DEFAULT_CONTENT_TYPEDEFINITION;
 	}
 
 	@Override

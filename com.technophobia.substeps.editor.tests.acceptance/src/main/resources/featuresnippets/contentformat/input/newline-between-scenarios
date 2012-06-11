@@ -1,0 +1,9 @@
+Scenario: scenario 1
+  Given something
+   When something
+   Then something
+   
+Scenario: scenario 2
+  Given something
+   When something
+   Then something

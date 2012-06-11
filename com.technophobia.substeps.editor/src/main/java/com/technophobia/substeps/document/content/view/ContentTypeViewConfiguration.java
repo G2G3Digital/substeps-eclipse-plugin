@@ -38,7 +38,7 @@ import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.formatting.ContextAwareContentFormatter;
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
-import com.technophobia.substeps.document.formatting.strategy.DefaultFormattingStrategy;
+import com.technophobia.substeps.document.formatting.strategy.NullFormattingStrategy;
 
 public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
 
@@ -81,7 +81,7 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
 				formatter.setFormattingStrategy(entry.getValue().formattingStrategy(formatter), entry.getKey());
 			}
 		}
-		formatter.setFormattingStrategy(new DefaultFormattingStrategy(), IDocument.DEFAULT_CONTENT_TYPE);
+		formatter.setFormattingStrategy(new NullFormattingStrategy(), IDocument.DEFAULT_CONTENT_TYPE);
 		return formatter;
 	}
 
