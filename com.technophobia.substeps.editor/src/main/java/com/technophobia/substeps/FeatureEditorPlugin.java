@@ -24,10 +24,13 @@ import java.util.ResourceBundle;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
-public class FeatureEditorPlugin implements BundleActivator {
+public class FeatureEditorPlugin extends AbstractUIPlugin implements
+		BundleActivator {
 
 	private static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
@@ -67,6 +70,10 @@ public class FeatureEditorPlugin implements BundleActivator {
 
 	public ResourceBundle getResourceBundle() {
 		return resourceBundle;
+	}
+
+	public Shell getActiveShell() {
+		return getWorkbench().getActiveWorkbenchWindow().getShell();
 	}
 
 	public static void log(final int status, final String message) {

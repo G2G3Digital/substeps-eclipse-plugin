@@ -1,6 +1,17 @@
 <?xml version="1.0"?>
 <!-- Copyright Technophobia.Ltd 2012 -->
 <plugin>
+	<extension
+         point="org.eclipse.ui.views">
+      <view
+            name="%View.label"
+            icon="$nl$/icons/full/eview16/junit.gif"
+            category="org.eclipse.jdt.ui.java"
+            fastViewWidthRatio="0.40"
+            class="com.technophobia.substeps.junit.ui.SubstepsFeatureTestRunnerViewPart"
+            id="org.eclipse.jdt.junit.SubstepResultView">
+      </view>
+   </extension>
   <extension
         point="org.eclipse.ui.actionSets">
      <actionSet
@@ -97,10 +108,20 @@
             contextId="org.eclipse.jdt.ui.javaEditorScope"
             commandId="org.eclipse.jdt.ui.edit.text.java.format"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+    <key
+            sequence="M2+M3+X F"
+            commandId="com.technophobia.substeps.junit.substepsFeatureShortcut.run"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
   </extension>
   <extension
         point="org.eclipse.ui.commands">
         
+    <command
+            name="%SubstepsFeatureShortcut.description.run"
+            description="%SubstepsFeatureShortcut.description.run"
+            categoryId="org.eclipse.debug.ui.category.run"
+            id="com.technophobia.substeps.junit.substepsFeatureShortcut.run">
+      </command>
     <command
             name="%ActionDefinition.format.name"
             description="%ActionDefinition.format.description"
@@ -108,6 +129,89 @@
             id="org.eclipse.jdt.ui.edit.text.java.format">
       </command>
   </extension>
-  
+  <extension
+        point="org.eclipse.debug.ui.launchShortcuts">
+     <shortcut
+     	   label="%SubstepsFeatureShortcut.label"
+     	   icon="$nl$/icons/full/obj16/julaunch.gif"
+           helpContextId="org.eclipse.jdt.junit.launch_shortcut"
+           class="com.technophobia.substeps.junit.launcher.SubstepsFeatureLaunchShortcut"
+           modes="run, debug"
+           id="com.technophobia.substeps.junitShortcut">
+        <contextualLaunch>
+           <enablement>
+             <with variable="selection">
+                <count value="1"/>
+                <iterate>
+                   <adapt type="org.eclipse.core.resources.IFile">
+                      <test property="org.eclipse.debug.ui.matchesPattern" value="*.feature"/>
+                      <!--or>
+                      <test property="scala.tools.eclipse.launching.canLaunchAsJUnit" forcePluginActivation="true"/>
+                      <test property="scala.tools.eclipse.launching.junit.canLaunchAsJUnit" forcePluginActivation="true"/>
+                      </or-->
+                   </adapt>
+                </iterate>
+             </with>
+          </enablement>
+        </contextualLaunch>
+        <configurationType
+             id="com.technophobia.substeps.junit.launchconfig">
+       </configurationType>
+       <description
+             description="%DebugJUnitLaunchShortcut.description"
+             mode="debug">
+       </description>
+       <description
+             description="%RunJUnitLaunchShortcut.description"
+             mode="run">
+       </description>
+     </shortcut>
+  </extension>
+  <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            name="%Launch.label"
+            delegateDescription="%SubstepsFeatureLaunchDelegate.description"
+            delegateName="%SubstepsFeatureLaunchDelegate.name"
+            delegate="org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate"
+            modes="run, debug"
+            id="com.technophobia.substeps.junit.launchconfig"
+            sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
+            sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer"
+            migrationDelegate="org.eclipse.jdt.internal.junit.launcher.JUnitMigrationDelegate">
+      </launchConfigurationType>
+   </extension>
+  <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            icon="$nl$/icons/full/obj16/julaunch.gif"
+            configTypeID="com.technophobia.substeps.junit.launchconfig"
+            id="com.technophobia.substeps.junit.launchimage">
+      </launchConfigurationTypeImage>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            type="com.technophobia.substeps.junit.launchconfig"
+            helpContextId="com.technophobia.substeps.junit.junit_tab_group"
+            class="org.eclipse.jdt.internal.junit.launcher.JUnitTabGroup"
+            id="com.technophobia.substeps.junit.launchConfigurationTabGroup.junit">
+         <launchMode
+               perspective="org.eclipse.debug.ui.DebugPerspective"
+               description="%SubstepsFeatureTabGroupDescription.debug"
+               mode="debug">
+         </launchMode>
+         <launchMode
+               description="%SubstepsFeatureTabGroupDescription.run"
+               mode="run">
+         </launchMode>
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.junit.junitLaunchConfigs">
+      <launchConfigType
+            configTypeID="com.technophobia.substeps.junit.launchconfig">
+      </launchConfigType>
+   </extension>
   
 </plugin>
