@@ -18,7 +18,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 
-import com.technophobia.substeps.FeatureEditorPlugin;
+import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 @SuppressWarnings("restriction")
@@ -101,7 +101,7 @@ public class SubstepsFeatureLaunchShortcut extends JUnitLaunchShortcut {
 	}
 
 	private Shell getParentShell() {
-		return FeatureEditorPlugin.instance().getActiveShell();
+		return FeatureRunnerPlugin.instance().getActiveShell();
 	}
 
 	private ILaunchManager launchManager() {
