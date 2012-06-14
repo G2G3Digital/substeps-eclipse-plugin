@@ -11,7 +11,7 @@ import org.osgi.framework.BundleContext;
 public class FeatureRunnerPlugin extends AbstractUIPlugin implements
 		BundleActivator {
 
-	private static final String PLUGIN_ID = "com.technophobia.substeps.editor";
+	public static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
 	private static FeatureRunnerPlugin pluginInstance;
 

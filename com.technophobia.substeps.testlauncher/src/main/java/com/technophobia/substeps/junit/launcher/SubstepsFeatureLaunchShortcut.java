@@ -1,110 +1,83 @@
 package com.technophobia.substeps.junit.launcher;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.jdt.internal.junit.launcher.JUnitLaunchConfigurationConstants;
-import org.eclipse.jdt.internal.junit.launcher.JUnitMigrationDelegate;
-import org.eclipse.jdt.internal.junit.launcher.TestKindRegistry;
-import org.eclipse.jdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.jdt.junit.launcher.JUnitLaunchShortcut;
-import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorPart;
 
+import com.technophobia.eclipse.launcher.config.FindExistingOrNewLaunchConfigFactory;
+import com.technophobia.eclipse.launcher.config.LaunchConfigurationFactory;
+import com.technophobia.eclipse.launcher.config.LaunchConfigurationWorkingCopyFactory;
+import com.technophobia.eclipse.launcher.exception.DialogExceptionReporter;
+import com.technophobia.eclipse.launcher.exception.ExceptionReporter;
+import com.technophobia.eclipse.transformer.Decorator;
+import com.technophobia.eclipse.transformer.ProjectToJavaProjectTransformer;
 import com.technophobia.substeps.FeatureRunnerPlugin;
+import com.technophobia.substeps.junit.launcher.config.JunitResourceMappingDecorator;
+import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorkingCopyDecorator;
+import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorkingCopyFactory;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
-@SuppressWarnings("restriction")
 public class SubstepsFeatureLaunchShortcut extends JUnitLaunchShortcut {
 
-	private static final String LAUNCH_CONFIG_ID = "com.technophobia.substeps.junit.launchconfig";
+    public static final String ATTR_FEATURE_FILE = "com.technophobia.substeps.junit.featureFile";
 
-	@Override
-	public void launch(final org.eclipse.ui.IEditorPart editor,
-			final String mode) {
-		final ILaunchConfigurationWorkingCopy workingCopy = createLaunchConfigWorkingCopyFor(
-				editor, mode);
-		final ILaunchConfiguration config = configFromWorkingCopy(workingCopy);
-		DebugUITools.launch(config, mode);
+    private final LaunchConfigurationWorkingCopyFactory workingCopyFactory;
+    private final LaunchConfigurationFactory launchConfigurationFactory;
 
-	}
 
-	private ILaunchConfiguration configFromWorkingCopy(
-			final ILaunchConfigurationWorkingCopy workingCopy) {
-		// TODO - check if there's an existing configuration for this working
-		// copy - if so, launch it, otherwise doSave()
-		try {
-			return workingCopy.doSave();
-		} catch (final CoreException e) {
-			ExceptionHandler
-					.handle(e,
-							getParentShell(),
-							SubstepsFeatureMessages.SubstepsFeatureLaunchShortcut_dialog_title,
-							SubstepsFeatureMessages.SubstepsFeatureLaunchShortcut_error_launch);
-			return null;
-		}
-	}
+    /**
+     * Default Constructor called by eclipse's Extension framework
+     */
+    public SubstepsFeatureLaunchShortcut() {
+        final ExceptionReporter exceptionReporter = exceptionReporter();
+        final ILaunchManager launchManager = launchManager();
 
-	private ILaunchConfigurationWorkingCopy createLaunchConfigWorkingCopyFor(
-			final IEditorPart editor, final String mode) {
-		final ILaunchConfigurationType configType = launchManager()
-				.getLaunchConfigurationType(LAUNCH_CONFIG_ID);
-		try {
-			final ILaunchConfigurationWorkingCopy wc = configType.newInstance(
-					null,
-					launchManager().generateLaunchConfigurationName(
-							editor.getTitle()));
-			wc.setAttribute(
-					IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME,
-					"com.technophobia.substeps.DefinableFeatureTest");
-			wc.setAttribute(
-					IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
-					currentProjectName(editor));
-			wc.setAttribute(JUnitLaunchConfigurationConstants.ATTR_KEEPRUNNING,
-					false);
-			wc.setAttribute(
-					JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER, "");
-			wc.setAttribute(
-					JUnitLaunchConfigurationConstants.ATTR_TEST_RUNNER_KIND,
-					TestKindRegistry.JUNIT4_TEST_KIND_ID);
-			JUnitMigrationDelegate.mapResources(wc);
-			return wc;
-		} catch (final CoreException e) {
-			ExceptionHandler
-					.handle(e,
-							getParentShell(),
-							SubstepsFeatureMessages.SubstepsFeatureLaunchShortcut_dialog_title,
-							SubstepsFeatureMessages.SubstepsFeatureLaunchShortcut_error_launch);
-			return null;
-		}
-	}
+        this.workingCopyFactory = new SubstepsLaunchConfigWorkingCopyFactory(launchManager,
+                workingCopyDecorators(exceptionReporter), exceptionReporter);
+        this.launchConfigurationFactory = new FindExistingOrNewLaunchConfigFactory(new String[] { ATTR_FEATURE_FILE },
+                launchManager, exceptionReporter);
+    }
 
-	private String currentProjectName(final org.eclipse.ui.IEditorPart editor) {
-		final IResource resource = (IResource) editor.getEditorInput()
-				.getAdapter(IResource.class);
-		return resource.getProject().getName();
-	}
 
-	private void noFeatureFoundDialog() {
-		MessageDialog
-				.openInformation(
-						getParentShell(),
-						SubstepsFeatureMessages.SubstepsFeatureLaunchShortcut_dialog_title,
-						SubstepsFeatureMessages.SubstepsFeatureLaunchShortcut_message_notests);
-	}
+    public SubstepsFeatureLaunchShortcut(final LaunchConfigurationWorkingCopyFactory workingCopyFactory,
+            final LaunchConfigurationFactory launchConfigurationFactory) {
+        this.workingCopyFactory = workingCopyFactory;
+        this.launchConfigurationFactory = launchConfigurationFactory;
+    }
 
-	private Shell getParentShell() {
-		return FeatureRunnerPlugin.instance().getActiveShell();
-	}
 
-	private ILaunchManager launchManager() {
-		return DebugPlugin.getDefault().getLaunchManager();
-	}
+    @Override
+    public void launch(final org.eclipse.ui.IEditorPart editor, final String mode) {
+        final ILaunchConfigurationWorkingCopy workingCopy = workingCopyFactory.create(editor.getTitle(),
+                (IResource) editor.getEditorInput().getAdapter(IResource.class));
+        final ILaunchConfiguration config = launchConfigurationFactory.create(workingCopy);
+        DebugUITools.launch(config, mode);
+    }
+
+
+    private ExceptionReporter exceptionReporter() {
+        return new DialogExceptionReporter(FeatureRunnerPlugin.instance().getActiveShell(),
+                SubstepsFeatureMessages.SubstepsFeatureLaunchShortcut_dialog_title,
+                SubstepsFeatureMessages.SubstepsFeatureLaunchShortcut_message_notests);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private Collection<Decorator<ILaunchConfigurationWorkingCopy, IResource>> workingCopyDecorators(
+            final ExceptionReporter exceptionReporter) {
+        return Arrays.asList(new SubstepsLaunchConfigWorkingCopyDecorator(new ProjectToJavaProjectTransformer(),
+                exceptionReporter), new JunitResourceMappingDecorator(exceptionReporter));
+    }
+
+
+    private ILaunchManager launchManager() {
+        return DebugPlugin.getDefault().getLaunchManager();
+    }
 }

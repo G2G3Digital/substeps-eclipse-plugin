@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>com.technophobia.substeps</groupId>
+		<artifactId>com.technophobia.substeps.parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../com.technophobia.substeps.parent</relativePath>
+	</parent>
+	
+	<artifactId>com.technophobia.substeps.testlauncher.tests.unit</artifactId>
+	
+	<packaging>eclipse-test-plugin</packaging>
+	
+	<organization>
+        <name>Technophobia Ltd</name>
+        <url>www.technophobia.com/</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>LGPL 3.0 license</name>
+            <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+            <distribution>manual</distribution>
+      </license>
+    </licenses>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<useUIHarness>false</useUIHarness>
+					<useUIThread>false</useUIThread>
+            			<!--argLine>-Xdebug -Xrunjdwp:transport=dt_socket,address=4001,server=y,suspend=y</argLine-->
+					<dependencies>
+						<dependency>
+						</dependency>
+					</dependencies>
+				</configuration>
+			</plugin>
+			
+			
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+		</dependency>
+	</dependencies>
+</project>
