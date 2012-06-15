@@ -3,21 +3,31 @@ package com.technophobia.substeps.junit.launcher;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.junit.launcher.JUnitLaunchShortcut;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
 
+import com.technophobia.eclipse.launcher.config.DialogConfigSelector;
 import com.technophobia.eclipse.launcher.config.FindExistingOrNewLaunchConfigFactory;
 import com.technophobia.eclipse.launcher.config.LaunchConfigurationFactory;
 import com.technophobia.eclipse.launcher.config.LaunchConfigurationWorkingCopyFactory;
+import com.technophobia.eclipse.launcher.config.WorkingCopyLaunchConfigLocator;
 import com.technophobia.eclipse.launcher.exception.DialogExceptionReporter;
 import com.technophobia.eclipse.launcher.exception.ExceptionReporter;
 import com.technophobia.eclipse.transformer.Decorator;
+import com.technophobia.eclipse.transformer.Locator;
 import com.technophobia.eclipse.transformer.ProjectToJavaProjectTransformer;
+import com.technophobia.eclipse.transformer.Transformers;
 import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.launcher.config.JunitResourceMappingDecorator;
 import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorkingCopyDecorator;
@@ -31,6 +41,8 @@ public class SubstepsFeatureLaunchShortcut extends JUnitLaunchShortcut {
     private final LaunchConfigurationWorkingCopyFactory workingCopyFactory;
     private final LaunchConfigurationFactory launchConfigurationFactory;
 
+    private final Locator<ILaunchConfiguration, ILaunchConfigurationWorkingCopy> configLocator;
+
 
     /**
      * Default Constructor called by eclipse's Extension framework
@@ -38,18 +50,20 @@ public class SubstepsFeatureLaunchShortcut extends JUnitLaunchShortcut {
     public SubstepsFeatureLaunchShortcut() {
         final ExceptionReporter exceptionReporter = exceptionReporter();
         final ILaunchManager launchManager = launchManager();
+        this.configLocator = configLocator(launchManager, exceptionReporter);
 
         this.workingCopyFactory = new SubstepsLaunchConfigWorkingCopyFactory(launchManager,
                 workingCopyDecorators(exceptionReporter), exceptionReporter);
-        this.launchConfigurationFactory = new FindExistingOrNewLaunchConfigFactory(new String[] { ATTR_FEATURE_FILE },
-                launchManager, exceptionReporter);
+        this.launchConfigurationFactory = new FindExistingOrNewLaunchConfigFactory(configLocator, exceptionReporter);
     }
 
 
     public SubstepsFeatureLaunchShortcut(final LaunchConfigurationWorkingCopyFactory workingCopyFactory,
-            final LaunchConfigurationFactory launchConfigurationFactory) {
+            final LaunchConfigurationFactory launchConfigurationFactory,
+            final Locator<ILaunchConfiguration, ILaunchConfigurationWorkingCopy> configLocator) {
         this.workingCopyFactory = workingCopyFactory;
         this.launchConfigurationFactory = launchConfigurationFactory;
+        this.configLocator = configLocator;
     }
 
 
@@ -62,10 +76,50 @@ public class SubstepsFeatureLaunchShortcut extends JUnitLaunchShortcut {
     }
 
 
+    @Override
+    public void launch(final ISelection selection, final String mode) {
+        // TODO: Find all scenarios in selection, and run only them
+        final IFile file = Transformers.selectionToFileOrNull(selection);
+        if (file != null) {
+            final ILaunchConfigurationWorkingCopy workingCopy = workingCopyFactory.create(file.getName(), file);
+            final ILaunchConfiguration config = launchConfigurationFactory.create(workingCopy);
+            DebugUITools.launch(config, mode);
+        }
+    }
+
+
+    @Override
+    public ILaunchConfiguration[] getLaunchConfigurations(final ISelection selection) {
+        FeatureRunnerPlugin.log(Status.WARNING, "Cannot launch by selection yet. Feature coming soon");
+        if (selection instanceof IStructuredSelection) {
+            final IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+            if (structuredSelection.size() == 1) {
+                // TODO: Find the current selected scenario, create working copy
+                // with scenario/feature/file name
+            }
+
+        }
+        return null;
+    }
+
+
+    @Override
+    public ILaunchConfiguration[] getLaunchConfigurations(final IEditorPart editorpart) {
+        final ILaunchConfigurationWorkingCopy workingCopy = workingCopyFactory.create(editorpart.getTitle(),
+                (IResource) editorpart.getEditorInput().getAdapter(IResource.class));
+        final Collection<ILaunchConfiguration> allConfigs = configLocator.all(workingCopy);
+        return allConfigs.toArray(new ILaunchConfiguration[allConfigs.size()]);
+    }
+
+
     private ExceptionReporter exceptionReporter() {
-        return new DialogExceptionReporter(FeatureRunnerPlugin.instance().getActiveShell(),
-                SubstepsFeatureMessages.SubstepsFeatureLaunchShortcut_dialog_title,
+        return new DialogExceptionReporter(shell(), SubstepsFeatureMessages.SubstepsFeatureLaunchShortcut_dialog_title,
                 SubstepsFeatureMessages.SubstepsFeatureLaunchShortcut_message_notests);
+    }
+
+
+    private Shell shell() {
+        return FeatureRunnerPlugin.instance().getActiveShell();
     }
 
 
@@ -79,5 +133,27 @@ public class SubstepsFeatureLaunchShortcut extends JUnitLaunchShortcut {
 
     private ILaunchManager launchManager() {
         return DebugPlugin.getDefault().getLaunchManager();
+    }
+
+
+    private Locator<ILaunchConfiguration, ILaunchConfigurationWorkingCopy> configLocator(
+            final ILaunchManager launchManager, final ExceptionReporter exceptionReporter) {
+        return new WorkingCopyLaunchConfigLocator(new String[] { ATTR_FEATURE_FILE }, launchManager,
+                new DialogConfigSelector(shell(), SubstepsFeatureMessages.SubstepsFeature_choose_config_title,
+                        SubstepsFeatureMessages.SubstepsFeature_choose_config_title), exceptionReporter);
+    }
+
+
+    @Override
+    public IResource getLaunchableResource(final ISelection selection) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public IResource getLaunchableResource(final IEditorPart editorpart) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

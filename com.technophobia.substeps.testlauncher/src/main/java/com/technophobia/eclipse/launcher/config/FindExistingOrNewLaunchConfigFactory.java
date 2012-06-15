@@ -3,21 +3,20 @@ package com.technophobia.eclipse.launcher.config;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.core.ILaunchManager;
 
 import com.technophobia.eclipse.launcher.exception.ExceptionReporter;
+import com.technophobia.eclipse.transformer.Locator;
 
 public class FindExistingOrNewLaunchConfigFactory implements LaunchConfigurationFactory {
 
-    private final ILaunchManager launchManager;
-    private final String[] attributeNameMatchers;
     private final ExceptionReporter exceptionReporter;
+    private final Locator<ILaunchConfiguration, ILaunchConfigurationWorkingCopy> existingConfigLocator;
 
 
-    public FindExistingOrNewLaunchConfigFactory(final String[] attributeNameMatchers,
-            final ILaunchManager launchManager, final ExceptionReporter exceptionReporter) {
-        this.attributeNameMatchers = attributeNameMatchers;
-        this.launchManager = launchManager;
+    public FindExistingOrNewLaunchConfigFactory(
+            final Locator<ILaunchConfiguration, ILaunchConfigurationWorkingCopy> existingConfigLocator,
+            final ExceptionReporter exceptionReporter) {
+        this.existingConfigLocator = existingConfigLocator;
         this.exceptionReporter = exceptionReporter;
     }
 
@@ -25,42 +24,11 @@ public class FindExistingOrNewLaunchConfigFactory implements LaunchConfiguration
     @Override
     public ILaunchConfiguration create(final ILaunchConfigurationWorkingCopy workingCopy) {
         try {
-            final ILaunchConfiguration existingLaunchConfig = findExistingOrNull(workingCopy);
+            final ILaunchConfiguration existingLaunchConfig = existingConfigLocator.one(workingCopy);
             return existingLaunchConfig != null ? existingLaunchConfig : workingCopy.doSave();
         } catch (final CoreException ex) {
             exceptionReporter.report(ex);
             return null;
         }
     }
-
-
-    private ILaunchConfiguration findExistingOrNull(final ILaunchConfigurationWorkingCopy workingCopy)
-            throws CoreException {
-        final ILaunchConfiguration[] configurations = launchManager.getLaunchConfigurations(workingCopy.getType());
-        for (final ILaunchConfiguration configuration : configurations) {
-            if (attributesMatch(configuration, workingCopy)) {
-                return configuration;
-            }
-
-        }
-        return null;
-    }
-
-
-    private boolean attributesMatch(final ILaunchConfiguration configuration,
-            final ILaunchConfigurationWorkingCopy workingCopy) {
-        try {
-            for (final String attributeName : attributeNameMatchers) {
-                if (configuration.hasAttribute(attributeName)
-                        && configuration.getAttribute(attributeName, "not-defined").equals(
-                                workingCopy.getAttribute(attributeName, ""))) {
-                    return true;
-                }
-            }
-        } catch (final CoreException ex) {
-            // no-op, just return false;
-        }
-        return false;
-    }
-
 }
