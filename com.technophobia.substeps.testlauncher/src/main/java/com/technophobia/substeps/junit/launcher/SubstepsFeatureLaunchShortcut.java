@@ -5,15 +5,13 @@ import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.jdt.junit.launcher.JUnitLaunchShortcut;
+import org.eclipse.debug.ui.ILaunchShortcut2;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 
@@ -34,7 +32,7 @@ import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorki
 import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorkingCopyFactory;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
-public class SubstepsFeatureLaunchShortcut extends JUnitLaunchShortcut {
+public class SubstepsFeatureLaunchShortcut implements ILaunchShortcut2 {
 
     public static final String ATTR_FEATURE_FILE = "com.technophobia.substeps.junit.featureFile";
 
@@ -90,16 +88,13 @@ public class SubstepsFeatureLaunchShortcut extends JUnitLaunchShortcut {
 
     @Override
     public ILaunchConfiguration[] getLaunchConfigurations(final ISelection selection) {
-        FeatureRunnerPlugin.log(Status.WARNING, "Cannot launch by selection yet. Feature coming soon");
-        if (selection instanceof IStructuredSelection) {
-            final IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-            if (structuredSelection.size() == 1) {
-                // TODO: Find the current selected scenario, create working copy
-                // with scenario/feature/file name
-            }
-
+        final IFile file = Transformers.selectionToFileOrNull(selection);
+        if (file != null) {
+            final ILaunchConfigurationWorkingCopy workingCopy = workingCopyFactory.create(file.getName(), file);
+            final Collection<ILaunchConfiguration> allConfigs = configLocator.all(workingCopy);
+            return allConfigs.toArray(new ILaunchConfiguration[allConfigs.size()]);
         }
-        return null;
+        return new ILaunchConfiguration[0];
     }
 
 
@@ -109,6 +104,18 @@ public class SubstepsFeatureLaunchShortcut extends JUnitLaunchShortcut {
                 (IResource) editorpart.getEditorInput().getAdapter(IResource.class));
         final Collection<ILaunchConfiguration> allConfigs = configLocator.all(workingCopy);
         return allConfigs.toArray(new ILaunchConfiguration[allConfigs.size()]);
+    }
+
+
+    @Override
+    public IResource getLaunchableResource(final ISelection selection) {
+        return Transformers.selectionToFileOrNull(selection);
+    }
+
+
+    @Override
+    public IResource getLaunchableResource(final IEditorPart editorpart) {
+        return Transformers.editorToResource(editorpart);
     }
 
 
@@ -141,19 +148,5 @@ public class SubstepsFeatureLaunchShortcut extends JUnitLaunchShortcut {
         return new WorkingCopyLaunchConfigLocator(new String[] { ATTR_FEATURE_FILE }, launchManager,
                 new DialogConfigSelector(shell(), SubstepsFeatureMessages.SubstepsFeature_choose_config_title,
                         SubstepsFeatureMessages.SubstepsFeature_choose_config_title), exceptionReporter);
-    }
-
-
-    @Override
-    public IResource getLaunchableResource(final ISelection selection) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public IResource getLaunchableResource(final IEditorPart editorpart) {
-        // TODO Auto-generated method stub
-        return null;
     }
 }
