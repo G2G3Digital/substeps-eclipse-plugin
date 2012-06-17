@@ -72,15 +72,15 @@
   <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            name="%Launch.label"
+            delegate="org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate"
             delegateDescription="%SubstepsFeatureLaunchDelegate.description"
             delegateName="%SubstepsFeatureLaunchDelegate.name"
-            delegate="org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate"
-            modes="run, debug"
             id="com.technophobia.substeps.junit.launchconfig"
+            migrationDelegate="org.eclipse.jdt.internal.junit.launcher.JUnitMigrationDelegate"
+            modes="run, debug"
+            name="%Launch.label"
             sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
-            sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer"
-            migrationDelegate="org.eclipse.jdt.internal.junit.launcher.JUnitMigrationDelegate">
+            sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
       </launchConfigurationType>
    </extension>
   <extension
@@ -95,9 +95,9 @@
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
             type="com.technophobia.substeps.junit.launchconfig"
-            helpContextId="com.technophobia.substeps.junit.junit_tab_group"
+            helpContextId="com.technophobia.substeps.feature_tab_group"
             class="org.eclipse.jdt.internal.junit.launcher.JUnitTabGroup"
-            id="com.technophobia.substeps.junit.launchConfigurationTabGroup.junit">
+            id="com.technophobia.substeps.launchConfigurationTabGroup">
          <launchMode
                perspective="org.eclipse.debug.ui.DebugPerspective"
                description="%SubstepsFeatureTabGroupDescription.debug"
