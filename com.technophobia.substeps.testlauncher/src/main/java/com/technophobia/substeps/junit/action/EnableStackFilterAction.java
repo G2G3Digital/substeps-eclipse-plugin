@@ -2,12 +2,12 @@ package com.technophobia.substeps.junit.action;
 
 import org.eclipse.jdt.internal.junit.JUnitPreferencesConstants;
 import org.eclipse.jdt.internal.junit.ui.IJUnitHelpContextIds;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
 import com.technophobia.eclipse.ui.Refreshable;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 public class EnableStackFilterAction extends Action {
 
@@ -15,9 +15,9 @@ public class EnableStackFilterAction extends Action {
 
 
     public EnableStackFilterAction(final Refreshable view) {
-        super(JUnitMessages.EnableStackFilterAction_action_label);
-        setDescription(JUnitMessages.EnableStackFilterAction_action_description);
-        setToolTipText(JUnitMessages.EnableStackFilterAction_action_tooltip);
+        super(SubstepsFeatureMessages.EnableStackFilterAction_action_label);
+        setDescription(SubstepsFeatureMessages.EnableStackFilterAction_action_description);
+        setToolTipText(SubstepsFeatureMessages.EnableStackFilterAction_action_tooltip);
 
         setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/cfilter.gif")); //$NON-NLS-1$
         setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/cfilter.gif")); //$NON-NLS-1$

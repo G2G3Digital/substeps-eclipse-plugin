@@ -1,12 +1,12 @@
 package com.technophobia.substeps.junit.action;
 
 import org.eclipse.jdt.internal.junit.ui.IJUnitHelpContextIds;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
 import com.technophobia.eclipse.ui.Notifier;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 /**
  * Toggles console auto-scroll
@@ -17,9 +17,9 @@ public class ScrollLockAction extends Action {
 
 
     public ScrollLockAction(final Notifier<Boolean> autoScrollNotifier) {
-        super(JUnitMessages.ScrollLockAction_action_label);
+        super(SubstepsFeatureMessages.ScrollLockAction_action_label);
         this.autoScrollNotifier = autoScrollNotifier;
-        setToolTipText(JUnitMessages.ScrollLockAction_action_tooltip);
+        setToolTipText(SubstepsFeatureMessages.ScrollLockAction_action_tooltip);
         setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/lock.gif")); //$NON-NLS-1$
         setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/lock.gif")); //$NON-NLS-1$
         setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/lock.gif")); //$NON-NLS-1$

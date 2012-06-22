@@ -7,7 +7,6 @@ import org.eclipse.jdt.internal.junit.Messages;
 import org.eclipse.jdt.internal.junit.model.ITestSessionListener;
 import org.eclipse.jdt.internal.junit.model.TestCaseElement;
 import org.eclipse.jdt.internal.junit.model.TestElement;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 
 import com.technophobia.eclipse.transformer.Callback;
 import com.technophobia.eclipse.transformer.Supplier;
@@ -112,7 +111,7 @@ public class TestSessionListener implements ITestSessionListener {
 
         testViewer.registerAutoScrollTarget(null);
 
-        infoMessageNotifier.notify(JUnitMessages.TestRunnerViewPart_message_stopped);
+        infoMessageNotifier.notify(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_message_stopped);
         handleStopped();
     }
 
@@ -123,7 +122,7 @@ public class TestSessionListener implements ITestSessionListener {
 
         testViewer.registerAutoScrollTarget(null);
 
-        infoMessageNotifier.notify(JUnitMessages.TestRunnerViewPart_message_terminated);
+        infoMessageNotifier.notify(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_message_terminated);
         handleStopped();
     }
 
@@ -143,8 +142,9 @@ public class TestSessionListener implements ITestSessionListener {
 
         final String className = BasicElementLabels.getJavaElementName(testCaseElement.getClassName());
         final String method = BasicElementLabels.getJavaElementName(testCaseElement.getTestMethodName());
-        final String status = Messages.format(JUnitMessages.TestRunnerViewPart_message_started, new String[] {
-                className, method });
+        final String status = Messages.format(
+                SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_message_started, new String[] { className,
+                        method });
         infoMessageNotifier.notify(status);
     }
 

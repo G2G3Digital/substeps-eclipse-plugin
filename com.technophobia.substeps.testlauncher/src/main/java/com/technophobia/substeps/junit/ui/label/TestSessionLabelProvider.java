@@ -7,7 +7,6 @@ import org.eclipse.jdt.internal.junit.Messages;
 import org.eclipse.jdt.internal.junit.model.TestCaseElement;
 import org.eclipse.jdt.internal.junit.model.TestElement.Status;
 import org.eclipse.jdt.internal.junit.model.TestSuiteElement;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.junit.model.ITestCaseElement;
 import org.eclipse.jdt.junit.model.ITestElement;
 import org.eclipse.jdt.junit.model.ITestRunSession;
@@ -21,6 +20,7 @@ import org.eclipse.swt.graphics.Image;
 
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.view.ViewLayout;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.SubstepsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
 
@@ -67,8 +67,8 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
                 final String testKindDisplayName = testKindDisplayNameSupplier.get();
                 if (testKindDisplayName != null) {
                     final String decorated = Messages.format(
-                            JUnitMessages.TestSessionLabelProvider_testName_JUnitVersion, new Object[] { label,
-                                    testKindDisplayName });
+                            SubstepsFeatureMessages.TestSessionLabelProvider_testName_JUnitVersion, new Object[] {
+                                    label, testKindDisplayName });
                     text = StyledCellLabelProvider.styleDecoratedString(decorated, StyledString.QUALIFIER_STYLER, text);
                 }
             }
@@ -78,8 +78,8 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
                 final String className = BasicElementLabels.getJavaElementName(((ITestCaseElement) element)
                         .getTestClassName());
                 final String decorated = Messages.format(
-                        JUnitMessages.TestSessionLabelProvider_testMethodName_className, new Object[] { label,
-                                className });
+                        SubstepsFeatureMessages.TestSessionLabelProvider_testMethodName_className, new Object[] {
+                                label, className });
                 text = StyledCellLabelProvider.styleDecoratedString(decorated, StyledString.QUALIFIER_STYLER, text);
             }
         }
@@ -99,8 +99,8 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
             return string;
         }
         final String formattedTime = timeFormat.format(time);
-        return Messages.format(JUnitMessages.TestSessionLabelProvider_testName_elapsedTimeInSeconds, new String[] {
-                string, formattedTime });
+        return Messages.format(SubstepsFeatureMessages.TestSessionLabelProvider_testName_elapsedTimeInSeconds,
+                new String[] { string, formattedTime });
     }
 
 
@@ -125,16 +125,16 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
             if (testElement.getParentContainer() instanceof ITestRunSession) {
                 final String testKindDisplayName = testKindDisplayNameSupplier.get();
                 if (testKindDisplayName != null) {
-                    label = Messages.format(JUnitMessages.TestSessionLabelProvider_testName_JUnitVersion, new Object[] {
-                            label, testKindDisplayName });
+                    label = Messages.format(SubstepsFeatureMessages.TestSessionLabelProvider_testName_JUnitVersion,
+                            new Object[] { label, testKindDisplayName });
                 }
             }
         } else {
             if (element instanceof ITestCaseElement) {
                 final String className = BasicElementLabels.getJavaElementName(((ITestCaseElement) element)
                         .getTestClassName());
-                label = Messages.format(JUnitMessages.TestSessionLabelProvider_testMethodName_className, new Object[] {
-                        label, className });
+                label = Messages.format(SubstepsFeatureMessages.TestSessionLabelProvider_testMethodName_className,
+                        new Object[] { label, className });
             }
         }
         return addElapsedTime(label, testElement.getElapsedTimeInSeconds());

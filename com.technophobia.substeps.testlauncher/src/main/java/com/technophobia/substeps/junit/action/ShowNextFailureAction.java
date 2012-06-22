@@ -1,10 +1,10 @@
 package com.technophobia.substeps.junit.action;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 
 import com.technophobia.substeps.junit.ui.FeatureViewer;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 public class ShowNextFailureAction extends Action {
 
@@ -12,13 +12,13 @@ public class ShowNextFailureAction extends Action {
 
 
     public ShowNextFailureAction(final FeatureViewer featureViewer) {
-        super(JUnitMessages.ShowNextFailureAction_label);
+        super(SubstepsFeatureMessages.ShowNextFailureAction_label);
         this.featureViewer = featureViewer;
 
         setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/select_next.gif")); //$NON-NLS-1$
         setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/select_next.gif")); //$NON-NLS-1$
         setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/select_next.gif")); //$NON-NLS-1$
-        setToolTipText(JUnitMessages.ShowNextFailureAction_tooltip);
+        setToolTipText(SubstepsFeatureMessages.ShowNextFailureAction_tooltip);
     }
 
 

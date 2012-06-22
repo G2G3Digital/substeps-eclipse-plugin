@@ -15,7 +15,6 @@ import org.eclipse.jdt.internal.junit.model.TestElement.Status;
 import org.eclipse.jdt.internal.junit.model.TestRoot;
 import org.eclipse.jdt.internal.junit.model.TestRunSession;
 import org.eclipse.jdt.internal.junit.model.TestSuiteElement;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.TestSessionTableContentProvider;
 import org.eclipse.jdt.internal.junit.ui.TestSessionTreeContentProvider;
 import org.eclipse.jdt.internal.ui.viewsupport.ColoringLabelProvider;
@@ -109,8 +108,8 @@ public class FeatureViewer {
 
     private class ExpandAllAction extends Action {
         public ExpandAllAction() {
-            setText(JUnitMessages.ExpandAllAction_text);
-            setToolTipText(JUnitMessages.ExpandAllAction_tooltip);
+            setText(SubstepsFeatureMessages.ExpandAllAction_text);
+            setToolTipText(SubstepsFeatureMessages.ExpandAllAction_tooltip);
         }
 
 
@@ -235,10 +234,10 @@ public class FeatureViewer {
                 manager.add(new OpenFeatureAction());
                 manager.add(new Separator());
                 if (testClassExists(className) && !testRunSession.isKeptAlive()) {
-                    manager.add(new RerunTestAction(JUnitMessages.RerunAction_label_run, testRunner, testElement
-                            .getId(), className, null, ILaunchManager.RUN_MODE));
-                    manager.add(new RerunTestAction(JUnitMessages.RerunAction_label_debug, testRunner, testElement
-                            .getId(), className, null, ILaunchManager.DEBUG_MODE));
+                    manager.add(new RerunTestAction(SubstepsFeatureMessages.RerunAction_label_run, testRunner,
+                            testElement.getId(), className, null, ILaunchManager.RUN_MODE));
+                    manager.add(new RerunTestAction(SubstepsFeatureMessages.RerunAction_label_debug, testRunner,
+                            testElement.getId(), className, null, ILaunchManager.DEBUG_MODE));
                 }
             } else {
                 final TestCaseElement testCaseElement = (TestCaseElement) testElement;
@@ -246,14 +245,14 @@ public class FeatureViewer {
                 manager.add(new OpenFeatureAction());
                 manager.add(new Separator());
                 if (testRunSession.isKeptAlive()) {
-                    manager.add(new RerunTestAction(JUnitMessages.RerunAction_label_rerun, testRunner, testElement
-                            .getId(), className, testMethodName, ILaunchManager.RUN_MODE));
+                    manager.add(new RerunTestAction(SubstepsFeatureMessages.RerunAction_label_rerun, testRunner,
+                            testElement.getId(), className, testMethodName, ILaunchManager.RUN_MODE));
 
                 } else {
-                    manager.add(new RerunTestAction(JUnitMessages.RerunAction_label_run, testRunner, testElement
-                            .getId(), className, testMethodName, ILaunchManager.RUN_MODE));
-                    manager.add(new RerunTestAction(JUnitMessages.RerunAction_label_debug, testRunner, testElement
-                            .getId(), className, testMethodName, ILaunchManager.DEBUG_MODE));
+                    manager.add(new RerunTestAction(SubstepsFeatureMessages.RerunAction_label_run, testRunner,
+                            testElement.getId(), className, testMethodName, ILaunchManager.RUN_MODE));
+                    manager.add(new RerunTestAction(SubstepsFeatureMessages.RerunAction_label_debug, testRunner,
+                            testElement.getId(), className, testMethodName, ILaunchManager.DEBUG_MODE));
                 }
             }
             if (layoutMode.equals(ViewLayout.HIERARCHICAL)) {

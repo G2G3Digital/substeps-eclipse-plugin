@@ -1,10 +1,10 @@
 package com.technophobia.substeps.junit.action;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 
 import com.technophobia.substeps.junit.ui.FeatureViewer;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 public class ShowTimeAction extends Action {
 
@@ -12,7 +12,7 @@ public class ShowTimeAction extends Action {
 
 
     public ShowTimeAction(final FeatureViewer testViewer) {
-        super(JUnitMessages.TestRunnerViewPart_show_execution_time, IAction.AS_CHECK_BOX);
+        super(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_show_execution_time, IAction.AS_CHECK_BOX);
         this.testViewer = testViewer;
     }
 

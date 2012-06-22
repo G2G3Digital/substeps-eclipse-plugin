@@ -4,7 +4,6 @@ import java.io.File;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.internal.junit.model.JUnitModel;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -12,6 +11,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 public class ImportTestRunSessionAction extends Action {
 
@@ -21,7 +22,7 @@ public class ImportTestRunSessionAction extends Action {
 
 
     public ImportTestRunSessionAction(final Shell shell) {
-        super(JUnitMessages.TestRunnerViewPart_ImportTestRunSessionAction_name);
+        super(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ImportTestRunSessionAction_name);
         fShell = shell;
     }
 
@@ -29,7 +30,8 @@ public class ImportTestRunSessionAction extends Action {
     @Override
     public void run() {
         final FileDialog importDialog = new FileDialog(fShell, SWT.OPEN);
-        importDialog.setText(JUnitMessages.TestRunnerViewPart_ImportTestRunSessionAction_title);
+        importDialog
+                .setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ImportTestRunSessionAction_title);
         final IDialogSettings dialogSettings = JUnitPlugin.getDefault().getDialogSettings();
         final String lastPath = dialogSettings.get(PREF_LAST_PATH);
         if (lastPath != null) {
@@ -47,8 +49,9 @@ public class ImportTestRunSessionAction extends Action {
             JUnitModel.importTestRunSession(file);
         } catch (final CoreException e) {
             JUnitPlugin.log(e);
-            ErrorDialog.openError(fShell, JUnitMessages.TestRunnerViewPart_ImportTestRunSessionAction_error_title, e
-                    .getStatus().getMessage(), e.getStatus());
+            ErrorDialog.openError(fShell,
+                    SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ImportTestRunSessionAction_title, e
+                            .getStatus().getMessage(), e.getStatus());
         }
     }
 }

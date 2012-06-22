@@ -12,7 +12,6 @@ import org.eclipse.jdt.internal.junit.JUnitCorePlugin;
 import org.eclipse.jdt.internal.junit.JUnitPreferencesConstants;
 import org.eclipse.jdt.internal.junit.Messages;
 import org.eclipse.jdt.internal.junit.model.TestRunSession;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jdt.internal.ui.viewsupport.ViewHistory;
 import org.eclipse.jdt.junit.model.ITestElement.Result;
@@ -25,6 +24,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.SubstepsIcon;
 import com.technophobia.substeps.junit.ui.TestRunSessionManager;
 
@@ -50,13 +50,13 @@ public class RunnerViewHistory extends ViewHistory<TestRunSession> {
 
     @Override
     public void configureHistoryListAction(final IAction action) {
-        action.setText(JUnitMessages.TestRunnerViewPart_history);
+        action.setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_history);
     }
 
 
     @Override
     public void configureHistoryDropDownAction(final IAction action) {
-        action.setToolTipText(JUnitMessages.TestRunnerViewPart_test_run_history);
+        action.setToolTipText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_test_run_history);
         JUnitPlugin.setLocalImageDescriptors(action, "history_list.gif"); //$NON-NLS-1$
     }
 
@@ -69,13 +69,13 @@ public class RunnerViewHistory extends ViewHistory<TestRunSession> {
 
     @Override
     public String getHistoryListDialogTitle() {
-        return JUnitMessages.TestRunnerViewPart_test_runs;
+        return SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_test_runs;
     }
 
 
     @Override
     public String getHistoryListDialogMessage() {
-        return JUnitMessages.TestRunnerViewPart_select_test_run;
+        return SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_select_test_run;
     }
 
 
@@ -150,8 +150,8 @@ public class RunnerViewHistory extends ViewHistory<TestRunSession> {
             return testRunLabel;
         } else {
             final String startTime = DateFormat.getDateTimeInstance().format(new Date(session.getStartTime()));
-            return Messages.format(JUnitMessages.TestRunnerViewPart_testName_startTime, new Object[] { testRunLabel,
-                    startTime });
+            return Messages.format(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_testName_startTime,
+                    new Object[] { testRunLabel, startTime });
         }
     }
 
@@ -169,7 +169,7 @@ public class RunnerViewHistory extends ViewHistory<TestRunSession> {
 
     @Override
     public String getMaxEntriesMessage() {
-        return JUnitMessages.TestRunnerViewPart_max_remembered;
+        return SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_max_remembered;
     }
 
 

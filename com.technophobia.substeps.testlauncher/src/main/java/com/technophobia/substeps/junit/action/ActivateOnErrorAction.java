@@ -3,18 +3,18 @@ package com.technophobia.substeps.junit.action;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.internal.junit.JUnitCorePlugin;
 import org.eclipse.jdt.internal.junit.JUnitPreferencesConstants;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 
 import com.technophobia.eclipse.ui.Notifier;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 public class ActivateOnErrorAction extends Action {
     private final Notifier<Boolean> showOnErrorOnlyNotifier;
 
 
     public ActivateOnErrorAction(final boolean initialValue, final Notifier<Boolean> showOnErrorOnlyNotifier) {
-        super(JUnitMessages.TestRunnerViewPart_activate_on_failure_only, IAction.AS_CHECK_BOX);
+        super(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_activate_on_failure_only, IAction.AS_CHECK_BOX);
         this.showOnErrorOnlyNotifier = showOnErrorOnlyNotifier;
         //setImageDescriptor(JUnitPlugin.getImageDescriptor("obj16/failures.gif")); //$NON-NLS-1$
 

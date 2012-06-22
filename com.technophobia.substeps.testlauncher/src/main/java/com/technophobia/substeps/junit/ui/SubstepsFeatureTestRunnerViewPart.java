@@ -21,7 +21,6 @@ import org.eclipse.jdt.internal.junit.model.TestCaseElement;
 import org.eclipse.jdt.internal.junit.model.TestElement;
 import org.eclipse.jdt.internal.junit.model.TestRunSession;
 import org.eclipse.jdt.internal.junit.ui.IJUnitHelpContextIds;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitProgressBar;
 import org.eclipse.jdt.internal.junit.ui.ProgressImages;
 import org.eclipse.jdt.internal.ui.viewsupport.ViewHistory;
@@ -539,7 +538,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         final ViewForm bottom = new ViewForm(sashForm, SWT.NONE);
 
         final CLabel label = new CLabel(bottom, SWT.NONE);
-        label.setText(JUnitMessages.TestRunnerViewPart_label_failure);
+        label.setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_label_failure);
         label.setImage(iconProvider.imageFor(SubstepsIcon.StackView));
         bottom.setTopLeft(label);
         final ToolBar failureToolBar = new ToolBar(bottom, SWT.FLAT | SWT.WRAP);
@@ -725,7 +724,8 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         viewMenu.add(showTimeAction);
         viewMenu.add(new Separator());
 
-        final MenuManager layoutSubMenu = new MenuManager(JUnitMessages.TestRunnerViewPart_layout_menu);
+        final MenuManager layoutSubMenu = new MenuManager(
+                SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_layout_menu);
         for (int i = 0; i < toggleOrientationActions.length; ++i) {
             layoutSubMenu.add(toggleOrientationActions[i]);
         }
@@ -851,8 +851,9 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
             final boolean couldLaunch = sessionManager.get().rerunTest(testId, className, testName, launchMode,
                     buildBeforeLaunch);
             if (!couldLaunch) {
-                MessageDialog.openInformation(getSite().getShell(), JUnitMessages.TestRunnerViewPart_cannotrerun_title,
-                        JUnitMessages.TestRunnerViewPart_cannotrerurn_message);
+                MessageDialog.openInformation(getSite().getShell(),
+                        SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_cannotrerun_title,
+                        SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_cannotrerurn_message);
             } else if (sessionManager.get().isKeptAlive()) {
                 final TestCaseElement testCaseElement = (TestCaseElement) sessionManager.get().getTestElement(testId);
                 testCaseElement.setStatus(TestElement.Status.RUNNING, null, null, null);
@@ -861,8 +862,9 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
             }
 
         } catch (final CoreException e) {
-            ErrorDialog.openError(getSite().getShell(), JUnitMessages.TestRunnerViewPart_error_cannotrerun,
-                    e.getMessage(), e.getStatus());
+            ErrorDialog.openError(getSite().getShell(),
+                    SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_error_cannotrerun, e.getMessage(),
+                    e.getStatus());
         }
     }
 

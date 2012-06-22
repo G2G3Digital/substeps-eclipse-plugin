@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.dnd.Clipboard;
@@ -12,6 +11,7 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.URLTransfer;
 import org.eclipse.swt.widgets.Shell;
 
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.TestSessionRunImporter;
 
 public class SubstepsPasteAction extends Action {
@@ -20,7 +20,7 @@ public class SubstepsPasteAction extends Action {
 
 
     public SubstepsPasteAction(final Shell shell, final Clipboard clipboard) {
-        super(JUnitMessages.TestRunnerViewPart_JUnitPasteAction_label);
+        super(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_JUnitPasteAction_label);
         Assert.isNotNull(clipboard);
         this.shell = shell;
         this.clipboard = clipboard;
@@ -39,8 +39,9 @@ public class SubstepsPasteAction extends Action {
                 return;
             }
         }
-        MessageDialog.openInformation(shell, JUnitMessages.TestRunnerViewPart_JUnitPasteAction_cannotpaste_title,
-                JUnitMessages.TestRunnerViewPart_JUnitPasteAction_cannotpaste_message);
+        MessageDialog.openInformation(shell,
+                SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_JUnitPasteAction_cannotpaste_title,
+                SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_JUnitPasteAction_cannotpaste_message);
     }
 
 

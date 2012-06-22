@@ -1,13 +1,13 @@
 package com.technophobia.substeps.junit.action;
 
 import org.eclipse.jdt.internal.junit.ui.IJUnitHelpContextIds;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
 import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.eclipse.ui.view.ViewOrientation;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 public class ToggleOrientationAction extends Action {
     private final ViewOrientation actionOrientation;
@@ -19,13 +19,13 @@ public class ToggleOrientationAction extends Action {
         super("", AS_RADIO_BUTTON); //$NON-NLS-1$
         this.viewOrientationNotifier = viewOrientationNotifier;
         if (orientation.equals(ViewOrientation.VIEW_ORIENTATION_HORIZONTAL)) {
-            setText(JUnitMessages.TestRunnerViewPart_toggle_horizontal_label);
+            setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_toggle_horizontal_label);
             setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/th_horizontal.gif")); //$NON-NLS-1$
         } else if (orientation.equals(ViewOrientation.VIEW_ORIENTATION_VERTICAL)) {
-            setText(JUnitMessages.TestRunnerViewPart_toggle_vertical_label);
+            setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_toggle_vertical_label);
             setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/th_vertical.gif")); //$NON-NLS-1$
         } else if (orientation.equals(ViewOrientation.VIEW_ORIENTATION_AUTOMATIC)) {
-            setText(JUnitMessages.TestRunnerViewPart_toggle_automatic_label);
+            setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_toggle_automatic_label);
             setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/th_automatic.gif")); //$NON-NLS-1$
         }
         actionOrientation = orientation;

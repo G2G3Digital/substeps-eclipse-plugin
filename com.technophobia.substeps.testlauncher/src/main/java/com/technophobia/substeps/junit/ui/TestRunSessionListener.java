@@ -7,7 +7,6 @@ import org.eclipse.jdt.internal.junit.JUnitCorePlugin;
 import org.eclipse.jdt.internal.junit.Messages;
 import org.eclipse.jdt.internal.junit.model.ITestRunSessionListener;
 import org.eclipse.jdt.internal.junit.model.TestRunSession;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jdt.internal.junit.ui.JUnitUIPreferencesConstants;
 import org.eclipse.swt.widgets.Display;
@@ -47,7 +46,7 @@ public class TestRunSessionListener implements ITestRunSessionListener {
                                 .getTestRunName());
                         String msg;
                         if (testRunSession.getLaunch() != null) {
-                            msg = Messages.format(JUnitMessages.TestRunnerViewPart_Launching,
+                            msg = Messages.format(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_Launching,
                                     new Object[] { testRunLabel });
                         } else {
                             msg = testRunLabel;

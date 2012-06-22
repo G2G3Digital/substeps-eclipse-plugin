@@ -1,10 +1,10 @@
 package com.technophobia.substeps.junit.action;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 
 import com.technophobia.eclipse.ui.Notifier;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 public class FailuresOnlyFilterAction extends Action {
 
@@ -12,9 +12,9 @@ public class FailuresOnlyFilterAction extends Action {
 
 
     public FailuresOnlyFilterAction(final Notifier<Boolean> showFailuresNotifier) {
-        super(JUnitMessages.TestRunnerViewPart_show_failures_only, AS_CHECK_BOX);
+        super(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_show_failures_only, AS_CHECK_BOX);
         this.showFailuresNotifier = showFailuresNotifier;
-        setToolTipText(JUnitMessages.TestRunnerViewPart_show_failures_only);
+        setToolTipText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_show_failures_only);
         setImageDescriptor(JUnitPlugin.getImageDescriptor("obj16/failures.gif")); //$NON-NLS-1$
     }
 

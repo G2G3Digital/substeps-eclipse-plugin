@@ -9,7 +9,6 @@ import java.io.StringWriter;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.internal.junit.model.TestElement;
 import org.eclipse.jdt.internal.junit.ui.IJUnitHelpContextIds;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.dnd.Clipboard;
@@ -21,6 +20,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.SelectionListenerAction;
 
 import com.technophobia.substeps.junit.ui.FailureTrace;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 public class SubstepsCopyAction extends SelectionListenerAction {
     private final FailureTrace failureTrace;
@@ -33,7 +33,7 @@ public class SubstepsCopyAction extends SelectionListenerAction {
 
 
     public SubstepsCopyAction(final Shell shell, final FailureTrace failureTrace, final Clipboard clipboard) {
-        super(JUnitMessages.CopyTrace_action_label);
+        super(SubstepsFeatureMessages.CopyTrace_action_label);
         Assert.isNotNull(clipboard);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IJUnitHelpContextIds.COPYTRACE_ACTION);
         this.shell = shell;
@@ -64,8 +64,8 @@ public class SubstepsCopyAction extends SelectionListenerAction {
         } catch (final SWTError e) {
             if (e.code != DND.ERROR_CANNOT_SET_CLIPBOARD)
                 throw e;
-            if (MessageDialog.openQuestion(shell, JUnitMessages.CopyTraceAction_problem,
-                    JUnitMessages.CopyTraceAction_clipboard_busy))
+            if (MessageDialog.openQuestion(shell, SubstepsFeatureMessages.CopyTraceAction_problem,
+                    SubstepsFeatureMessages.CopyTraceAction_clipboard_busy))
                 run();
         }
     }

@@ -5,9 +5,10 @@ import java.util.List;
 
 import org.eclipse.jdt.internal.junit.JUnitCorePlugin;
 import org.eclipse.jdt.internal.junit.model.TestRunSession;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.ui.viewsupport.ViewHistory;
 import org.eclipse.jface.action.Action;
+
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 public class ClearAction extends Action {
     private final ViewHistory<TestRunSession> viewHistory;
@@ -15,7 +16,7 @@ public class ClearAction extends Action {
 
     public ClearAction(final ViewHistory<TestRunSession> viewHistory) {
         this.viewHistory = viewHistory;
-        setText(JUnitMessages.TestRunnerViewPart_clear_history_label);
+        setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_clear_history_label);
 
         boolean enabled = false;
         final List<TestRunSession> testRunSessions = JUnitCorePlugin.getModel().getTestRunSessions();

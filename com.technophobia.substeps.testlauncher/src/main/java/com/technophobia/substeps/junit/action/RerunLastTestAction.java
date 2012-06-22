@@ -1,9 +1,9 @@
 package com.technophobia.substeps.junit.action;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.TestRelauncher;
 
 public class RerunLastTestAction extends Action {
@@ -12,8 +12,8 @@ public class RerunLastTestAction extends Action {
 
     public RerunLastTestAction(final String actionDefinitionId, final TestRelauncher testRelauncher) {
         this.testRelauncher = testRelauncher;
-        setText(JUnitMessages.TestRunnerViewPart_rerunaction_label);
-        setToolTipText(JUnitMessages.TestRunnerViewPart_rerunaction_tooltip);
+        setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_rerunaction_label);
+        setToolTipText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_rerunaction_label);
         JUnitPlugin.setLocalImageDescriptors(this, "relaunch.gif"); //$NON-NLS-1$
         setEnabled(false);
         setActionDefinitionId(actionDefinitionId);

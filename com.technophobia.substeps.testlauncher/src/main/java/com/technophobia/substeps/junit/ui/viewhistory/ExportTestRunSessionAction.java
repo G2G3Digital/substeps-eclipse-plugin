@@ -7,7 +7,6 @@ import java.util.Date;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.internal.junit.model.JUnitModel;
 import org.eclipse.jdt.internal.junit.model.TestRunSession;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -16,13 +15,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+
 public class ExportTestRunSessionAction extends Action {
     private final TestRunSession fTestRunSession;
     private final Shell fShell;
 
 
     public ExportTestRunSessionAction(final Shell shell, final TestRunSession testRunSession) {
-        super(JUnitMessages.TestRunnerViewPart_ExportTestRunSessionAction_name);
+        super(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ExportTestRunSessionAction_name);
         fShell = shell;
         fTestRunSession = testRunSession;
     }
@@ -31,7 +32,8 @@ public class ExportTestRunSessionAction extends Action {
     @Override
     public void run() {
         final FileDialog exportDialog = new FileDialog(fShell, SWT.SAVE);
-        exportDialog.setText(JUnitMessages.TestRunnerViewPart_ExportTestRunSessionAction_title);
+        exportDialog
+                .setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ExportTestRunSessionAction_title);
         final IDialogSettings dialogSettings = JUnitPlugin.getDefault().getDialogSettings();
         final String lastPath = dialogSettings.get(ImportTestRunSessionAction.PREF_LAST_PATH);
         if (lastPath != null) {
@@ -50,8 +52,9 @@ public class ExportTestRunSessionAction extends Action {
             JUnitModel.exportTestRunSession(fTestRunSession, file);
         } catch (final CoreException e) {
             JUnitPlugin.log(e);
-            ErrorDialog.openError(fShell, JUnitMessages.TestRunnerViewPart_ExportTestRunSessionAction_error_title, e
-                    .getStatus().getMessage(), e.getStatus());
+            ErrorDialog.openError(fShell,
+                    SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ExportTestRunSessionAction_title, e
+                            .getStatus().getMessage(), e.getStatus());
         }
     }
 

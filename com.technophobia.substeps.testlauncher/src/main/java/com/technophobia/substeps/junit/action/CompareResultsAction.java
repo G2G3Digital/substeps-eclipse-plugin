@@ -2,7 +2,6 @@ package com.technophobia.substeps.junit.action;
 
 import org.eclipse.jdt.internal.junit.model.TestElement;
 import org.eclipse.jdt.internal.junit.ui.CompareResultDialog;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.events.DisposeEvent;
@@ -10,6 +9,7 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Shell;
 
 import com.technophobia.eclipse.transformer.Supplier;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 public class CompareResultsAction extends Action {
 
@@ -19,9 +19,9 @@ public class CompareResultsAction extends Action {
 
 
     public CompareResultsAction(final Shell shell, final Supplier<TestElement> failedTestSupplier) {
-        super(JUnitMessages.CompareResultsAction_label);
-        setDescription(JUnitMessages.CompareResultsAction_description);
-        setToolTipText(JUnitMessages.CompareResultsAction_tooltip);
+        super(SubstepsFeatureMessages.CompareResultsAction_label);
+        setDescription(SubstepsFeatureMessages.CompareResultsAction_description);
+        setToolTipText(SubstepsFeatureMessages.CompareResultsAction_tooltip);
 
         setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/compare.gif")); //$NON-NLS-1$
         setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/compare.gif")); //$NON-NLS-1$

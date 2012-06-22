@@ -3,7 +3,6 @@ package com.technophobia.substeps.junit.ui.viewhistory;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
@@ -16,6 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.TestSessionRunImporter;
 
 public class ImportTestRunSessionFromURLAction extends Action {
@@ -29,7 +29,7 @@ public class ImportTestRunSessionFromURLAction extends Action {
                 final URL url = new URL(newText);
                 return null;
             } catch (final MalformedURLException e) {
-                return JUnitMessages.TestRunnerViewPart_ImportTestRunSessionFromURLAction_invalid_url
+                return SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ImportTestRunSessionFromURLAction_invalid_url
                         + e.getLocalizedMessage();
             }
         }
@@ -41,15 +41,16 @@ public class ImportTestRunSessionFromURLAction extends Action {
 
 
     public ImportTestRunSessionFromURLAction(final Shell shell) {
-        super(JUnitMessages.TestRunnerViewPart_ImportTestRunSessionFromURLAction_import_from_url);
+        super(
+                SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ImportTestRunSessionFromURLAction_import_from_url);
         fShell = shell;
     }
 
 
     @Override
     public void run() {
-        final String title = JUnitMessages.TestRunnerViewPart_ImportTestRunSessionAction_title;
-        final String message = JUnitMessages.TestRunnerViewPart_ImportTestRunSessionFromURLAction_url;
+        final String title = SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ImportTestRunSessionAction_title;
+        final String message = SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ImportTestRunSessionFromURLAction_url;
 
         final IDialogSettings dialogSettings = JUnitPlugin.getDefault().getDialogSettings();
         String url = dialogSettings.get(ImportTestRunSessionAction.PREF_LAST_PATH);
