@@ -5,6 +5,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 
 import com.technophobia.eclipse.transformer.Transformer;
 
+@SuppressWarnings("restriction")
 public class ImageDescriptorLoader implements Transformer<SubstepsIcon, ImageDescriptor> {
     @Override
     public ImageDescriptor to(final SubstepsIcon icon) {

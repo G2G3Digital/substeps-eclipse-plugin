@@ -5,30 +5,29 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.jdt.internal.junit.Messages;
-import org.eclipse.jdt.internal.junit.launcher.JUnitLaunchConfigurationConstants;
-import org.eclipse.jdt.internal.junit.model.TestElement;
-import org.eclipse.jdt.internal.junit.model.TestRunSession;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Shell;
 
+import com.technophobia.eclipse.launcher.config.SubstepsLaunchConfigurationConstants;
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Notifier;
+import com.technophobia.substeps.FeatureRunnerPlugin;
+import com.technophobia.substeps.model.structure.SubstepsTestElement;
 
 public class FailedTestFirstTestRelauncher extends TestRelauncher {
 
     private final Shell shell;
-    final Supplier<TestRunSession> testRunSession;
+    final Supplier<SubstepsRunSession> testRunSession;
 
 
-    public FailedTestFirstTestRelauncher(final Supplier<TestRunSession> testRunSession, final Shell shell,
+    public FailedTestFirstTestRelauncher(final Supplier<SubstepsRunSession> testRunSession, final Shell shell,
             final Notifier<String> infoMessageNotifier) {
         super(testRunSession, shell, infoMessageNotifier);
         this.testRunSession = testRunSession;
@@ -41,17 +40,17 @@ public class FailedTestFirstTestRelauncher extends TestRelauncher {
         try {
             final String oldName = launchConfiguration.getName();
             final String oldFailuresFilename = launchConfiguration.getAttribute(
-                    JUnitLaunchConfigurationConstants.ATTR_FAILURES_NAMES, (String) null);
+                    SubstepsLaunchConfigurationConstants.ATTR_FAILURES_NAMES, (String) null);
             String configName;
             if (oldFailuresFilename != null) {
                 configName = oldName;
             } else {
-                configName = Messages.format(
+                configName = MessageFormat.format(
                         SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_rerunFailedFirstLaunchConfigName,
                         oldName);
             }
             final ILaunchConfigurationWorkingCopy tmp = launchConfiguration.copy(configName);
-            tmp.setAttribute(JUnitLaunchConfigurationConstants.ATTR_FAILURES_NAMES, createFailureNamesFile());
+            tmp.setAttribute(SubstepsLaunchConfigurationConstants.ATTR_FAILURES_NAMES, createFailureNamesFile());
             return tmp;
         } catch (final CoreException ex) {
             ErrorDialog.openError(shell, SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_error_cannotrerun,
@@ -65,11 +64,11 @@ public class FailedTestFirstTestRelauncher extends TestRelauncher {
         try {
             final File file = File.createTempFile("testFailures", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
             file.deleteOnExit();
-            final TestElement[] failures = testRunSession.get().getAllFailedTestElements();
+            final SubstepsTestElement[] failures = testRunSession.get().getAllFailedTestElements();
             BufferedWriter bw = null;
             try {
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
-                for (final TestElement testElement : failures) {
+                for (final SubstepsTestElement testElement : failures) {
                     bw.write(testElement.getTestName());
                     bw.newLine();
                 }
@@ -80,7 +79,7 @@ public class FailedTestFirstTestRelauncher extends TestRelauncher {
             }
             return file.getAbsolutePath();
         } catch (final IOException e) {
-            throw new CoreException(new Status(IStatus.ERROR, JUnitPlugin.PLUGIN_ID, IStatus.ERROR, "", e)); //$NON-NLS-1$
+            throw new CoreException(new Status(IStatus.ERROR, FeatureRunnerPlugin.PLUGIN_ID, IStatus.ERROR, "", e)); //$NON-NLS-1$
         }
     }
 }

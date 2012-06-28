@@ -3,6 +3,7 @@ package com.technophobia.substeps.junit.ui;
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.UiUpdater;
 import com.technophobia.eclipse.ui.render.NonDisposedUiUpdater;
+import com.technophobia.substeps.junit.ui.component.FeatureViewer;
 
 public class SubstepsFeatureUiUpdater extends NonDisposedUiUpdater {
 

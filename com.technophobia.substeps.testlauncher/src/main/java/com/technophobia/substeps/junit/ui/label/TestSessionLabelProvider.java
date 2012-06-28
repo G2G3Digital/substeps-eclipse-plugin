@@ -1,16 +1,8 @@
 package com.technophobia.substeps.junit.ui.label;
 
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 
-import org.eclipse.jdt.internal.junit.BasicElementLabels;
-import org.eclipse.jdt.internal.junit.Messages;
-import org.eclipse.jdt.internal.junit.model.TestCaseElement;
-import org.eclipse.jdt.internal.junit.model.TestElement.Status;
-import org.eclipse.jdt.internal.junit.model.TestSuiteElement;
-import org.eclipse.jdt.junit.model.ITestCaseElement;
-import org.eclipse.jdt.junit.model.ITestElement;
-import org.eclipse.jdt.junit.model.ITestRunSession;
-import org.eclipse.jdt.junit.model.ITestSuiteElement;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
@@ -23,6 +15,11 @@ import com.technophobia.eclipse.ui.view.ViewLayout;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.SubstepsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
+import com.technophobia.substeps.junit.ui.SubstepsRunSession;
+import com.technophobia.substeps.model.structure.Status;
+import com.technophobia.substeps.model.structure.SubstepsTestElement;
+import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
+import com.technophobia.substeps.model.structure.SubstepsTestParentElement;
 
 public class TestSessionLabelProvider extends LabelProvider implements IStyledLabelProvider {
 
@@ -61,12 +58,12 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
         }
         StyledString text = new StyledString(label);
 
-        final ITestElement testElement = (ITestElement) element;
+        final SubstepsTestElement testElement = (SubstepsTestElement) element;
         if (layoutMode.equals(ViewLayout.HIERARCHICAL)) {
-            if (testElement.getParentContainer() instanceof ITestRunSession) {
+            if (testElement.getParentContainer() instanceof SubstepsRunSession) {
                 final String testKindDisplayName = testKindDisplayNameSupplier.get();
                 if (testKindDisplayName != null) {
-                    final String decorated = Messages.format(
+                    final String decorated = MessageFormat.format(
                             SubstepsFeatureMessages.TestSessionLabelProvider_testName_JUnitVersion, new Object[] {
                                     label, testKindDisplayName });
                     text = StyledCellLabelProvider.styleDecoratedString(decorated, StyledString.QUALIFIER_STYLER, text);
@@ -74,12 +71,9 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
             }
 
         } else {
-            if (element instanceof ITestCaseElement) {
-                final String className = BasicElementLabels.getJavaElementName(((ITestCaseElement) element)
-                        .getTestClassName());
-                final String decorated = Messages.format(
-                        SubstepsFeatureMessages.TestSessionLabelProvider_testMethodName_className, new Object[] {
-                                label, className });
+            if (element instanceof SubstepsTestLeafElement) {
+                final String decorated = MessageFormat.format(
+                        SubstepsFeatureMessages.TestSessionLabelProvider_testMethodName_className, label);
                 text = StyledCellLabelProvider.styleDecoratedString(decorated, StyledString.QUALIFIER_STYLER, text);
             }
         }
@@ -99,16 +93,16 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
             return string;
         }
         final String formattedTime = timeFormat.format(time);
-        return Messages.format(SubstepsFeatureMessages.TestSessionLabelProvider_testName_elapsedTimeInSeconds,
-                new String[] { string, formattedTime });
+        return MessageFormat.format(SubstepsFeatureMessages.TestSessionLabelProvider_testName_elapsedTimeInSeconds,
+                new Object[] { string, formattedTime });
     }
 
 
     private String getSimpleLabel(final Object element) {
-        if (element instanceof ITestCaseElement) {
-            return BasicElementLabels.getJavaElementName(((ITestCaseElement) element).getTestMethodName());
-        } else if (element instanceof ITestSuiteElement) {
-            return BasicElementLabels.getJavaElementName(((ITestSuiteElement) element).getSuiteTypeName());
+        if (element instanceof SubstepsTestLeafElement) {
+            return ((SubstepsTestLeafElement) element).getTestName();
+        } else if (element instanceof SubstepsTestParentElement) {
+            return ((SubstepsTestParentElement) element).getTestName();
         }
         return null;
     }
@@ -120,21 +114,20 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
         if (label == null) {
             return element.toString();
         }
-        final ITestElement testElement = (ITestElement) element;
+        final SubstepsTestElement testElement = (SubstepsTestElement) element;
         if (layoutMode.equals(ViewLayout.HIERARCHICAL)) {
-            if (testElement.getParentContainer() instanceof ITestRunSession) {
+            if (testElement.getParentContainer() instanceof SubstepsRunSession) {
                 final String testKindDisplayName = testKindDisplayNameSupplier.get();
                 if (testKindDisplayName != null) {
-                    label = Messages.format(SubstepsFeatureMessages.TestSessionLabelProvider_testName_JUnitVersion,
-                            new Object[] { label, testKindDisplayName });
+                    label = MessageFormat.format(
+                            SubstepsFeatureMessages.TestSessionLabelProvider_testName_JUnitVersion, new Object[] {
+                                    label, testKindDisplayName });
                 }
             }
         } else {
-            if (element instanceof ITestCaseElement) {
-                final String className = BasicElementLabels.getJavaElementName(((ITestCaseElement) element)
-                        .getTestClassName());
-                label = Messages.format(SubstepsFeatureMessages.TestSessionLabelProvider_testMethodName_className,
-                        new Object[] { label, className });
+            if (element instanceof SubstepsTestLeafElement) {
+                label = MessageFormat.format(SubstepsFeatureMessages.TestSessionLabelProvider_testMethodName_className,
+                        label);
             }
         }
         return addElapsedTime(label, testElement.getElapsedTimeInSeconds());
@@ -143,8 +136,8 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
 
     @Override
     public Image getImage(final Object element) {
-        if (element instanceof TestCaseElement) {
-            final TestCaseElement testCaseElement = ((TestCaseElement) element);
+        if (element instanceof SubstepsTestLeafElement) {
+            final SubstepsTestLeafElement testCaseElement = ((SubstepsTestLeafElement) element);
             if (testCaseElement.isIgnored())
                 return iconProvider.imageFor(SubstepsIcon.TestIgnored);
 
@@ -162,8 +155,8 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
             else
                 throw new IllegalStateException(element.toString());
 
-        } else if (element instanceof TestSuiteElement) {
-            final Status status = ((TestSuiteElement) element).getStatus();
+        } else if (element instanceof SubstepsTestParentElement) {
+            final Status status = ((SubstepsTestParentElement) element).getStatus();
             if (status.isNotRun())
                 return iconProvider.imageFor(SubstepsIcon.Suite);
             else if (status.isRunning())

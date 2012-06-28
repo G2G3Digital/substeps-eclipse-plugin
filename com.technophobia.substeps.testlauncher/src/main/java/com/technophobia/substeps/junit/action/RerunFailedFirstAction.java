@@ -1,9 +1,10 @@
 package com.technophobia.substeps.junit.action;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.junit.ui.SubstepsIcon;
+import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
 import com.technophobia.substeps.junit.ui.TestRelauncher;
 
 public class RerunFailedFirstAction extends Action {
@@ -11,11 +12,14 @@ public class RerunFailedFirstAction extends Action {
     private final TestRelauncher testRelauncher;
 
 
-    public RerunFailedFirstAction(final String actionDefinitionId, final TestRelauncher testRelauncher) {
+    public RerunFailedFirstAction(final String actionDefinitionId, final TestRelauncher testRelauncher,
+            final SubstepsIconProvider iconProvider) {
         this.testRelauncher = testRelauncher;
         setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_rerunfailuresaction_label);
         setToolTipText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_rerunfailuresaction_label);
-        JUnitPlugin.setLocalImageDescriptors(this, "relaunchf.gif"); //$NON-NLS-1$
+        setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.RelaunchFailedDisabled)); //$NON-NLS-1$
+        setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.RelaunchFailedEnabled)); //$NON-NLS-1$
+        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.RelaunchFailedEnabled)); //$NON-NLS-1$
         setEnabled(false);
         setActionDefinitionId(actionDefinitionId);
     }

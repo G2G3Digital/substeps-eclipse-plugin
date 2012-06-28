@@ -1,8 +1,5 @@
 package com.technophobia.substeps.junit.action;
 
-import org.eclipse.jdt.internal.junit.model.TestElement;
-import org.eclipse.jdt.internal.junit.ui.CompareResultDialog;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -10,22 +7,27 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.junit.ui.SubstepsIcon;
+import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
+import com.technophobia.substeps.junit.ui.dialog.CompareResultDialog;
+import com.technophobia.substeps.model.structure.SubstepsTestElement;
 
 public class CompareResultsAction extends Action {
 
     private CompareResultDialog openDialog;
-    private final Supplier<TestElement> failedTestSupplier;
+    private final Supplier<SubstepsTestElement> failedTestSupplier;
     private final Shell shell;
 
 
-    public CompareResultsAction(final Shell shell, final Supplier<TestElement> failedTestSupplier) {
+    public CompareResultsAction(final Shell shell, final Supplier<SubstepsTestElement> failedTestSupplier,
+            final SubstepsIconProvider iconProvider) {
         super(SubstepsFeatureMessages.CompareResultsAction_label);
         setDescription(SubstepsFeatureMessages.CompareResultsAction_description);
         setToolTipText(SubstepsFeatureMessages.CompareResultsAction_tooltip);
 
-        setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/compare.gif")); //$NON-NLS-1$
-        setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/compare.gif")); //$NON-NLS-1$
-        setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/compare.gif")); //$NON-NLS-1$
+        setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.Compare)); //$NON-NLS-1$
+        setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.Compare)); //$NON-NLS-1$
+        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.Compare)); //$NON-NLS-1$
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
         // IJUnitHelpContextIds.ENABLEFILTER_ACTION);
 
@@ -39,7 +41,7 @@ public class CompareResultsAction extends Action {
      */
     @Override
     public void run() {
-        final TestElement failedTest = failedTestSupplier.get();
+        final SubstepsTestElement failedTest = failedTestSupplier.get();
         if (openDialog != null) {
             openDialog.setInput(failedTest);
             openDialog.getShell().setActive();
@@ -59,7 +61,7 @@ public class CompareResultsAction extends Action {
     }
 
 
-    public void updateOpenDialog(final TestElement failedTest) {
+    public void updateOpenDialog(final SubstepsTestElement failedTest) {
         if (openDialog != null) {
             openDialog.setInput(failedTest);
         }

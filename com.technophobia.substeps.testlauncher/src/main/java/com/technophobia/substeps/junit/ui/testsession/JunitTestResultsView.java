@@ -1,11 +1,13 @@
 package com.technophobia.substeps.junit.ui.testsession;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
-import org.eclipse.jdt.internal.junit.ui.TestRunnerViewPart;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+
+import com.technophobia.substeps.FeatureRunnerPlugin;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureTestRunnerViewPart;
 
 public class JunitTestResultsView implements TestResultsView {
 
@@ -20,22 +22,22 @@ public class JunitTestResultsView implements TestResultsView {
     @Override
     public void showTestResultsView() {
         final IWorkbenchPage page = window.getActivePage();
-        TestRunnerViewPart testRunner = null;
+        SubstepsFeatureTestRunnerViewPart testRunner = null;
 
         if (page != null) {
             try { // show the result view
-                testRunner = (TestRunnerViewPart) page.findView(TestRunnerViewPart.NAME);
+                testRunner = (SubstepsFeatureTestRunnerViewPart) page.findView(SubstepsFeatureTestRunnerViewPart.NAME);
                 if (testRunner == null) {
                     final IWorkbenchPart activePart = page.getActivePart();
-                    testRunner = (TestRunnerViewPart) page.showView(TestRunnerViewPart.NAME, null,
-                            IWorkbenchPage.VIEW_VISIBLE);
+                    testRunner = (SubstepsFeatureTestRunnerViewPart) page.showView(
+                            SubstepsFeatureTestRunnerViewPart.NAME, null, IWorkbenchPage.VIEW_VISIBLE);
                     // restore focus
                     page.activate(activePart);
                 } else {
                     page.bringToTop(testRunner);
                 }
             } catch (final PartInitException pie) {
-                JUnitPlugin.log(pie);
+                FeatureRunnerPlugin.log(Status.ERROR, pie.getMessage());
             }
         }
     }

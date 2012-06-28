@@ -1,21 +1,22 @@
 package com.technophobia.substeps.junit.action;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 
-import com.technophobia.substeps.junit.ui.FeatureViewer;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.junit.ui.SubstepsIcon;
+import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
+import com.technophobia.substeps.junit.ui.component.FeatureViewer;
 
 public class ShowPreviousFailureAction extends Action {
 
     private final FeatureViewer testViewer;
 
 
-    public ShowPreviousFailureAction(final FeatureViewer testViewer) {
+    public ShowPreviousFailureAction(final FeatureViewer testViewer, final SubstepsIconProvider iconProvider) {
         super(SubstepsFeatureMessages.ShowPreviousFailureAction_label);
-        setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/select_prev.gif")); //$NON-NLS-1$
-        setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/select_prev.gif")); //$NON-NLS-1$
-        setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/select_prev.gif")); //$NON-NLS-1$
+        setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.SelectPreviousTestDisabled)); //$NON-NLS-1$
+        setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.SelectPreviousTestEnabled)); //$NON-NLS-1$
+        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.SelectPreviousTestEnabled)); //$NON-NLS-1$
         setToolTipText(SubstepsFeatureMessages.ShowPreviousFailureAction_tooltip);
         this.testViewer = testViewer;
     }

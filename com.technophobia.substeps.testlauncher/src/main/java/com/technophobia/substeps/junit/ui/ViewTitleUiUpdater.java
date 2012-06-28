@@ -1,6 +1,5 @@
 package com.technophobia.substeps.junit.ui;
 
-import org.eclipse.jdt.internal.junit.model.TestRunSession;
 import org.eclipse.jdt.internal.junit.ui.ProgressImages;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IPropertyListener;
@@ -11,10 +10,11 @@ import com.technophobia.eclipse.ui.Resettable;
 import com.technophobia.eclipse.ui.UiUpdater;
 import com.technophobia.eclipse.ui.part.PartMonitor;
 
+@SuppressWarnings("restriction")
 public class ViewTitleUiUpdater implements UiUpdater, Resettable {
 
     private final PartMonitor partMonitor;
-    private final Supplier<TestRunSession> testRunSession;
+    private final Supplier<SubstepsRunSession> substepsRunSession;
     private final Supplier<TestRunStats> testRunStats;
 
     private final Image originalViewImage;
@@ -24,11 +24,11 @@ public class ViewTitleUiUpdater implements UiUpdater, Resettable {
     private final IPropertyListener propertyListener;
 
 
-    public ViewTitleUiUpdater(final PartMonitor partMonitor, final Supplier<TestRunSession> testRunSession,
+    public ViewTitleUiUpdater(final PartMonitor partMonitor, final Supplier<SubstepsRunSession> substepsRunSession,
             final Supplier<TestRunStats> testRunStats, final SubstepsIconProvider iconProvider,
             final Image originalViewImage, final ProgressImages progressImages, final IPropertyListener propertyListener) {
         this.partMonitor = partMonitor;
-        this.testRunSession = testRunSession;
+        this.substepsRunSession = substepsRunSession;
         this.testRunStats = testRunStats;
         this.iconProvider = iconProvider;
         this.originalViewImage = originalViewImage;
@@ -55,8 +55,8 @@ public class ViewTitleUiUpdater implements UiUpdater, Resettable {
 
 
     private void updateViewIcon() {
-        final TestRunSession session = testRunSession.get();
-        if (testRunSession == null || session.isStopped() || session.isRunning() || session.getStartedCount() == 0)
+        final SubstepsRunSession session = substepsRunSession.get();
+        if (substepsRunSession == null || session.isStopped() || session.isRunning() || session.getStartedCount() == 0)
             viewImage = originalViewImage;
         else if (testRunStats.get().hasErrorsOrFailures())
             viewImage = iconProvider.imageFor(SubstepsIcon.TestRunFail);
@@ -67,8 +67,8 @@ public class ViewTitleUiUpdater implements UiUpdater, Resettable {
 
 
     private void updateViewTitleProgress() {
-        if (testRunSession != null) {
-            if (testRunSession.get().isRunning()) {
+        if (substepsRunSession != null) {
+            if (substepsRunSession.get().isRunning()) {
                 final TestRunStats stats = testRunStats.get();
                 final Image progress = progressImages.getImage(stats.getStartedCount(), stats.getTotalCount(),
                         stats.getErrorCount(), stats.getFailureCount());

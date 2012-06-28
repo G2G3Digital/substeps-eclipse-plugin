@@ -1,9 +1,6 @@
 package com.technophobia.substeps.junit.ui;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jdt.internal.junit.JUnitPreferencesConstants;
-import org.eclipse.jdt.internal.junit.model.TestElement;
-import org.eclipse.jdt.internal.junit.ui.TextualTrace;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -28,6 +25,8 @@ import com.technophobia.substeps.junit.action.CompareResultsAction;
 import com.technophobia.substeps.junit.action.EnableStackFilterAction;
 import com.technophobia.substeps.junit.action.OpenEditorAtLineAction;
 import com.technophobia.substeps.junit.action.SubstepsCopyAction;
+import com.technophobia.substeps.model.structure.SubstepsTestElement;
+import com.technophobia.substeps.preferences.PreferencesConstants;
 
 public class FailureTrace implements IMenuListener, Refreshable, Resettable {
     private static final int MAX_LABEL_LENGTH = 256;
@@ -36,20 +35,21 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
     private final Table table;
     private String inputTrace;
     private final Clipboard clipboard;
-    private TestElement failure;
+    private SubstepsTestElement failure;
     private final CompareResultsAction compareAction;
     private final FailureTableDisplay failureTableDisplay;
 
     private final Composite parent;
 
 
-    public FailureTrace(final Composite parent, final Clipboard clipboard, final ToolBar toolBar) {
+    public FailureTrace(final Composite parent, final Clipboard clipboard, final ToolBar toolBar,
+            final SubstepsIconProvider iconProvider) {
         Assert.isNotNull(clipboard);
 
         // fill the failure trace viewer toolbar
         final ToolBarManager failureToolBarmanager = new ToolBarManager(toolBar);
-        failureToolBarmanager.add(new EnableStackFilterAction(this));
-        compareAction = new CompareResultsAction(parent.getShell(), failedTestSupplier());
+        failureToolBarmanager.add(new EnableStackFilterAction(this, iconProvider));
+        compareAction = new CompareResultsAction(parent.getShell(), failedTestSupplier(), iconProvider);
         compareAction.setEnabled(false);
         failureToolBarmanager.add(compareAction);
         failureToolBarmanager.update(true);
@@ -75,7 +75,7 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
 
         initMenu();
 
-        failureTableDisplay = new FailureTableDisplay(table);
+        failureTableDisplay = new FailureTableDisplay(table, iconProvider);
     }
 
 
@@ -125,7 +125,7 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
             String lineNumber = traceLine;
             lineNumber = lineNumber.substring(lineNumber.indexOf(':') + 1, lineNumber.lastIndexOf(')'));
             final int line = Integer.valueOf(lineNumber).intValue();
-            return new OpenEditorAtLineAction();
+            return new OpenEditorAtLineAction(line);
         } catch (final NumberFormatException e) {
         } catch (final IndexOutOfBoundsException e) {
         }
@@ -164,8 +164,8 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
      * @param test
      *            the failed test
      */
-    public void showFailure(final TestElement test) {
-        failure = test;
+    public void showFailure(final SubstepsTestElement test) {
+        this.failure = test;
         String trace = ""; //$NON-NLS-1$
         updateEnablement(test);
         if (test != null)
@@ -177,7 +177,7 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
     }
 
 
-    public void updateEnablement(final TestElement test) {
+    public void updateEnablement(final SubstepsTestElement test) {
         final boolean enableCompare = test != null && test.isComparisonFailure();
         compareAction.setEnabled(enableCompare);
         if (enableCompare) {
@@ -200,8 +200,8 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
 
 
     private String[] getFilterPatterns() {
-        if (JUnitPreferencesConstants.getFilterStack())
-            return JUnitPreferencesConstants.getFilterPatterns();
+        if (PreferencesConstants.getFilterStack())
+            return PreferencesConstants.getFilterPatterns();
         return new String[0];
     }
 
@@ -228,10 +228,10 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
     }
 
 
-    public Supplier<TestElement> failedTestSupplier() {
-        return new Supplier<TestElement>() {
+    public Supplier<SubstepsTestElement> failedTestSupplier() {
+        return new Supplier<SubstepsTestElement>() {
             @Override
-            public TestElement get() {
+            public SubstepsTestElement get() {
                 return failure;
             }
         };
@@ -243,7 +243,7 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
     }
 
 
-    public FailureTableDisplay getFailureTableDisplay() {
+    public TraceDisplay getFailureTableDisplay() {
         return failureTableDisplay;
     }
 }

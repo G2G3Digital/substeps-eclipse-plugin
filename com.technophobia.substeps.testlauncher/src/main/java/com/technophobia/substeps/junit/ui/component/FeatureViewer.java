@@ -1,4 +1,4 @@
-package com.technophobia.substeps.junit.ui;
+package com.technophobia.substeps.junit.ui.component;
 
 import java.util.AbstractList;
 import java.util.Arrays;
@@ -9,17 +9,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.jdt.internal.junit.model.TestCaseElement;
-import org.eclipse.jdt.internal.junit.model.TestElement;
-import org.eclipse.jdt.internal.junit.model.TestElement.Status;
-import org.eclipse.jdt.internal.junit.model.TestRoot;
-import org.eclipse.jdt.internal.junit.model.TestRunSession;
-import org.eclipse.jdt.internal.junit.model.TestSuiteElement;
-import org.eclipse.jdt.internal.junit.ui.TestSessionTableContentProvider;
-import org.eclipse.jdt.internal.junit.ui.TestSessionTreeContentProvider;
-import org.eclipse.jdt.internal.ui.viewsupport.ColoringLabelProvider;
-import org.eclipse.jdt.internal.ui.viewsupport.SelectionProviderMediator;
-import org.eclipse.jdt.junit.model.ITestElement;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -36,7 +25,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -52,7 +40,16 @@ import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.eclipse.ui.view.ViewLayout;
 import com.technophobia.substeps.junit.action.OpenFeatureAction;
 import com.technophobia.substeps.junit.action.RerunTestAction;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
+import com.technophobia.substeps.junit.ui.SubstepsRunSession;
+import com.technophobia.substeps.junit.ui.TestContext;
 import com.technophobia.substeps.junit.ui.label.TestSessionLabelProvider;
+import com.technophobia.substeps.model.structure.Status;
+import com.technophobia.substeps.model.structure.SubstepsTestElement;
+import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
+import com.technophobia.substeps.model.structure.SubstepsTestParentElement;
+import com.technophobia.substeps.model.structure.SubstepsTestRootElement;
 
 public class FeatureViewer {
     private final class TestSelectionListener implements ISelectionChangedListener {
@@ -72,37 +69,37 @@ public class FeatureViewer {
     private final class FailuresOnlyFilter extends ViewerFilter {
         @Override
         public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
-            return select(((TestElement) element));
+            return select(((SubstepsTestElement) element));
         }
 
 
-        public boolean select(final TestElement testElement) {
+        public boolean select(final SubstepsTestElement testElement) {
             final Status status = testElement.getStatus();
             if (status.isErrorOrFailure())
                 return true;
             else
-                return !testRunSession.isRunning() && status == Status.RUNNING; // rerunning
+                return !testRunSession.isRunning() && (status.equals(Status.RUNNING)); // rerunning
         }
     }
 
     private static class ReverseList<E> extends AbstractList<E> {
-        private final List<E> fList;
+        private final List<E> list;
 
 
         public ReverseList(final List<E> list) {
-            fList = list;
+            this.list = list;
         }
 
 
         @Override
         public E get(final int index) {
-            return fList.get(fList.size() - index - 1);
+            return list.get(list.size() - index - 1);
         }
 
 
         @Override
         public int size() {
-            return fList.size();
+            return list.size();
         }
     }
 
@@ -121,8 +118,6 @@ public class FeatureViewer {
 
     private final FailuresOnlyFilter failuresOnlyFilter = new FailuresOnlyFilter();
 
-    private final Clipboard clipboard;
-
     private PageBook viewerbook;
     private TreeViewer treeViewer;
     private TestSessionTreeContentProvider treeContentProvider;
@@ -136,29 +131,28 @@ public class FeatureViewer {
     private boolean treeHasFilter;
     private boolean tableHasFilter;
 
-    private TestRunSession testRunSession;
+    private SubstepsRunSession testRunSession;
 
     private boolean treeNeedsRefresh;
     private boolean tableNeedsRefresh;
-    private HashSet<TestElement> needUpdate;
-    private TestCaseElement autoScrollTarget;
+    private HashSet<SubstepsTestElement> needUpdate;
+    private SubstepsTestLeafElement autoScrollTarget;
 
-    private LinkedList<TestSuiteElement> autoClose;
-    private HashSet<TestSuiteElement> autoExpand;
+    private LinkedList<SubstepsTestParentElement> autoClose;
+    private HashSet<SubstepsTestParentElement> autoExpand;
 
     private final Supplier<IWorkbenchPartSite> siteSupplier;
     private final Notifier<Boolean> autoScrollSupplier;
-    private final Notifier<TestElement> failedTestNotifier;
+    private final Notifier<SubstepsTestElement> failedTestNotifier;
     private final Supplier<String> testKindDisplayNameSupplier;
     private final SubstepsIconProvider iconProvider;
     private final Notifier<TestContext> testRunner;
 
 
-    public FeatureViewer(final Composite parent, final Clipboard clipboard,
-            final Supplier<IWorkbenchPartSite> siteSupplier, final Notifier<TestElement> failedTestNotifier,
-            final Notifier<TestContext> testRunner, final Notifier<Boolean> autoScrollSupplier,
-            final Supplier<String> testKindDisplayNameSupplier, final SubstepsIconProvider iconProvider) {
-        this.clipboard = clipboard;
+    public FeatureViewer(final Composite parent, final Supplier<IWorkbenchPartSite> siteSupplier,
+            final Notifier<SubstepsTestElement> failedTestNotifier, final Notifier<TestContext> testRunner,
+            final Notifier<Boolean> autoScrollSupplier, final Supplier<String> testKindDisplayNameSupplier,
+            final SubstepsIconProvider iconProvider) {
         this.siteSupplier = siteSupplier;
         this.failedTestNotifier = failedTestNotifier;
         this.testRunner = testRunner;
@@ -226,12 +220,11 @@ public class FeatureViewer {
     void handleMenuAboutToShow(final IMenuManager manager) {
         final IStructuredSelection selection = (IStructuredSelection) selectionProvider.getSelection();
         if (!selection.isEmpty()) {
-            final TestElement testElement = (TestElement) selection.getFirstElement();
+            final SubstepsTestElement testElement = (SubstepsTestElement) selection.getFirstElement();
 
-            final String testLabel = testElement.getTestName();
             final String className = testElement.getClassName();
-            if (testElement instanceof TestSuiteElement) {
-                manager.add(new OpenFeatureAction());
+            if (testElement instanceof SubstepsTestParentElement) {
+                manager.add(new OpenFeatureAction(testElement));
                 manager.add(new Separator());
                 if (testClassExists(className) && !testRunSession.isKeptAlive()) {
                     manager.add(new RerunTestAction(SubstepsFeatureMessages.RerunAction_label_run, testRunner,
@@ -240,9 +233,9 @@ public class FeatureViewer {
                             testElement.getId(), className, null, ILaunchManager.DEBUG_MODE));
                 }
             } else {
-                final TestCaseElement testCaseElement = (TestCaseElement) testElement;
+                final SubstepsTestLeafElement testCaseElement = (SubstepsTestLeafElement) testElement;
                 final String testMethodName = testCaseElement.getTestMethodName();
-                manager.add(new OpenFeatureAction());
+                manager.add(new OpenFeatureAction(testElement));
                 manager.add(new Separator());
                 if (testRunSession.isKeptAlive()) {
                     manager.add(new RerunTestAction(SubstepsFeatureMessages.RerunAction_label_rerun, testRunner,
@@ -292,7 +285,7 @@ public class FeatureViewer {
     }
 
 
-    public synchronized void registerActiveSession(final TestRunSession testRunSession) {
+    public synchronized void registerActiveSession(final SubstepsRunSession testRunSession) {
         this.testRunSession = testRunSession;
         registerAutoScrollTarget(null);
         registerViewersRefresh();
@@ -304,14 +297,14 @@ public class FeatureViewer {
         if (selection.size() != 1)
             return;
 
-        final TestElement testElement = (TestElement) selection.getFirstElement();
+        final SubstepsTestElement testElement = (SubstepsTestElement) selection.getFirstElement();
 
         OpenFeatureAction action;
-        if (testElement instanceof TestSuiteElement) {
-            action = new OpenFeatureAction();
-        } else if (testElement instanceof TestCaseElement) {
-            final TestCaseElement testCase = (TestCaseElement) testElement;
-            action = new OpenFeatureAction();
+        if (testElement instanceof SubstepsTestParentElement) {
+            action = new OpenFeatureAction(testElement);
+        } else if (testElement instanceof SubstepsTestLeafElement) {
+            final SubstepsTestLeafElement testCase = (SubstepsTestLeafElement) testElement;
+            action = new OpenFeatureAction(testCase);
         } else {
             throw new IllegalStateException(String.valueOf(testElement));
         }
@@ -323,9 +316,9 @@ public class FeatureViewer {
 
     private void handleSelected() {
         final IStructuredSelection selection = (IStructuredSelection) selectionProvider.getSelection();
-        TestElement testElement = null;
+        SubstepsTestElement testElement = null;
         if (selection.size() == 1) {
-            testElement = (TestElement) selection.getFirstElement();
+            testElement = (SubstepsTestElement) selection.getFirstElement();
         }
         failedTestNotifier.notify(testElement);
     }
@@ -449,7 +442,7 @@ public class FeatureViewer {
      * To be called periodically by the TestRunnerViewPart (in the UI thread).
      */
     public void processChangesInUI() {
-        TestRoot testRoot;
+        SubstepsTestRootElement testRoot;
         if (testRunSession == null) {
             registerViewersRefresh();
             treeNeedsRefresh = false;
@@ -476,12 +469,12 @@ public class FeatureViewer {
             if (!treeNeedsRefresh && toUpdate.length > 0) {
                 if (treeHasFilter)
                     for (final Object element : toUpdate)
-                        updateElementInTree((TestElement) element);
+                        updateElementInTree((SubstepsTestElement) element);
                 else {
                     final HashSet<Object> toUpdateWithParents = new HashSet<Object>();
                     toUpdateWithParents.addAll(Arrays.asList(toUpdate));
                     for (final Object element : toUpdate) {
-                        TestElement parent = ((TestElement) element).getParent();
+                        SubstepsTestElement parent = ((SubstepsTestElement) element).getParent();
                         while (parent != null) {
                             toUpdateWithParents.add(parent);
                             parent = parent.getParent();
@@ -493,7 +486,7 @@ public class FeatureViewer {
             if (!tableNeedsRefresh && toUpdate.length > 0) {
                 if (tableHasFilter)
                     for (final Object element : toUpdate)
-                        updateElementInTable((TestElement) element);
+                        updateElementInTable((SubstepsTestElement) element);
                 else
                     tableViewer.update(toUpdate, null);
             }
@@ -502,18 +495,18 @@ public class FeatureViewer {
     }
 
 
-    private void updateElementInTree(final TestElement testElement) {
+    private void updateElementInTree(final SubstepsTestElement testElement) {
         if (isShown(testElement)) {
             updateShownElementInTree(testElement);
         } else {
-            TestElement current = testElement;
+            SubstepsTestElement current = testElement;
             do {
                 if (treeViewer.testFindItem(current) != null)
                     treeViewer.remove(current);
                 current = current.getParent();
-            } while (!(current instanceof TestRoot) && !isShown(current));
+            } while (!(current instanceof SubstepsTestRootElement) && !isShown(current));
 
-            while (current != null && !(current instanceof TestRoot)) {
+            while (current != null && !(current instanceof SubstepsTestRootElement)) {
                 treeViewer.update(current, null);
                 current = current.getParent();
             }
@@ -521,13 +514,13 @@ public class FeatureViewer {
     }
 
 
-    private void updateShownElementInTree(final TestElement testElement) {
-        if (testElement == null || testElement instanceof TestRoot) // paranoia
-                                                                    // null
-                                                                    // check
+    private void updateShownElementInTree(final SubstepsTestElement testElement) {
+        if (testElement == null || testElement instanceof SubstepsTestRootElement) // paranoia
+            // null
+            // check
             return;
 
-        final TestSuiteElement parent = testElement.getParent();
+        final SubstepsTestParentElement parent = testElement.getParent();
         updateShownElementInTree(parent); // make sure parent is shown and
                                           // up-to-date
 
@@ -539,10 +532,10 @@ public class FeatureViewer {
     }
 
 
-    private void updateElementInTable(final TestElement element) {
+    private void updateElementInTable(final SubstepsTestElement element) {
         if (isShown(element)) {
             if (tableViewer.testFindItem(element) == null) {
-                final TestElement previous = getNextFailure(element, false);
+                final SubstepsTestElement previous = getNextFailure(element, false);
                 int insertionIndex = -1;
                 if (previous != null) {
                     final TableItem item = (TableItem) tableViewer.testFindItem(previous);
@@ -559,7 +552,7 @@ public class FeatureViewer {
     }
 
 
-    private boolean isShown(final TestElement current) {
+    private boolean isShown(final SubstepsTestElement current) {
         return failuresOnlyFilter.select(current);
     }
 
@@ -578,25 +571,26 @@ public class FeatureViewer {
         }
 
         synchronized (this) {
-            for (final TestSuiteElement suite : autoExpand) {
+            for (final SubstepsTestParentElement suite : autoExpand) {
                 treeViewer.setExpandedState(suite, true);
             }
             clearAutoExpand();
         }
 
-        final TestCaseElement current = autoScrollTarget;
+        final SubstepsTestLeafElement current = autoScrollTarget;
         autoScrollTarget = null;
 
-        TestSuiteElement parent = current == null ? null : (TestSuiteElement) treeContentProvider.getParent(current);
+        SubstepsTestParentElement parent = current == null ? null : (SubstepsTestParentElement) treeContentProvider
+                .getParent(current);
         if (autoClose.isEmpty() || !autoClose.getLast().equals(parent)) {
             // we're in a new branch, so let's close old OK branches:
-            for (final ListIterator<TestSuiteElement> iter = autoClose.listIterator(autoClose.size()); iter
+            for (final ListIterator<SubstepsTestParentElement> iter = autoClose.listIterator(autoClose.size()); iter
                     .hasPrevious();) {
-                final TestSuiteElement previousAutoOpened = iter.previous();
+                final SubstepsTestParentElement previousAutoOpened = iter.previous();
                 if (previousAutoOpened.equals(parent))
                     break;
 
-                if (previousAutoOpened.getStatus() == TestElement.Status.OK) {
+                if (previousAutoOpened.getStatus().equals(Status.OK)) {
                     // auto-opened the element, and all children are OK -> auto
                     // close
                     iter.remove();
@@ -608,7 +602,7 @@ public class FeatureViewer {
                     && treeViewer.getExpandedState(parent) == false) {
                 autoClose.add(parent); // add to auto-opened elements -> close
                                        // later if STATUS_OK
-                parent = (TestSuiteElement) treeContentProvider.getParent(parent);
+                parent = (SubstepsTestParentElement) treeContentProvider.getParent(parent);
             }
         }
         if (current != null)
@@ -617,7 +611,7 @@ public class FeatureViewer {
 
 
     public void selectFirstFailure() {
-        final TestCaseElement firstFailure = getNextChildFailure(testRunSession.getTestRoot(), true);
+        final SubstepsTestLeafElement firstFailure = getNextChildFailure(testRunSession.getTestRoot(), true);
         if (firstFailure != null)
             getActiveViewer().setSelection(new StructuredSelection(firstFailure), true);
     }
@@ -625,8 +619,8 @@ public class FeatureViewer {
 
     public void selectFailure(final boolean showNext) {
         final IStructuredSelection selection = (IStructuredSelection) getActiveViewer().getSelection();
-        final TestElement selected = (TestElement) selection.getFirstElement();
-        TestElement next;
+        final SubstepsTestElement selected = (SubstepsTestElement) selection.getFirstElement();
+        SubstepsTestElement next;
 
         if (selected == null) {
             next = getNextChildFailure(testRunSession.getTestRoot(), showNext);
@@ -639,9 +633,9 @@ public class FeatureViewer {
     }
 
 
-    private TestElement getNextFailure(final TestElement selected, final boolean showNext) {
-        if (selected instanceof TestSuiteElement) {
-            final TestElement nextChild = getNextChildFailure((TestSuiteElement) selected, showNext);
+    private SubstepsTestElement getNextFailure(final SubstepsTestElement selected, final boolean showNext) {
+        if (selected instanceof SubstepsTestParentElement) {
+            final SubstepsTestElement nextChild = getNextChildFailure((SubstepsTestParentElement) selected, showNext);
             if (nextChild != null)
                 return nextChild;
         }
@@ -649,23 +643,23 @@ public class FeatureViewer {
     }
 
 
-    private TestCaseElement getNextFailureSibling(final TestElement current, final boolean showNext) {
-        final TestSuiteElement parent = current.getParent();
+    private SubstepsTestLeafElement getNextFailureSibling(final SubstepsTestElement current, final boolean showNext) {
+        final SubstepsTestParentElement parent = current.getParent();
         if (parent == null)
             return null;
 
-        List<ITestElement> siblings = Arrays.asList(parent.getChildren());
+        List<SubstepsTestElement> siblings = Arrays.asList(parent.getChildren());
         if (!showNext)
-            siblings = new ReverseList<ITestElement>(siblings);
+            siblings = new ReverseList<SubstepsTestElement>(siblings);
 
         final int nextIndex = siblings.indexOf(current) + 1;
         for (int i = nextIndex; i < siblings.size(); i++) {
-            final TestElement sibling = (TestElement) siblings.get(i);
+            final SubstepsTestElement sibling = siblings.get(i);
             if (sibling.getStatus().isErrorOrFailure()) {
-                if (sibling instanceof TestCaseElement) {
-                    return (TestCaseElement) sibling;
+                if (sibling instanceof SubstepsTestLeafElement) {
+                    return (SubstepsTestLeafElement) sibling;
                 } else {
-                    return getNextChildFailure((TestSuiteElement) sibling, showNext);
+                    return getNextChildFailure((SubstepsTestParentElement) sibling, showNext);
                 }
             }
         }
@@ -673,17 +667,17 @@ public class FeatureViewer {
     }
 
 
-    private TestCaseElement getNextChildFailure(final TestSuiteElement root, final boolean showNext) {
-        List<ITestElement> children = Arrays.asList(root.getChildren());
+    private SubstepsTestLeafElement getNextChildFailure(final SubstepsTestParentElement root, final boolean showNext) {
+        List<SubstepsTestElement> children = Arrays.asList(root.getChildren());
         if (!showNext)
-            children = new ReverseList<ITestElement>(children);
+            children = new ReverseList<SubstepsTestElement>(children);
         for (int i = 0; i < children.size(); i++) {
-            final TestElement child = (TestElement) children.get(i);
+            final SubstepsTestElement child = children.get(i);
             if (child.getStatus().isErrorOrFailure()) {
-                if (child instanceof TestCaseElement) {
-                    return (TestCaseElement) child;
+                if (child instanceof SubstepsTestLeafElement) {
+                    return (SubstepsTestLeafElement) child;
                 } else {
-                    return getNextChildFailure((TestSuiteElement) child, showNext);
+                    return getNextChildFailure((SubstepsTestParentElement) child, showNext);
                 }
             }
         }
@@ -699,9 +693,9 @@ public class FeatureViewer {
 
 
     private void clearUpdateAndExpansion() {
-        needUpdate = new LinkedHashSet<TestElement>();
-        autoClose = new LinkedList<TestSuiteElement>();
-        autoExpand = new HashSet<TestSuiteElement>();
+        needUpdate = new LinkedHashSet<SubstepsTestElement>();
+        autoClose = new LinkedList<SubstepsTestParentElement>();
+        autoExpand = new HashSet<SubstepsTestParentElement>();
     }
 
 
@@ -709,14 +703,14 @@ public class FeatureViewer {
      * @param testElement
      *            the added test
      */
-    public synchronized void registerTestAdded(final TestElement testElement) {
+    public synchronized void registerTestAdded(final SubstepsTestElement testElement) {
         // TODO: performance: would only need to refresh parent of added element
         treeNeedsRefresh = true;
         tableNeedsRefresh = true;
     }
 
 
-    public synchronized void registerViewerUpdate(final TestElement testElement) {
+    public synchronized void registerViewerUpdate(final SubstepsTestElement testElement) {
         needUpdate.add(testElement);
     }
 
@@ -726,13 +720,13 @@ public class FeatureViewer {
     }
 
 
-    public void registerAutoScrollTarget(final TestCaseElement testCaseElement) {
+    public void registerAutoScrollTarget(final SubstepsTestLeafElement testCaseElement) {
         autoScrollTarget = testCaseElement;
     }
 
 
-    public synchronized void registerFailedForAutoScroll(final TestElement testElement) {
-        final TestSuiteElement parent = (TestSuiteElement) treeContentProvider.getParent(testElement);
+    public synchronized void registerFailedForAutoScroll(final SubstepsTestElement testElement) {
+        final SubstepsTestParentElement parent = (SubstepsTestParentElement) treeContentProvider.getParent(testElement);
         if (parent != null)
             autoExpand.add(parent);
     }

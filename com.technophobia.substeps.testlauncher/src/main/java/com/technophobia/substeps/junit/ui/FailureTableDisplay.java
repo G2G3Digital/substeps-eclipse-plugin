@@ -1,67 +1,64 @@
 package com.technophobia.substeps.junit.ui;
 
-import org.eclipse.jdt.internal.junit.ui.ITraceDisplay;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
-import org.eclipse.jdt.internal.junit.ui.TextualTrace;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
-public class FailureTableDisplay implements ITraceDisplay {
-    private final Table fTable;
+import com.technophobia.substeps.table.LineType;
 
-    private final Image fExceptionIcon= JUnitPlugin.createImage("obj16/exc_catch.gif"); //$NON-NLS-1$
+public class FailureTableDisplay implements TraceDisplay {
+    private final Table table;
 
-    private final Image fStackIcon= JUnitPlugin.createImage("obj16/stkfrm_obj.gif"); //$NON-NLS-1$
+    private final Image exceptionIcon; //$NON-NLS-1$
 
-    public FailureTableDisplay(Table table) {
-            fTable = table;
-            fTable.getParent().addDisposeListener(new DisposeListener() {
-                    public void widgetDisposed(DisposeEvent e) {
-                            disposeIcons();
-                    }
-            });
+    private final Image stackIcon; //$NON-NLS-1$
+
+
+    public FailureTableDisplay(final Table table, final SubstepsIconProvider iconProvider) {
+        this.table = table;
+        exceptionIcon = iconProvider.imageFor(SubstepsIcon.Exception);
+        stackIcon = iconProvider.imageFor(SubstepsIcon.Stack);
     }
 
-    public void addTraceLine(int lineType, String label) {
-            TableItem tableItem = newTableItem();
-            switch (lineType) {
-            case TextualTrace.LINE_TYPE_EXCEPTION:
-                    tableItem.setImage(fExceptionIcon);
-                    break;
-            case TextualTrace.LINE_TYPE_STACKFRAME:
-                    tableItem.setImage(fStackIcon);
-                    break;
-            case TextualTrace.LINE_TYPE_NORMAL:
-            default:
-                    break;
-            }
-            tableItem.setText(label);
+
+    /* (non-Javadoc)
+     * @see com.technophobia.substeps.junit.ui.TraceDisplay#addTraceLine(com.technophobia.substeps.table.LineType, java.lang.String)
+     */
+    @Override
+    public void addTraceLine(final LineType lineType, final String label) {
+        final TableItem tableItem = newTableItem();
+        switch (lineType) {
+        case EXCEPTION:
+            tableItem.setImage(exceptionIcon);
+            break;
+        case STACK:
+            tableItem.setImage(stackIcon);
+            break;
+        case NORMAL:
+        default:
+            break;
+        }
+        tableItem.setText(label);
     }
+
 
     public Image getExceptionIcon() {
-            return fExceptionIcon;
+        return exceptionIcon;
     }
+
 
     public Image getStackIcon() {
-            return fStackIcon;
+        return stackIcon;
     }
+
 
     public Table getTable() {
-            return fTable;
+        return table;
     }
 
-    private void disposeIcons() {
-            if (fExceptionIcon != null && !fExceptionIcon.isDisposed())
-                    fExceptionIcon.dispose();
-            if (fStackIcon != null && !fStackIcon.isDisposed())
-                    fStackIcon.dispose();
-    }
 
     public TableItem newTableItem() {
-            return new TableItem(fTable, SWT.NONE);
+        return new TableItem(table, SWT.NONE);
     }
 }

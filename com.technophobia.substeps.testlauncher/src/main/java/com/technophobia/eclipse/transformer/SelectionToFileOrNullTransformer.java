@@ -6,7 +6,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 
 public class SelectionToFileOrNullTransformer implements Transformer<ISelection, IFile> {
 
-    @SuppressWarnings("unchecked")
     @Override
     public IFile to(final ISelection selection) {
         if (selection instanceof IStructuredSelection) {

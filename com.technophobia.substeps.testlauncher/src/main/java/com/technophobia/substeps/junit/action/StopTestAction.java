@@ -1,25 +1,28 @@
 package com.technophobia.substeps.junit.action;
 
-import org.eclipse.jdt.internal.junit.model.TestRunSession;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.junit.ui.SubstepsIcon;
+import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
+import com.technophobia.substeps.junit.ui.SubstepsRunSession;
 
 public class StopTestAction extends Action {
-    private final Supplier<TestRunSession> testRunSessionSupplier;
+    private final Supplier<SubstepsRunSession> substepsRunSessionSupplier;
     private final Notifier<String> infoMessageUpdater;
 
 
-    public StopTestAction(final Supplier<TestRunSession> testRunSessionSupplier,
-            final Notifier<String> infoMessageUpdater) {
-        this.testRunSessionSupplier = testRunSessionSupplier;
+    public StopTestAction(final Supplier<SubstepsRunSession> substepsRunSessionSupplier,
+            final Notifier<String> infoMessageUpdater, final SubstepsIconProvider iconProvider) {
+        this.substepsRunSessionSupplier = substepsRunSessionSupplier;
         this.infoMessageUpdater = infoMessageUpdater;
         setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_stopaction_text);
         setToolTipText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_stopaction_text);
-        JUnitPlugin.setLocalImageDescriptors(this, "stop.gif"); //$NON-NLS-1$
+        setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.StopDisbled)); //$NON-NLS-1$
+        setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.StopEnabled)); //$NON-NLS-1$
+        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.StopEnabled)); //$NON-NLS-1$
     }
 
 
@@ -31,12 +34,12 @@ public class StopTestAction extends Action {
 
 
     private void stopTest() {
-        final TestRunSession testRunSession = testRunSessionSupplier.get();
-        if (testRunSession != null) {
-            if (testRunSession.isRunning()) {
+        final SubstepsRunSession substepsRunSession = substepsRunSessionSupplier.get();
+        if (substepsRunSession != null) {
+            if (substepsRunSession.isRunning()) {
                 infoMessageUpdater.notify(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_message_stopping);
             }
-            testRunSession.stopTestRun();
+            substepsRunSession.stopTestRun();
         }
     }
 }

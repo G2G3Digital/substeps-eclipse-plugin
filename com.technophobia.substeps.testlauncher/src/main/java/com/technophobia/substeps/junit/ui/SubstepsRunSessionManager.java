@@ -1,25 +1,23 @@
 package com.technophobia.substeps.junit.ui;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jdt.internal.junit.BasicElementLabels;
-import org.eclipse.jdt.internal.junit.JUnitCorePlugin;
-import org.eclipse.jdt.internal.junit.JUnitPreferencesConstants;
-import org.eclipse.jdt.internal.junit.model.ITestSessionListener;
-import org.eclipse.jdt.internal.junit.model.TestRunSession;
 
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.eclipse.ui.Resettable;
 import com.technophobia.eclipse.ui.UiUpdater;
+import com.technophobia.substeps.FeatureRunnerPlugin;
+import com.technophobia.substeps.junit.ui.component.FeatureViewer;
 import com.technophobia.substeps.junit.ui.job.UpdateJobManager;
 import com.technophobia.substeps.junit.ui.testsession.TestResultsView;
+import com.technophobia.substeps.model.SubstepsSessionListener;
+import com.technophobia.substeps.preferences.PreferencesConstants;
 
-public class TestRunSessionManager implements Supplier<TestRunSession> {
+public class SubstepsRunSessionManager implements Supplier<SubstepsRunSession> {
 
-    private TestRunSession currentSession;
+    private SubstepsRunSession currentSession;
     private final FeatureViewer testViewer;
-    private final Supplier<TestRunStats> testRunStats;
-    private ITestSessionListener sessionListener;
+    private SubstepsSessionListener sessionListener;
     private final Supplier<Boolean> disposedSashFormChecker;
     private final UiUpdater tooltipUpdater;
     private final Resettable viewIconResetter;
@@ -27,25 +25,23 @@ public class TestRunSessionManager implements Supplier<TestRunSession> {
     private final Resettable failureTraceResetter;
     private final Notifier<String> infoMessageNotifier;
 
-    private final Supplier<ITestSessionListener> testRunSessionListenerSupplier;
+    private final Supplier<SubstepsSessionListener> testRunSessionListenerSupplier;
 
-    private final boolean showOnErrorOnly = Platform.getPreferencesService().getBoolean(JUnitCorePlugin.CORE_PLUGIN_ID,
-            JUnitPreferencesConstants.SHOW_ON_ERROR_ONLY, false, null);
+    private final boolean showOnErrorOnly = Platform.getPreferencesService().getBoolean(FeatureRunnerPlugin.PLUGIN_ID,
+            PreferencesConstants.SHOW_ON_ERROR_ONLY, false, null);
     private final TestResultsView testResultsView;
 
     private final SubstepsActionManager actionManager;
     private final UpdateJobManager updateJobManager;
 
 
-    @SuppressWarnings("restriction")
-    public TestRunSessionManager(final Supplier<Boolean> disposedSashFormChecker,
-            final Supplier<TestRunStats> testRunStats, final FeatureViewer testViewer, final UiUpdater tooltipUpdater,
-            final Notifier<String> infoMessageNotifier, final Resettable viewIconResetter,
-            final Resettable statusMessageResetter, final Resettable failureTraceResetter,
-            final TestResultsView testResultsView, final SubstepsActionManager substepsActionManager,
-            final UpdateJobManager updateJobManager, final Supplier<ITestSessionListener> testSessionListenerSupplier) {
+    public SubstepsRunSessionManager(final Supplier<Boolean> disposedSashFormChecker, final FeatureViewer testViewer,
+            final UiUpdater tooltipUpdater, final Notifier<String> infoMessageNotifier,
+            final Resettable viewIconResetter, final Resettable statusMessageResetter,
+            final Resettable failureTraceResetter, final TestResultsView testResultsView,
+            final SubstepsActionManager substepsActionManager, final UpdateJobManager updateJobManager,
+            final Supplier<SubstepsSessionListener> testSessionListenerSupplier) {
         this.disposedSashFormChecker = disposedSashFormChecker;
-        this.testRunStats = testRunStats;
         this.testViewer = testViewer;
         this.tooltipUpdater = tooltipUpdater;
         this.infoMessageNotifier = infoMessageNotifier;
@@ -60,7 +56,7 @@ public class TestRunSessionManager implements Supplier<TestRunSession> {
     }
 
 
-    public TestRunSession setActiveState(final TestRunSession testRunSession) {
+    public SubstepsRunSession setActiveState(final SubstepsRunSession substepsRunSession) {
         /*
          * - State: fTestRunSession fTestSessionListener Jobs
          * fTestViewer.processChangesInUI(); - UI: fCounterPanel fProgressBar
@@ -69,23 +65,23 @@ public class TestRunSessionManager implements Supplier<TestRunSession> {
          * 
          * action enablement
          */
-        if (currentSession == testRunSession)
+        if (currentSession == substepsRunSession)
             return null;
 
         deregisterTestSessionListener(true);
 
-        final TestRunSession deactivatedSession = currentSession;
+        final SubstepsRunSession deactivatedSession = currentSession;
 
-        currentSession = testRunSession;
+        currentSession = substepsRunSession;
 
-        testViewer.registerActiveSession(testRunSession);
+        testViewer.registerActiveSession(substepsRunSession);
 
         if (disposedSashFormChecker.get()) {
             updateJobManager.stopUpdateJobs();
             return deactivatedSession;
         }
 
-        if (testRunSession == null) {
+        if (substepsRunSession == null) {
             tooltipUpdater.reset();
             viewIconResetter.reset();
             statusMessageResetter.reset();
@@ -99,23 +95,23 @@ public class TestRunSessionManager implements Supplier<TestRunSession> {
             actionManager.setRerunLastTestActionEnabled(false);
 
         } else {
-            if (testRunSession.isStarting() || testRunSession.isRunning() || testRunSession.isKeptAlive()) {
+            if (substepsRunSession.isStarting() || substepsRunSession.isRunning() || substepsRunSession.isKeptAlive()) {
                 sessionListener = testRunSessionListenerSupplier.get();
-                testRunSession.addTestSessionListener(sessionListener);
+                substepsRunSession.addTestSessionListener(sessionListener);
             }
-            if (!testRunSession.isStarting() && !showOnErrorOnly)
+            if (!substepsRunSession.isStarting() && !showOnErrorOnly)
                 testResultsView.showTestResultsView();
 
             tooltipUpdater.doUpdate();
 
             statusMessageResetter.reset();
             failureTraceResetter.reset();
-            infoMessageNotifier.notify(BasicElementLabels.getJavaElementName(testRunSession.getTestRunName()));
+            infoMessageNotifier.notify(substepsRunSession.getTestRunName());
 
             updateRerunFailedFirstAction();
-            actionManager.setRerunLastTestActionEnabled(testRunSession.getLaunch() != null);
+            actionManager.setRerunLastTestActionEnabled(substepsRunSession.getLaunch() != null);
 
-            if (testRunSession.isRunning()) {
+            if (substepsRunSession.isRunning()) {
                 updateJobManager.startUpdateJobs();
 
                 actionManager.setStopActionEnabled(true);
@@ -123,7 +119,7 @@ public class TestRunSessionManager implements Supplier<TestRunSession> {
             } else /* old or fresh session: don't want jobs at this stage */{
                 updateJobManager.stopUpdateJobs();
 
-                actionManager.setStopActionEnabled(testRunSession.isKeptAlive());
+                actionManager.setStopActionEnabled(substepsRunSession.isKeptAlive());
                 testViewer.expandFirstLevel();
             }
         }
@@ -132,7 +128,7 @@ public class TestRunSessionManager implements Supplier<TestRunSession> {
 
 
     @Override
-    public TestRunSession get() {
+    public SubstepsRunSession get() {
         return currentSession;
     }
 
@@ -146,7 +142,7 @@ public class TestRunSessionManager implements Supplier<TestRunSession> {
 
 
     public void updateRerunFailedFirstAction() {
-        final boolean state = testRunStats.get().hasErrorsOrFailures() && currentSession.getLaunch() != null;
+        final boolean state = currentSession.hasErrorsOrFailures() && currentSession.getLaunch() != null;
         actionManager.setRerunFailedFirstActionEnabled(state);
     }
 }

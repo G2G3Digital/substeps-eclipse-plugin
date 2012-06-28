@@ -11,19 +11,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.jdt.internal.junit.JUnitCorePlugin;
-import org.eclipse.jdt.internal.junit.JUnitPreferencesConstants;
-import org.eclipse.jdt.internal.junit.launcher.ITestKind;
-import org.eclipse.jdt.internal.junit.model.ITestRunSessionListener;
-import org.eclipse.jdt.internal.junit.model.ITestSessionListener;
-import org.eclipse.jdt.internal.junit.model.JUnitModel;
-import org.eclipse.jdt.internal.junit.model.TestCaseElement;
-import org.eclipse.jdt.internal.junit.model.TestElement;
-import org.eclipse.jdt.internal.junit.model.TestRunSession;
-import org.eclipse.jdt.internal.junit.ui.IJUnitHelpContextIds;
-import org.eclipse.jdt.internal.junit.ui.JUnitProgressBar;
 import org.eclipse.jdt.internal.junit.ui.ProgressImages;
-import org.eclipse.jdt.internal.ui.viewsupport.ViewHistory;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -89,6 +77,7 @@ import com.technophobia.eclipse.ui.part.PartMonitor;
 import com.technophobia.eclipse.ui.render.OneTimeRenderUpdater;
 import com.technophobia.eclipse.ui.view.ViewLayout;
 import com.technophobia.eclipse.ui.view.ViewOrientation;
+import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.action.ActivateOnErrorAction;
 import com.technophobia.substeps.junit.action.FailuresOnlyFilterAction;
 import com.technophobia.substeps.junit.action.RerunFailedFirstAction;
@@ -102,18 +91,29 @@ import com.technophobia.substeps.junit.action.StopTestAction;
 import com.technophobia.substeps.junit.action.SubstepsCopyAction;
 import com.technophobia.substeps.junit.action.SubstepsPasteAction;
 import com.technophobia.substeps.junit.action.ToggleOrientationAction;
-import com.technophobia.substeps.junit.ui.component.JUnitDelegateCounterPanel;
+import com.technophobia.substeps.junit.ui.component.FeatureViewer;
+import com.technophobia.substeps.junit.ui.component.ProgressBar;
+import com.technophobia.substeps.junit.ui.component.SubstepsCounterPanel;
 import com.technophobia.substeps.junit.ui.handler.SubstepsHandlerServiceManager;
+import com.technophobia.substeps.junit.ui.help.SubstepsHelpContextIds;
 import com.technophobia.substeps.junit.ui.job.ProcessRunningJob;
 import com.technophobia.substeps.junit.ui.job.UpdateJobManager;
 import com.technophobia.substeps.junit.ui.job.UpdateSubstepsUIJob;
+import com.technophobia.substeps.junit.ui.progress.SubstepsProgressBar;
 import com.technophobia.substeps.junit.ui.testsession.JunitTestResultsView;
 import com.technophobia.substeps.junit.ui.testsession.TestResultsView;
 import com.technophobia.substeps.junit.ui.viewhistory.RunnerViewHistory;
+import com.technophobia.substeps.model.SubstepsSessionListener;
+import com.technophobia.substeps.model.structure.Status;
+import com.technophobia.substeps.model.structure.SubstepsTestElement;
+import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
+import com.technophobia.substeps.preferences.PreferencesConstants;
 
 @SuppressWarnings("restriction")
 public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements UpdateJobManager, Notifier<Runnable>,
         Callback, IPropertyListener {
+
+    public static final String NAME = "com.technophobia.substeps.runner.SubstepsResultView";
 
     private static final IMarker FAMILY_SUBSTEPS_FEATURE_RUN = new IMarker() {
     };
@@ -162,9 +162,9 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     private FailureTrace failureTrace;
 
     private Supplier<TestRunStats> testRunStatsSupplier;
-    private TestRunSessionManager sessionManager;
+    private SubstepsRunSessionManager sessionManager;
 
-    private ITestRunSessionListener testRunSessionListener;
+    private SubstepsRunSessionListener testRunSessionListener;
     private SubstepsHandlerServiceManager handlerServiceManager;
     private TestResultsView testResultsView;
     private FeatureViewer testViewer;
@@ -183,12 +183,12 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
     private Composite parent;
 
-    private ViewHistory<TestRunSession> viewHistory;
+    private RunnerViewHistory viewHistory;
     private SubstepsActionManager actionManager;
 
     private Composite counterComposite;
 
-    private JUnitProgressBar progressBar;
+    private ProgressBar progressBar;
 
     private Image originalViewImage;
     private Image viewImage;
@@ -202,7 +202,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
                 return isDisposed();
             }
         };
-        this.iconProvider = new SubstepsIconProvider(new ImageDescriptorImageLoader());
+        this.iconProvider = new SubstepsIconProvider(new ImageDescriptorImageLoader(), new ImageDescriptorLoader());
 
         this.infoMessageUpdater = new OneTimeRenderUpdater<String>(new Renderer<String>() {
             @Override
@@ -231,14 +231,15 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
 
     private SubstepsActionManager createActionManager() {
-        final Action stopAction = new StopTestAction(sessionManager, infoMessageUpdater);
+        final Action stopAction = new StopTestAction(sessionManager, infoMessageUpdater, iconProvider);
         final Action copyAction = new SubstepsCopyAction(getSite().getShell(), failureTrace, clipboard);
         final Action rerunFailedFirstAction = new RerunFailedFirstAction(RERUN_FAILED_FIRST_COMMAND,
-                new FailedTestFirstTestRelauncher(sessionManager, getSite().getShell(), infoMessageUpdater));
+                new FailedTestFirstTestRelauncher(sessionManager, getSite().getShell(), infoMessageUpdater),
+                iconProvider);
         final Action rerunLastTestAction = new RerunLastTestAction(RERUN_LAST_COMMAND, new TestRelauncher(
-                sessionManager, getSite().getShell(), infoMessageUpdater));
-        final Action nextAction = new ShowNextFailureAction(testViewer);
-        final Action prevAction = new ShowPreviousFailureAction(testViewer);
+                sessionManager, getSite().getShell(), infoMessageUpdater), iconProvider);
+        final Action nextAction = new ShowNextFailureAction(testViewer, iconProvider);
+        final Action prevAction = new ShowPreviousFailureAction(testViewer, iconProvider);
         return new SubstepsActionManager(stopAction, copyAction, rerunFailedFirstAction, rerunLastTestAction,
                 nextAction, prevAction);
     }
@@ -282,7 +283,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     public synchronized void dispose() {
         disposed = true;
         if (testRunSessionListener != null)
-            JUnitCorePlugin.getModel().removeTestRunSessionListener(testRunSessionListener);
+            FeatureRunnerPlugin.instance().getModel().removeTestRunSessionListener(testRunSessionListener);
 
         handlerServiceManager.deactivateHandlers();
         sessionManager.setActiveState(null);
@@ -326,9 +327,9 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         final UiUpdater statusMessageUpdater = new StatusMessageUiUpdater(getViewSite());
         final SashForm sashForm = createSashForm(parent);
 
-        this.sessionManager = new TestRunSessionManager(disposedSashFormChecker(), testRunStatsSupplier, testViewer,
-                tooltipUpdater, infoMessageUpdater, viewTitleUiUpdater, statusMessageUpdater, failureTrace,
-                testResultsView, actionManager, this, testSessionListenerSupplier());
+        this.sessionManager = new SubstepsRunSessionManager(disposedSashFormChecker(), testViewer, tooltipUpdater,
+                infoMessageUpdater, viewTitleUiUpdater, statusMessageUpdater, failureTrace, testResultsView,
+                actionManager, this, testSessionListenerSupplier());
         this.handlerServiceManager = new SubstepsHandlerServiceManager((IHandlerService) getSite().getWorkbenchWindow()
                 .getService(IHandlerService.class));
 
@@ -347,7 +348,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         actionBars.setGlobalActionHandler(ActionFactory.PASTE.getId(), pasteAction);
 
         this.viewHistory = new RunnerViewHistory(sessionManager, parent.getShell(), sessionManager,
-                new ImageDescriptorLoader(), pasteAction);
+                new ImageDescriptorLoader(), iconProvider, pasteAction);
         configureToolBar();
 
         initPageSwitcher();
@@ -355,7 +356,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
         originalViewImage = getTitleImage();
         progressImages = new ProgressImages();
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IJUnitHelpContextIds.RESULTS_VIEW);
+        PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, SubstepsHelpContextIds.RESULTS_VIEW);
 
         getViewSite().getPage().addPartListener(partMonitor);
 
@@ -366,13 +367,13 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         }
         memento = null;
 
-        testRunSessionListener = new TestRunSessionListener(displaySupplier(), siteSupplier(), infoMessageUpdater,
-                sessionManager);
-        JUnitCorePlugin.getModel().addTestRunSessionListener(testRunSessionListener);
+        testRunSessionListener = new DefaultSubstepsRunSessionListener(displaySupplier(), siteSupplier(),
+                infoMessageUpdater, sessionManager);
+        FeatureRunnerPlugin.instance().getModel().addTestRunSessionListener(testRunSessionListener);
 
         // always show youngest test run in view. simulate "sessionAdded" event
         // to do that
-        final List<TestRunSession> testRunSessions = JUnitCorePlugin.getModel().getTestRunSessions();
+        final List<SubstepsRunSession> testRunSessions = FeatureRunnerPlugin.instance().getModel().getTestRunSessions();
         if (!testRunSessions.isEmpty()) {
             testRunSessionListener.sessionAdded(testRunSessions.get(0));
         }
@@ -514,7 +515,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         sashForm = new SashForm(parent, SWT.VERTICAL);
 
         final ViewForm top = new ViewForm(sashForm, SWT.NONE);
-        this.testViewer = new FeatureViewer(top, clipboard, siteSupplier(), failedTestNotifier(), testRerunner(),
+        this.testViewer = new FeatureViewer(top, siteSupplier(), failedTestNotifier(), testRerunner(),
                 autoScrollNotifier(), testKindDisplayNameSupplier(), iconProvider);
 
         final Composite empty = new Composite(top, SWT.NONE);
@@ -543,7 +544,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         bottom.setTopLeft(label);
         final ToolBar failureToolBar = new ToolBar(bottom, SWT.FLAT | SWT.WRAP);
         bottom.setTopCenter(failureToolBar);
-        failureTrace = new FailureTrace(bottom, clipboard, failureToolBar);
+        failureTrace = new FailureTrace(bottom, clipboard, failureToolBar, iconProvider);
         bottom.setContent(failureTrace.getComposite());
 
         sashForm.setWeights(new int[] { 50, 50 });
@@ -600,7 +601,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
             @Override
             public String getName(final Object page) {
-                return viewHistory.getText((TestRunSession) page);
+                return viewHistory.getText((SubstepsRunSession) page);
             }
 
 
@@ -612,7 +613,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
             @Override
             public void activatePage(final Object page) {
-                viewHistory.setActiveEntry((TestRunSession) page);
+                viewHistory.setActiveEntry((SubstepsRunSession) page);
             }
 
 
@@ -696,18 +697,21 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
             }
         });
 
-        failuresOnlyFilterAction = new FailuresOnlyFilterAction(showFailuresOnlyNotifier());
+        failuresOnlyFilterAction = new FailuresOnlyFilterAction(showFailuresOnlyNotifier(), iconProvider);
 
-        scrollLockAction = new ScrollLockAction(autoScrollNotifier());
+        scrollLockAction = new ScrollLockAction(autoScrollNotifier(), iconProvider);
         scrollLockAction.setChecked(!autoScroll);
 
         final Notifier<ViewOrientation> viewOrientationNotifier = viewOrientationNotifier();
         toggleOrientationActions = new ToggleOrientationAction[] {
-                new ToggleOrientationAction(ViewOrientation.VIEW_ORIENTATION_VERTICAL, viewOrientationNotifier),
-                new ToggleOrientationAction(ViewOrientation.VIEW_ORIENTATION_HORIZONTAL, viewOrientationNotifier),
-                new ToggleOrientationAction(ViewOrientation.VIEW_ORIENTATION_AUTOMATIC, viewOrientationNotifier) };
+                new ToggleOrientationAction(ViewOrientation.VIEW_ORIENTATION_VERTICAL, viewOrientationNotifier,
+                        iconProvider),
+                new ToggleOrientationAction(ViewOrientation.VIEW_ORIENTATION_HORIZONTAL, viewOrientationNotifier,
+                        iconProvider),
+                new ToggleOrientationAction(ViewOrientation.VIEW_ORIENTATION_AUTOMATIC, viewOrientationNotifier,
+                        iconProvider) };
 
-        showTestHierarchyAction = new ShowTestHierarchyAction();
+        showTestHierarchyAction = new ShowTestHierarchyAction(layoutModeNotifier(), iconProvider);
         showTimeAction = new ShowTimeAction(testViewer);
 
         toolBar.add(actionManager.nextAction());
@@ -780,15 +784,16 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         composite.setLayout(layout);
         setCounterColumns(layout);
 
-        counterPanel = new JUnitDelegateCounterPanel(composite);
+        counterPanel = new SubstepsCounterPanel(composite, iconProvider);
         counterPanel.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
-        progressBar = new JUnitProgressBar(composite);
-        progressBar.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
+        progressBar = new SubstepsProgressBar(composite);
+        ((Composite) progressBar)
+                .setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
         return composite;
     }
 
 
-    private void showFailure(final TestElement test) {
+    private void showFailure(final SubstepsTestElement test) {
         notify(new Runnable() {
             @Override
             public void run() {
@@ -855,8 +860,9 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
                         SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_cannotrerun_title,
                         SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_cannotrerurn_message);
             } else if (sessionManager.get().isKeptAlive()) {
-                final TestCaseElement testCaseElement = (TestCaseElement) sessionManager.get().getTestElement(testId);
-                testCaseElement.setStatus(TestElement.Status.RUNNING, null, null, null);
+                final SubstepsTestLeafElement testCaseElement = (SubstepsTestLeafElement) sessionManager.get()
+                        .getTestElement(testId);
+                testCaseElement.setStatus(Status.RUNNING, null, null, null);
                 testViewer.registerViewerUpdate(testCaseElement);
                 postSyncProcessChanges();
             }
@@ -887,8 +893,8 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
 
     public boolean lastLaunchIsKeptAlive() {
-        final TestRunSession testRunSession = sessionManager.get();
-        return testRunSession != null && testRunSession.isKeptAlive();
+        final SubstepsRunSession subsepsRunSession = sessionManager.get();
+        return subsepsRunSession != null && subsepsRunSession.isKeptAlive();
     }
 
 
@@ -915,8 +921,8 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
 
     static boolean getShowOnErrorOnly() {
-        return Platform.getPreferencesService().getBoolean(JUnitCorePlugin.CORE_PLUGIN_ID,
-                JUnitPreferencesConstants.SHOW_ON_ERROR_ONLY, false, null);
+        return Platform.getPreferencesService().getBoolean(FeatureRunnerPlugin.PLUGIN_ID,
+                PreferencesConstants.SHOW_ON_ERROR_ONLY, false, null);
     }
 
 
@@ -925,7 +931,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                    JUnitModel.importTestRunSession(url, monitor);
+                    throw new UnsupportedOperationException("Import is not currently available");
                 }
             });
         } catch (final InterruptedException e) {
@@ -962,7 +968,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     }
 
 
-    TestElement[] getAllFailures() {
+    SubstepsTestElement[] getAllFailures() {
         return sessionManager.get().getAllFailedTestElements();
     }
 
@@ -1069,17 +1075,17 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     }
 
 
-    private Notifier<TestElement> failedTestNotifier() {
-        return new Notifier<TestElement>() {
+    private Notifier<SubstepsTestElement> failedTestNotifier() {
+        return new Notifier<SubstepsTestElement>() {
             @Override
-            public void notify(final TestElement t) {
+            public void notify(final SubstepsTestElement t) {
                 showFailure(t);
                 ((SubstepsCopyAction) actionManager.copyAction()).handleTestSelected(t);
             }
 
 
             @Override
-            public TestElement currentValue() {
+            public SubstepsTestElement currentValue() {
                 // TODO Auto-generated method stub
                 return null;
             }
@@ -1107,8 +1113,8 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         return new Supplier<String>() {
             @Override
             public String get() {
-                final ITestKind testRunnerKind = sessionManager.get().getTestRunnerKind();
-                return testRunnerKind.isNull() ? "" : testRunnerKind.getDisplayName();
+                final String testRunnerKind = sessionManager.get().getTestRunnerKind();
+                return testRunnerKind == null ? "" : testRunnerKind;
             }
         };
     }
@@ -1141,10 +1147,10 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     }
 
 
-    private Supplier<ITestSessionListener> testSessionListenerSupplier() {
-        return new Supplier<ITestSessionListener>() {
+    private Supplier<SubstepsSessionListener> testSessionListenerSupplier() {
+        return new Supplier<SubstepsSessionListener>() {
             @Override
-            public ITestSessionListener get() {
+            public SubstepsSessionListener get() {
                 return new TestSessionListener(testViewer, SubstepsFeatureTestRunnerViewPart.this, infoMessageUpdater,
                         uiUpdater, showOnErrorOnlyNotifier(), SubstepsFeatureTestRunnerViewPart.this, actionManager,
                         sessionManager, testRunStatsSupplier, disposedChecker, autoScrollNotifier(),
@@ -1159,7 +1165,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         return new Supplier<TestRunStats>() {
             @Override
             public TestRunStats get() {
-                return new JunitTestRunSessionAdapter(sessionManager);
+                return sessionManager.get();
             }
         };
     }

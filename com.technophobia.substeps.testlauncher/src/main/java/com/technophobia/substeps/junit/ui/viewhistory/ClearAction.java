@@ -3,25 +3,25 @@ package com.technophobia.substeps.junit.ui.viewhistory;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.jdt.internal.junit.JUnitCorePlugin;
-import org.eclipse.jdt.internal.junit.model.TestRunSession;
-import org.eclipse.jdt.internal.ui.viewsupport.ViewHistory;
 import org.eclipse.jface.action.Action;
 
+import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.junit.ui.SubstepsRunSession;
 
 public class ClearAction extends Action {
-    private final ViewHistory<TestRunSession> viewHistory;
+    private final RunnerViewHistory viewHistory;
 
 
-    public ClearAction(final ViewHistory<TestRunSession> viewHistory) {
+    public ClearAction(final RunnerViewHistory viewHistory) {
         this.viewHistory = viewHistory;
         setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_clear_history_label);
 
         boolean enabled = false;
-        final List<TestRunSession> testRunSessions = JUnitCorePlugin.getModel().getTestRunSessions();
-        for (final TestRunSession testRunSession : testRunSessions) {
-            if (!testRunSession.isRunning() && !testRunSession.isStarting()) {
+        final List<SubstepsRunSession> substepsRunSessions = FeatureRunnerPlugin.instance().getModel()
+                .getTestRunSessions();
+        for (final SubstepsRunSession substepsRunSession : substepsRunSessions) {
+            if (!substepsRunSession.isRunning() && !substepsRunSession.isStarting()) {
                 enabled = true;
                 break;
             }
@@ -32,20 +32,21 @@ public class ClearAction extends Action {
 
     @Override
     public void run() {
-        final List<TestRunSession> testRunSessions = getRunningSessions();
-        final TestRunSession first = testRunSessions.isEmpty() ? null : testRunSessions.get(0);
-        viewHistory.setHistoryEntries(testRunSessions, first);
+        final List<SubstepsRunSession> substepsRunSessions = getRunningSessions();
+        final SubstepsRunSession first = substepsRunSessions.isEmpty() ? null : substepsRunSessions.get(0);
+        viewHistory.setHistoryEntries(substepsRunSessions, first);
     }
 
 
-    private List<TestRunSession> getRunningSessions() {
-        final List<TestRunSession> testRunSessions = JUnitCorePlugin.getModel().getTestRunSessions();
-        for (final Iterator<TestRunSession> iter = testRunSessions.iterator(); iter.hasNext();) {
-            final TestRunSession testRunSession = iter.next();
-            if (!testRunSession.isRunning() && !testRunSession.isStarting()) {
+    private List<SubstepsRunSession> getRunningSessions() {
+        final List<SubstepsRunSession> substepsRunSessions = FeatureRunnerPlugin.instance().getModel()
+                .getTestRunSessions();
+        for (final Iterator<SubstepsRunSession> iter = substepsRunSessions.iterator(); iter.hasNext();) {
+            final SubstepsRunSession substepsRunSession = iter.next();
+            if (!substepsRunSession.isRunning() && !substepsRunSession.isStarting()) {
                 iter.remove();
             }
         }
-        return testRunSessions;
+        return substepsRunSessions;
     }
 }

@@ -1,52 +1,44 @@
 package com.technophobia.substeps.junit.ui;
 
-import org.eclipse.jdt.internal.junit.model.TestRunSession;
-
-import com.technophobia.eclipse.transformer.Supplier;
-
 public class JunitTestRunSessionAdapter implements TestRunStats {
 
-    private final Supplier<TestRunSession> delegate;
-
-
-    public JunitTestRunSessionAdapter(final Supplier<TestRunSession> delegate) {
-        this.delegate = delegate;
+    public JunitTestRunSessionAdapter() {
     }
 
 
     @Override
     public int getTotalCount() {
-        return delegate.get().getTotalCount();
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
     public int getStartedCount() {
-        return delegate.get().getStartedCount();
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
     public int getIgnoredCount() {
-        return delegate.get().getIgnoredCount();
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
     public int getErrorCount() {
-        return delegate.get().getErrorCount();
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
     public int getFailureCount() {
-        return delegate.get().getFailureCount();
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
     public TestRunState getState() {
-        return delegate.get().isStopped() ? TestRunState.STOPPED : TestRunState.IN_PROGRESS;
+        throw new UnsupportedOperationException();
     }
 
 

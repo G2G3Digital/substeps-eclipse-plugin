@@ -1,21 +1,20 @@
 package com.technophobia.substeps.junit.ui;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitProgressBar;
-
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.UiUpdater;
 import com.technophobia.substeps.junit.ui.TestRunStats.TestRunState;
 import com.technophobia.substeps.junit.ui.component.CounterPanel;
+import com.technophobia.substeps.junit.ui.component.ProgressBar;
 
 public class TestCounterUiUpdater implements UiUpdater {
 
-    private final Supplier<TestRunStats> testRunStatsSupplier;
     private final CounterPanel counterPanel;
-    private final JUnitProgressBar progressBar;
+    private final ProgressBar progressBar;
+    private final Supplier<TestRunStats> testRunStatsSupplier;
 
 
     public TestCounterUiUpdater(final Supplier<TestRunStats> testRunStatsSupplier, final CounterPanel counterPanel,
-            final JUnitProgressBar progressBar) {
+            final ProgressBar progressBar) {
         this.testRunStatsSupplier = testRunStatsSupplier;
         this.counterPanel = counterPanel;
         this.progressBar = progressBar;

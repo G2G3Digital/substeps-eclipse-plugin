@@ -1,20 +1,14 @@
 package com.technophobia.substeps.junit.ui.viewhistory;
 
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jdt.internal.junit.BasicElementLabels;
-import org.eclipse.jdt.internal.junit.JUnitCorePlugin;
-import org.eclipse.jdt.internal.junit.JUnitPreferencesConstants;
-import org.eclipse.jdt.internal.junit.Messages;
-import org.eclipse.jdt.internal.junit.model.TestRunSession;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jdt.internal.ui.viewsupport.ViewHistory;
-import org.eclipse.jdt.junit.model.ITestElement.Result;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
@@ -24,26 +18,35 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.SubstepsIcon;
-import com.technophobia.substeps.junit.ui.TestRunSessionManager;
+import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
+import com.technophobia.substeps.junit.ui.SubstepsRunSession;
+import com.technophobia.substeps.junit.ui.SubstepsRunSessionManager;
+import com.technophobia.substeps.model.structure.Result;
+import com.technophobia.substeps.preferences.PreferencesConstants;
 
-public class RunnerViewHistory extends ViewHistory<TestRunSession> {
+@SuppressWarnings("restriction")
+public class RunnerViewHistory extends ViewHistory<SubstepsRunSession> {
 
-    private final Supplier<TestRunSession> testRunSessionSupplier;
+    private final Supplier<SubstepsRunSession> substepsRunSessionSupplier;
     private final Shell shell;
-    private final TestRunSessionManager sessionManager;
+    private final SubstepsRunSessionManager sessionManager;
     private final Transformer<SubstepsIcon, ImageDescriptor> imageDescriptorTransformer;
     private final Action pasteAction;
+    private final SubstepsIconProvider iconProvider;
 
 
-    public RunnerViewHistory(final Supplier<TestRunSession> testRunSessionSupplier, final Shell shell,
-            final TestRunSessionManager sessionManager,
-            final Transformer<SubstepsIcon, ImageDescriptor> imageDescriptorTransformer, final Action pasteAction) {
-        this.testRunSessionSupplier = testRunSessionSupplier;
+    public RunnerViewHistory(final Supplier<SubstepsRunSession> substepsRunSessionSupplier, final Shell shell,
+            final SubstepsRunSessionManager sessionManager,
+            final Transformer<SubstepsIcon, ImageDescriptor> imageDescriptorTransformer,
+            final SubstepsIconProvider iconProvider, final Action pasteAction) {
+        this.substepsRunSessionSupplier = substepsRunSessionSupplier;
         this.shell = shell;
         this.sessionManager = sessionManager;
         this.imageDescriptorTransformer = imageDescriptorTransformer;
+        this.iconProvider = iconProvider;
         this.pasteAction = pasteAction;
     }
 
@@ -57,7 +60,9 @@ public class RunnerViewHistory extends ViewHistory<TestRunSession> {
     @Override
     public void configureHistoryDropDownAction(final IAction action) {
         action.setToolTipText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_test_run_history);
-        JUnitPlugin.setLocalImageDescriptors(action, "history_list.gif"); //$NON-NLS-1$
+        action.setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.HistoryListDisabled)); //$NON-NLS-1$
+        action.setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.HistoryListEnabled)); //$NON-NLS-1$
+        action.setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.HistoryListEnabled)); //$NON-NLS-1$
     }
 
 
@@ -86,37 +91,37 @@ public class RunnerViewHistory extends ViewHistory<TestRunSession> {
 
 
     @Override
-    public List<TestRunSession> getHistoryEntries() {
-        return JUnitCorePlugin.getModel().getTestRunSessions();
+    public List<SubstepsRunSession> getHistoryEntries() {
+        return FeatureRunnerPlugin.instance().getModel().getTestRunSessions();
     }
 
 
     @Override
-    public TestRunSession getCurrentEntry() {
-        return testRunSessionSupplier.get();
+    public SubstepsRunSession getCurrentEntry() {
+        return substepsRunSessionSupplier.get();
     }
 
 
     @Override
-    public void setActiveEntry(final TestRunSession entry) {
-        final TestRunSession deactivatedSession = sessionManager.setActiveState(entry);
+    public void setActiveEntry(final SubstepsRunSession entry) {
+        final SubstepsRunSession deactivatedSession = sessionManager.setActiveState(entry);
         if (deactivatedSession != null)
             deactivatedSession.swapOut();
     }
 
 
     @Override
-    public void setHistoryEntries(final List<TestRunSession> remainingEntries, final TestRunSession activeEntry) {
+    public void setHistoryEntries(final List<SubstepsRunSession> remainingEntries, final SubstepsRunSession activeEntry) {
         sessionManager.setActiveState(activeEntry);
 
-        final List<org.eclipse.jdt.internal.junit.model.TestRunSession> testRunSessions = JUnitCorePlugin.getModel()
+        final List<SubstepsRunSession> substepsRunSessions = FeatureRunnerPlugin.instance().getModel()
                 .getTestRunSessions();
-        testRunSessions.removeAll(remainingEntries);
-        for (final org.eclipse.jdt.internal.junit.model.TestRunSession testRunSession : testRunSessions) {
-            JUnitCorePlugin.getModel().removeTestRunSession(testRunSession);
+        substepsRunSessions.removeAll(remainingEntries);
+        for (final SubstepsRunSession substepsRunSession : substepsRunSessions) {
+            FeatureRunnerPlugin.instance().getModel().removeTestRunSession(substepsRunSession);
         }
-        for (final Iterator<TestRunSession> iter = remainingEntries.iterator(); iter.hasNext();) {
-            final TestRunSession remaining = iter.next();
+        for (final Iterator<SubstepsRunSession> iter = remainingEntries.iterator(); iter.hasNext();) {
+            final SubstepsRunSession remaining = iter.next();
             remaining.swapOut();
         }
     }
@@ -124,7 +129,7 @@ public class RunnerViewHistory extends ViewHistory<TestRunSession> {
 
     @Override
     public ImageDescriptor getImageDescriptor(final Object element) {
-        final TestRunSession session = (TestRunSession) element;
+        final SubstepsRunSession session = (SubstepsRunSession) element;
         if (session.isStopped())
             return imageDescriptorTransformer.to(SubstepsIcon.Suite);
 
@@ -144,14 +149,14 @@ public class RunnerViewHistory extends ViewHistory<TestRunSession> {
 
 
     @Override
-    public String getText(final TestRunSession session) {
-        final String testRunLabel = BasicElementLabels.getJavaElementName(session.getTestRunName());
+    public String getText(final SubstepsRunSession session) {
+        final String testRunLabel = session.getTestRunName();
         if (session.getStartTime() <= 0) {
             return testRunLabel;
         } else {
             final String startTime = DateFormat.getDateTimeInstance().format(new Date(session.getStartTime()));
-            return Messages.format(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_testName_startTime,
-                    new Object[] { testRunLabel, startTime });
+            return MessageFormat.format(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_testName_startTime,
+                    testRunLabel, startTime);
         }
     }
 
@@ -161,9 +166,9 @@ public class RunnerViewHistory extends ViewHistory<TestRunSession> {
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new ImportTestRunSessionAction(shell));
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new ImportTestRunSessionFromURLAction(shell));
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, pasteAction);
-        if (testRunSessionSupplier.get() != null)
+        if (substepsRunSessionSupplier.get() != null)
             manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new ExportTestRunSessionAction(shell,
-                    testRunSessionSupplier.get()));
+                    substepsRunSessionSupplier.get()));
     }
 
 
@@ -175,14 +180,14 @@ public class RunnerViewHistory extends ViewHistory<TestRunSession> {
 
     @Override
     public int getMaxEntries() {
-        return Platform.getPreferencesService().getInt(JUnitCorePlugin.CORE_PLUGIN_ID,
-                JUnitPreferencesConstants.MAX_TEST_RUNS, 10, null);
+        return Platform.getPreferencesService().getInt(FeatureRunnerPlugin.PLUGIN_ID,
+                PreferencesConstants.MAX_TEST_RUNS, 10, null);
     }
 
 
     @Override
     public void setMaxEntries(final int maxEntries) {
-        InstanceScope.INSTANCE.getNode(JUnitCorePlugin.CORE_PLUGIN_ID).putInt(JUnitPreferencesConstants.MAX_TEST_RUNS,
+        InstanceScope.INSTANCE.getNode(FeatureRunnerPlugin.PLUGIN_ID).putInt(PreferencesConstants.MAX_TEST_RUNS,
                 maxEntries);
     }
 }

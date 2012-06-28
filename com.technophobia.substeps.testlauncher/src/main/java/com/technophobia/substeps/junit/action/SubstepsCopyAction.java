@@ -7,8 +7,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jdt.internal.junit.model.TestElement;
-import org.eclipse.jdt.internal.junit.ui.IJUnitHelpContextIds;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.dnd.Clipboard;
@@ -21,13 +19,15 @@ import org.eclipse.ui.actions.SelectionListenerAction;
 
 import com.technophobia.substeps.junit.ui.FailureTrace;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.junit.ui.help.SubstepsHelpContextIds;
+import com.technophobia.substeps.model.structure.SubstepsTestElement;
 
 public class SubstepsCopyAction extends SelectionListenerAction {
     private final FailureTrace failureTrace;
 
     private final Clipboard clipboard;
 
-    private TestElement testElement;
+    private SubstepsTestElement testElement;
 
     private final Shell shell;
 
@@ -35,7 +35,7 @@ public class SubstepsCopyAction extends SelectionListenerAction {
     public SubstepsCopyAction(final Shell shell, final FailureTrace failureTrace, final Clipboard clipboard) {
         super(SubstepsFeatureMessages.CopyTrace_action_label);
         Assert.isNotNull(clipboard);
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IJUnitHelpContextIds.COPYTRACE_ACTION);
+        PlatformUI.getWorkbench().getHelpSystem().setHelp(this, SubstepsHelpContextIds.COPYTRACE_ACTION);
         this.shell = shell;
         this.failureTrace = failureTrace;
         this.clipboard = clipboard;
@@ -71,8 +71,8 @@ public class SubstepsCopyAction extends SelectionListenerAction {
     }
 
 
-    public void handleTestSelected(final TestElement test) {
-        testElement = test;
+    public void handleTestSelected(final SubstepsTestElement test) {
+        this.testElement = test;
     }
 
 

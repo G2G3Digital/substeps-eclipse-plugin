@@ -3,7 +3,6 @@ package com.technophobia.substeps.junit.ui.viewhistory;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -15,6 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
+import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.TestSessionRunImporter;
 
@@ -52,7 +52,7 @@ public class ImportTestRunSessionFromURLAction extends Action {
         final String title = SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ImportTestRunSessionAction_title;
         final String message = SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ImportTestRunSessionFromURLAction_url;
 
-        final IDialogSettings dialogSettings = JUnitPlugin.getDefault().getDialogSettings();
+        final IDialogSettings dialogSettings = FeatureRunnerPlugin.instance().getDialogSettings();
         String url = dialogSettings.get(ImportTestRunSessionAction.PREF_LAST_PATH);
 
         final IInputValidator validator = new URLValidator();

@@ -3,8 +3,8 @@ package com.technophobia.substeps.junit.action;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 
-import com.technophobia.substeps.junit.ui.FeatureViewer;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.junit.ui.component.FeatureViewer;
 
 public class ShowTimeAction extends Action {
 

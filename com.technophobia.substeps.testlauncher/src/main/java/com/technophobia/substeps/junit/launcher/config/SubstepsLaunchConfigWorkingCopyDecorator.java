@@ -6,19 +6,17 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.junit.launcher.JUnitLaunchConfigurationConstants;
-import org.eclipse.jdt.internal.junit.launcher.TestKindRegistry;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
+import com.technophobia.eclipse.launcher.config.SubstepsLaunchConfigurationConstants;
 import com.technophobia.eclipse.launcher.exception.ExceptionReporter;
 import com.technophobia.eclipse.transformer.Decorator;
 import com.technophobia.eclipse.transformer.Transformer;
 import com.technophobia.substeps.junit.launcher.SubstepsFeatureLaunchShortcut;
 
-@SuppressWarnings("restriction")
 public class SubstepsLaunchConfigWorkingCopyDecorator implements Decorator<ILaunchConfigurationWorkingCopy, IResource> {
 
-    private static final String FEATURE_TEST = "com.technophobia.substeps.runner.runtime.DefinableFeatureTest";
+    public static final String FEATURE_TEST = "com.technophobia.substeps.runner.runtime.DefinableFeatureTest";
 
     private final Transformer<IProject, IJavaProject> javaProjectTransformer;
     private final ExceptionReporter exceptionReporter;
@@ -39,10 +37,10 @@ public class SubstepsLaunchConfigWorkingCopyDecorator implements Decorator<ILaun
 
         workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, FEATURE_TEST);
         workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project.getName());
-        workingCopy.setAttribute(JUnitLaunchConfigurationConstants.ATTR_KEEPRUNNING, false);
-        workingCopy.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER, "");
-        workingCopy.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_RUNNER_KIND,
-                TestKindRegistry.JUNIT4_TEST_KIND_ID);
+        workingCopy.setAttribute(SubstepsLaunchConfigurationConstants.ATTR_KEEPRUNNING, false);
+        workingCopy.setAttribute(SubstepsLaunchConfigurationConstants.ATTR_TEST_CONTAINER, "");
+        workingCopy.setAttribute(SubstepsLaunchConfigurationConstants.ATTR_TEST_RUNNER_KIND,
+                SubstepsLaunchConfigurationConstants.JUNIT4_TEST_KIND_ID);
 
         workingCopy.setAttribute(SubstepsFeatureLaunchShortcut.ATTR_FEATURE_FILE, filePath);
         workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, vmArgs(filePath, project));

@@ -1,67 +1,59 @@
 package com.technophobia.substeps.junit.ui.viewhistory;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.internal.junit.model.JUnitModel;
-import org.eclipse.jdt.internal.junit.model.TestRunSession;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.junit.ui.SubstepsRunSession;
 
 public class ExportTestRunSessionAction extends Action {
-    private final TestRunSession fTestRunSession;
-    private final Shell fShell;
+    private final SubstepsRunSession substepsRunSession;
+    @SuppressWarnings("unused")
+    private final Shell shell;
 
 
-    public ExportTestRunSessionAction(final Shell shell, final TestRunSession testRunSession) {
+    public ExportTestRunSessionAction(final Shell shell, final SubstepsRunSession substepsRunSession) {
         super(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ExportTestRunSessionAction_name);
-        fShell = shell;
-        fTestRunSession = testRunSession;
+        this.shell = shell;
+        this.substepsRunSession = substepsRunSession;
     }
 
 
     @Override
     public void run() {
-        final FileDialog exportDialog = new FileDialog(fShell, SWT.SAVE);
-        exportDialog
-                .setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ExportTestRunSessionAction_title);
-        final IDialogSettings dialogSettings = JUnitPlugin.getDefault().getDialogSettings();
-        final String lastPath = dialogSettings.get(ImportTestRunSessionAction.PREF_LAST_PATH);
-        if (lastPath != null) {
-            exportDialog.setFilterPath(lastPath);
-        }
-        exportDialog.setFileName(getFileName());
-        exportDialog.setFilterExtensions(new String[] { "*.xml", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
-        final String path = exportDialog.open();
-        if (path == null)
-            return;
-
-        // TODO: MULTI: getFileNames()
-        final File file = new File(path);
-
-        try {
-            JUnitModel.exportTestRunSession(fTestRunSession, file);
-        } catch (final CoreException e) {
-            JUnitPlugin.log(e);
-            ErrorDialog.openError(fShell,
-                    SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_ExportTestRunSessionAction_title, e
-                            .getStatus().getMessage(), e.getStatus());
-        }
+        throw new UnsupportedOperationException("Export test run is not currently available");
+        /*
+         * final FileDialog exportDialog = new FileDialog(shell, SWT.SAVE);
+         * exportDialog .setText(SubstepsFeatureMessages.
+         * SubstepsFeatureTestRunnerViewPart_ExportTestRunSessionAction_title);
+         * final IDialogSettings dialogSettings =
+         * JUnitPlugin.getDefault().getDialogSettings(); final String lastPath =
+         * dialogSettings.get(ImportTestRunSessionAction.PREF_LAST_PATH); if
+         * (lastPath != null) { exportDialog.setFilterPath(lastPath); }
+         * exportDialog.setFileName(getFileName());
+         * exportDialog.setFilterExtensions(new String[] { "*.xml", "*.*" });
+         * //$NON-NLS-1$ //$NON-NLS-2$ final String path = exportDialog.open();
+         * if (path == null) return;
+         * 
+         * // TODO: MULTI: getFileNames() final File file = new File(path);
+         * 
+         * try { SubstepsModel.exportTestRunSession(substepsRunSession, file); }
+         * catch (final CoreException e) { FeatureRunnerPlugin.log(Status.ERROR,
+         * e.getMessage()); ErrorDialog.openError(shell,
+         * SubstepsFeatureMessages.
+         * SubstepsFeatureTestRunnerViewPart_ExportTestRunSessionAction_title, e
+         * .getStatus().getMessage(), e.getStatus()); }
+         */
     }
 
 
+    @SuppressWarnings("unused")
     private String getFileName() {
-        final String testRunName = fTestRunSession.getTestRunName();
-        final long startTime = fTestRunSession.getStartTime();
+        final String testRunName = substepsRunSession.getTestRunName();
+        final long startTime = substepsRunSession.getStartTime();
         if (startTime <= 0)
             return testRunName;
 

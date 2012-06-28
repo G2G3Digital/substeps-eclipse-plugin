@@ -75,9 +75,26 @@ public class SubstepsFeatureMessages {
     public static String SubstepsFeatureTestRunnerViewPart_label_failure;
     public static String SubstepsFeatureTestRunnerViewPart_layout_menu;
 
+    public static String SubstepsLaunchConfigurationDelegate_verifying_attributes_description;
+    public static String SubstepsLaunchConfigurationDelegate_create_source_locator_description;
+    public static String SubstepsLaunchConfigurationDelegate_error_no_socket;
+    public static String SubstepsLaunchConfigurationDelegate_error_invalidproject;
+    public static String SubstepsLaunchConfigurationDelegate_error_junitnotonpath;
+    public static String SubstepsLaunchConfigurationDelegate_error_junit4notonpath;
+    public static String SubstepsLaunchConfigurationDelegate_error_wrong_input;
+    public static String SubstepsLaunchConfigurationDelegate_error_input_element_deosn_not_exist;
+    public static String SubstepsLaunchConfigurationDelegate_input_type_does_not_exist;
+
+    public static String SubstepsRunSession_unrootedTests;
+
     public static String CompareResultsAction_label;
     public static String CompareResultsAction_description;
     public static String CompareResultsAction_tooltip;
+
+    public static String CompareResultDialog_title;
+    public static String CompareResultDialog_labelOK;
+    public static String CompareResultDialog_expectedLabel;
+    public static String CompareResultDialog_actualLabel;
 
     public static String CopyTrace_action_label;
     public static String CopyTraceAction_problem;
@@ -105,6 +122,24 @@ public class SubstepsFeatureMessages {
     public static String TestSessionLabelProvider_testName_JUnitVersion;
     public static String TestSessionLabelProvider_testMethodName_className;
     public static String TestSessionLabelProvider_testName_elapsedTimeInSeconds;
+
+    public static String Model_importing_from_url;
+    public static String Model_could_not_import;
+    public static String Model_could_not_write;
+    public static String Model_could_not_read;
+    public static String SubstepsRunHandler_lines_read;
+
+    public static String CounterPanel_label_runs;
+    public static String CounterPanel_label_errors;
+    public static String CounterPanel_label_failures;
+    public static String CounterPanel_runcount;
+    public static String CounterPanel_runcount_ignored;
+
+    public static String RemoteTestRunner_error_classnamemissing;
+    public static String RemoteTestRunner_error_portmissing;
+    public static String RemoteTestRunner_error_invalidloader;
+    public static String RemoteTestRunner_error_connect;
+    public static String RemoteTestRunner_error_classnotfound;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, SubstepsFeatureMessages.class);

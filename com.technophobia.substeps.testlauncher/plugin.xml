@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!-- Copyright Technophobia.Ltd 2012 -->
 <plugin>
+   <extension-point id="substepsRunListeners" name="Substeps Run Listeners" schema="schema/substepsRunListeners.exsd"/>
 	<extension
          point="org.eclipse.ui.views">
       <view
@@ -9,7 +10,7 @@
             category="org.eclipse.jdt.ui.java"
             fastViewWidthRatio="0.40"
             class="com.technophobia.substeps.junit.ui.SubstepsFeatureTestRunnerViewPart"
-            id="org.eclipse.jdt.junit.SubstepResultView">
+            id="com.technophobia.substeps.runner.SubstepsResultView">
       </view>
    </extension>
   
@@ -71,8 +72,21 @@
   </extension>
   <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
+         <!--org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate
+         com.technophobia.substeps.junit.launcher.SubstepsLaunchConfigurationDelegate-->
       <launchConfigurationType
             delegate="org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate"
+            delegateDescription="%SubstepsFeatureLaunchDelegate.description"
+            delegateName="%SubstepsFeatureLaunchDelegate.name"
+            id="com.technophobia.substeps.junit.launchconfig"
+            migrationDelegate="org.eclipse.jdt.internal.junit.launcher.JUnitMigrationDelegate"
+            modes="run, debug"
+            name="%Launch.label"
+            sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
+            sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
+      </launchConfigurationType>
+      <launchConfigurationType
+            delegate="com.technophobia.substeps.junit.launcher.SubstepsLaunchConfigurationDelegate"
             delegateDescription="%SubstepsFeatureLaunchDelegate.description"
             delegateName="%SubstepsFeatureLaunchDelegate.name"
             id="com.technophobia.substeps.junit.launchconfig"
@@ -114,6 +128,12 @@
       <launchConfigType
             configTypeID="com.technophobia.substeps.junit.launchconfig">
       </launchConfigType>
+   </extension>
+   <extension
+         point="com.technophobia.substeps.runner.substepsRunListeners">
+      <substepsRunListener
+            class="com.technophobia.substeps.junit.ui.UITestRunListener">
+      </substepsRunListener>
    </extension>
   
 </plugin>

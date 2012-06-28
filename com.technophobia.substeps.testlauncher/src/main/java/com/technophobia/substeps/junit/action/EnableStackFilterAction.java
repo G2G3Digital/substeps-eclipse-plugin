@@ -1,31 +1,32 @@
 package com.technophobia.substeps.junit.action;
 
-import org.eclipse.jdt.internal.junit.JUnitPreferencesConstants;
-import org.eclipse.jdt.internal.junit.ui.IJUnitHelpContextIds;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
 import com.technophobia.eclipse.ui.Refreshable;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.junit.ui.SubstepsIcon;
+import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
+import com.technophobia.substeps.junit.ui.help.SubstepsHelpContextIds;
+import com.technophobia.substeps.preferences.PreferencesConstants;
 
 public class EnableStackFilterAction extends Action {
 
     private final Refreshable view;
 
 
-    public EnableStackFilterAction(final Refreshable view) {
+    public EnableStackFilterAction(final Refreshable view, final SubstepsIconProvider iconProvider) {
         super(SubstepsFeatureMessages.EnableStackFilterAction_action_label);
         setDescription(SubstepsFeatureMessages.EnableStackFilterAction_action_description);
         setToolTipText(SubstepsFeatureMessages.EnableStackFilterAction_action_tooltip);
 
-        setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/cfilter.gif")); //$NON-NLS-1$
-        setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/cfilter.gif")); //$NON-NLS-1$
-        setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/cfilter.gif")); //$NON-NLS-1$
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IJUnitHelpContextIds.ENABLEFILTER_ACTION);
+        setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.StackFilterDisabled)); //$NON-NLS-1$
+        setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.StackFilterEnabled)); //$NON-NLS-1$
+        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.StackFilterEnabled)); //$NON-NLS-1$
+        PlatformUI.getWorkbench().getHelpSystem().setHelp(this, SubstepsHelpContextIds.ENABLEFILTER_ACTION);
 
         this.view = view;
-        setChecked(JUnitPreferencesConstants.getFilterStack());
+        setChecked(PreferencesConstants.getFilterStack());
     }
 
 
@@ -34,7 +35,7 @@ public class EnableStackFilterAction extends Action {
      */
     @Override
     public void run() {
-        JUnitPreferencesConstants.setFilterStack(isChecked());
+        PreferencesConstants.setFilterStack(isChecked());
         view.refresh();
     }
 }
