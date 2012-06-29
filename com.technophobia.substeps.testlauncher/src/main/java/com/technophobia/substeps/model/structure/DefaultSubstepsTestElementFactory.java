@@ -1,8 +1,17 @@
 package com.technophobia.substeps.model.structure;
 
 import com.technophobia.eclipse.transformer.Supplier;
+import com.technophobia.eclipse.transformer.Transformer;
 
 public class DefaultSubstepsTestElementFactory implements SubstepsTestElementFactory {
+
+    private final Transformer<String, String>[] testNameTransformers;
+
+
+    public DefaultSubstepsTestElementFactory(final Transformer<String, String>... testNameTransformers) {
+        this.testNameTransformers = testNameTransformers;
+    }
+
 
     @Override
     public SubstepsTestElement createForTestEntryString(final String testEntry,
@@ -12,7 +21,7 @@ public class DefaultSubstepsTestElementFactory implements SubstepsTestElementFac
 
         final StringBuffer testNameBuffer = new StringBuffer(100);
         final int index1 = scanTestName(testEntry, index0 + 1, testNameBuffer);
-        final String testName = stripUniqueNumberingSystem(testNameBuffer.toString().trim());
+        final String testName = transform(testNameBuffer.toString().trim());
 
         final int index2 = testEntry.indexOf(',', index1 + 1);
         final boolean isSuite = testEntry.substring(index1 + 1, index2).equals("true"); //$NON-NLS-1$
@@ -20,6 +29,15 @@ public class DefaultSubstepsTestElementFactory implements SubstepsTestElementFac
         final int testCount = Integer.parseInt(testEntry.substring(index2 + 1));
 
         return createTestElement(parentElementSupplier.get(), id, testName, isSuite, testCount);
+    }
+
+
+    private String transform(final String originalString) {
+        String currentString = originalString;
+        for (final Transformer<String, String> transformer : testNameTransformers) {
+            currentString = transformer.to(currentString);
+        }
+        return currentString;
     }
 
 
@@ -63,19 +81,5 @@ public class DefaultSubstepsTestElementFactory implements SubstepsTestElementFac
                 testName.append(c);
         }
         return i;
-    }
-
-
-    private String stripUniqueNumberingSystem(final String testName) {
-        final String[] split = testName.split(":");
-        if (split.length > 0 && isUniqueNumber(split[0])) {
-            return testName.substring(split[0].length() + 1).trim();
-        }
-        return testName;
-    }
-
-
-    private boolean isUniqueNumber(final String text) {
-        return text.matches("(-|[0-9])*");
     }
 }

@@ -62,7 +62,7 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
         if (layoutMode.equals(ViewLayout.HIERARCHICAL)) {
             if (testElement.getParentContainer() instanceof SubstepsRunSession) {
                 final String testKindDisplayName = testKindDisplayNameSupplier.get();
-                if (testKindDisplayName != null) {
+                if (testKindDisplayName != null && testKindDisplayName.length() > 0) {
                     final String decorated = MessageFormat.format(
                             SubstepsFeatureMessages.TestSessionLabelProvider_testName_JUnitVersion, new Object[] {
                                     label, testKindDisplayName });

@@ -19,10 +19,14 @@ import org.eclipse.jdt.core.IJavaProject;
 
 import com.technophobia.eclipse.launcher.config.SubstepsLaunchConfigurationConstants;
 import com.technophobia.substeps.FeatureRunnerPlugin;
+import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorkingCopyDecorator;
+import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.SubstepsRunSession;
 import com.technophobia.substeps.junit.ui.SubstepsRunSessionImpl;
 import com.technophobia.substeps.junit.ui.SubstepsRunSessionListener;
 import com.technophobia.substeps.model.structure.DefaultSubstepsTestElementFactory;
+import com.technophobia.substeps.model.structure.ReplacesConstantWithAnotherConstantValueTestNameTransformer;
+import com.technophobia.substeps.model.structure.StripUniqueNumberingSystemTestNameTransformer;
 import com.technophobia.substeps.model.structure.SubstepsTestElementFactory;
 import com.technophobia.substeps.preferences.PreferencesConstants;
 
@@ -117,7 +121,12 @@ public class SubstepsModel {
     private final ILaunchListener launchListener = new SubstepsLaunchListener();
 
     // for run session
-    private final SubstepsTestElementFactory testElementFactory = new DefaultSubstepsTestElementFactory();
+    @SuppressWarnings("unchecked")
+    private final SubstepsTestElementFactory testElementFactory = new DefaultSubstepsTestElementFactory(
+            new StripUniqueNumberingSystemTestNameTransformer(),
+            new ReplacesConstantWithAnotherConstantValueTestNameTransformer(
+                    SubstepsLaunchConfigWorkingCopyDecorator.FEATURE_TEST,
+                    SubstepsFeatureMessages.SubstepsFeature_TreeRoot));
 
 
     /**

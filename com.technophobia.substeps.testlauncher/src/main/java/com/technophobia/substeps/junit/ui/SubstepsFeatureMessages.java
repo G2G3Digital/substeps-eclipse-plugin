@@ -12,6 +12,8 @@ public class SubstepsFeatureMessages {
     public static String SubstepsFeature_choose_config_title;
     public static String SubstepsFeature_choose_config_message;
 
+    public static String SubstepsFeature_TreeRoot;
+
     public static String SubstepsFeatureTestRunnerViewPart_titleToolTip;
 
     public static String SubstepsFeatureTestRunnerViewPart_jobName;

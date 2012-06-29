@@ -73,36 +73,4 @@ public class DefaultSubstepsTestElementFactoryTest {
         assertThat(testElement, is(SubstepsTestLeafElement.class));
         assertThat(testElement.getId(), is("2"));
     }
-
-
-    @Test
-    public void removesUniqueNumberingFromTestName() {
-
-        final SubstepsTestParentElement parent = context.mock(SubstepsTestParentElement.class);
-
-        context.checking(new Expectations() {
-            {
-                exactly(4).of(parentSupplier).get();
-                will(returnValue(parent));
-
-                exactly(4).of(parent).addChild(with(any(SubstepsTestElement.class)));
-            }
-        });
-
-        final SubstepsTestElement testElement = factory.createForTestEntryString("1,1: Some input,true,1",
-                parentSupplier);
-        assertThat(testElement.getTestName(), is("Some input"));
-
-        final SubstepsTestElement testElement2 = factory.createForTestEntryString("1,1-2: Some input 2,true,1",
-                parentSupplier);
-        assertThat(testElement2.getTestName(), is("Some input 2"));
-
-        final SubstepsTestElement testElement3 = factory.createForTestEntryString("1,3-1-2-1: Some input 3,true,1",
-                parentSupplier);
-        assertThat(testElement3.getTestName(), is("Some input 3"));
-
-        final SubstepsTestElement testElement4 = factory.createForTestEntryString("1,Some input 4,true,1",
-                parentSupplier);
-        assertThat(testElement4.getTestName(), is("Some input 4"));
-    }
 }
