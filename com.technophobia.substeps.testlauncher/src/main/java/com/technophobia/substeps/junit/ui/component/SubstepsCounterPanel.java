@@ -11,8 +11,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
-import com.technophobia.substeps.junit.ui.SubstepsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
+import com.technophobia.substeps.junit.ui.SubstepsTestIcon;
 
 public class SubstepsCounterPanel extends Composite implements CounterPanel {
 
@@ -34,8 +34,8 @@ public class SubstepsCounterPanel extends Composite implements CounterPanel {
         gridLayout.marginWidth = 0;
         setLayout(gridLayout);
 
-        this.errorIcon = iconProvider.imageFor(SubstepsIcon.SuiteError);
-        this.failureIcon = iconProvider.imageFor(SubstepsIcon.SuiteFail);
+        this.errorIcon = iconProvider.imageFor(SubstepsTestIcon.SuiteError);
+        this.failureIcon = iconProvider.imageFor(SubstepsTestIcon.SuiteFail);
 
         numberOfRuns = createLabel(SubstepsFeatureMessages.CounterPanel_label_runs, null, " 0/0  "); //$NON-NLS-1$
         numberOfErrors = createLabel(SubstepsFeatureMessages.CounterPanel_label_errors, errorIcon, " 0 "); //$NON-NLS-1$

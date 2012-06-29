@@ -13,9 +13,9 @@ import org.eclipse.swt.graphics.Image;
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.view.ViewLayout;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
-import com.technophobia.substeps.junit.ui.SubstepsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
 import com.technophobia.substeps.junit.ui.SubstepsRunSession;
+import com.technophobia.substeps.junit.ui.SubstepsTestIcon;
 import com.technophobia.substeps.model.structure.Status;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
 import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
@@ -139,34 +139,34 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
         if (element instanceof SubstepsTestLeafElement) {
             final SubstepsTestLeafElement testCaseElement = ((SubstepsTestLeafElement) element);
             if (testCaseElement.isIgnored())
-                return iconProvider.imageFor(SubstepsIcon.TestIgnored);
+                return iconProvider.imageFor(SubstepsTestIcon.TestIgnored);
 
             final Status status = testCaseElement.getStatus();
             if (status.isNotRun())
-                return iconProvider.imageFor(SubstepsIcon.Test);
+                return iconProvider.imageFor(SubstepsTestIcon.Test);
             else if (status.isRunning())
-                return iconProvider.imageFor(SubstepsIcon.TestRunning);
+                return iconProvider.imageFor(SubstepsTestIcon.TestRunning);
             else if (status.isError())
-                return iconProvider.imageFor(SubstepsIcon.TestError);
+                return iconProvider.imageFor(SubstepsTestIcon.TestError);
             else if (status.isFailure())
-                return iconProvider.imageFor(SubstepsIcon.TestFail);
+                return iconProvider.imageFor(SubstepsTestIcon.TestFail);
             else if (status.isOK())
-                return iconProvider.imageFor(SubstepsIcon.TestOk);
+                return iconProvider.imageFor(SubstepsTestIcon.TestOk);
             else
                 throw new IllegalStateException(element.toString());
 
         } else if (element instanceof SubstepsTestParentElement) {
             final Status status = ((SubstepsTestParentElement) element).getStatus();
             if (status.isNotRun())
-                return iconProvider.imageFor(SubstepsIcon.Suite);
+                return iconProvider.imageFor(SubstepsTestIcon.Suite);
             else if (status.isRunning())
-                return iconProvider.imageFor(SubstepsIcon.SuiteRunning);
+                return iconProvider.imageFor(SubstepsTestIcon.SuiteRunning);
             else if (status.isError())
-                return iconProvider.imageFor(SubstepsIcon.SuiteError);
+                return iconProvider.imageFor(SubstepsTestIcon.SuiteError);
             else if (status.isFailure())
-                return iconProvider.imageFor(SubstepsIcon.SuiteFail);
+                return iconProvider.imageFor(SubstepsTestIcon.SuiteFail);
             else if (status.isOK())
-                return iconProvider.imageFor(SubstepsIcon.SuiteOk);
+                return iconProvider.imageFor(SubstepsTestIcon.SuiteOk);
             else
                 throw new IllegalStateException(element.toString());
 

@@ -1,10 +1,12 @@
 package com.technophobia.eclipse.launcher.exception;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.internal.ui.util.ExceptionHandler;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Shell;
 
-@SuppressWarnings("restriction")
+import com.technophobia.substeps.FeatureRunnerPlugin;
+
 public class DialogExceptionReporter implements ExceptionReporter {
 
     private final Shell parentShell;
@@ -21,7 +23,9 @@ public class DialogExceptionReporter implements ExceptionReporter {
 
     @Override
     public void report(final CoreException ex) {
-        ExceptionHandler.handle(ex, parentShell, dialogTitle, message);
+
+        ErrorDialog.openError(parentShell, dialogTitle, message, new Status(Status.ERROR,
+                FeatureRunnerPlugin.PLUGIN_ID, message, ex));
     }
 
 }

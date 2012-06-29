@@ -17,10 +17,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jdt.internal.junit.BasicElementLabels;
-import org.eclipse.jdt.internal.junit.JUnitCorePlugin;
-import org.eclipse.jdt.internal.junit.Messages;
-import org.eclipse.jdt.internal.junit.model.ModelMessages;
 import org.xml.sax.InputSource;
 
 import com.technophobia.substeps.FeatureRunnerPlugin;

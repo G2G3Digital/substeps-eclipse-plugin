@@ -1,6 +1,5 @@
 package com.technophobia.substeps.junit.ui;
 
-import org.eclipse.jdt.internal.junit.ui.ProgressImages;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -9,8 +8,8 @@ import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Resettable;
 import com.technophobia.eclipse.ui.UiUpdater;
 import com.technophobia.eclipse.ui.part.PartMonitor;
+import com.technophobia.substeps.junit.ui.image.ProgressImages;
 
-@SuppressWarnings("restriction")
 public class ViewTitleUiUpdater implements UiUpdater, Resettable {
 
     private final PartMonitor partMonitor;
@@ -59,9 +58,9 @@ public class ViewTitleUiUpdater implements UiUpdater, Resettable {
         if (substepsRunSession == null || session.isStopped() || session.isRunning() || session.getStartedCount() == 0)
             viewImage = originalViewImage;
         else if (testRunStats.get().hasErrorsOrFailures())
-            viewImage = iconProvider.imageFor(SubstepsIcon.TestRunFail);
+            viewImage = iconProvider.imageFor(SubstepsTestIcon.TestRunFail);
         else
-            viewImage = iconProvider.imageFor(SubstepsIcon.TestRunOK);
+            viewImage = iconProvider.imageFor(SubstepsTestIcon.TestRunOK);
         firePropertyChange(IWorkbenchPart.PROP_TITLE);
     }
 

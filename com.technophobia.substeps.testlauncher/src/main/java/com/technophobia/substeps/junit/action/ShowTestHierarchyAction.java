@@ -5,8 +5,8 @@ import org.eclipse.jface.action.IAction;
 
 import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.eclipse.ui.view.ViewLayout;
+import com.technophobia.substeps.junit.ui.SubstepsControlsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
-import com.technophobia.substeps.junit.ui.SubstepsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
 
 public class ShowTestHierarchyAction extends Action {
@@ -18,7 +18,7 @@ public class ShowTestHierarchyAction extends Action {
             final SubstepsIconProvider iconProvider) {
         super(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_hierarchical_layout, IAction.AS_CHECK_BOX);
         this.layoutModeNotifier = layoutModeNotifier;
-        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.HierarchicalLayout)); //$NON-NLS-1$
+        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.HierarchicalLayout)); //$NON-NLS-1$
     }
 
 

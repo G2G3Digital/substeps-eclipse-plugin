@@ -11,7 +11,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.jdt.internal.junit.ui.ProgressImages;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -96,6 +95,7 @@ import com.technophobia.substeps.junit.ui.component.ProgressBar;
 import com.technophobia.substeps.junit.ui.component.SubstepsCounterPanel;
 import com.technophobia.substeps.junit.ui.handler.SubstepsHandlerServiceManager;
 import com.technophobia.substeps.junit.ui.help.SubstepsHelpContextIds;
+import com.technophobia.substeps.junit.ui.image.ProgressImages;
 import com.technophobia.substeps.junit.ui.job.ProcessRunningJob;
 import com.technophobia.substeps.junit.ui.job.UpdateJobManager;
 import com.technophobia.substeps.junit.ui.job.UpdateSubstepsUIJob;
@@ -109,7 +109,6 @@ import com.technophobia.substeps.model.structure.SubstepsTestElement;
 import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
 import com.technophobia.substeps.preferences.PreferencesConstants;
 
-@SuppressWarnings("restriction")
 public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements UpdateJobManager, Notifier<Runnable>,
         Callback, IPropertyListener {
 
@@ -355,7 +354,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         addDropAdapter(parent);
 
         originalViewImage = getTitleImage();
-        progressImages = new ProgressImages();
+        progressImages = new ProgressImages(iconProvider);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, SubstepsHelpContextIds.RESULTS_VIEW);
 
         getViewSite().getPage().addPartListener(partMonitor);
@@ -540,7 +539,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
         final CLabel label = new CLabel(bottom, SWT.NONE);
         label.setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_label_failure);
-        label.setImage(iconProvider.imageFor(SubstepsIcon.StackView));
+        label.setImage(iconProvider.imageFor(SubstepsFailureTraceIcon.StackView));
         bottom.setTopLeft(label);
         final ToolBar failureToolBar = new ToolBar(bottom, SWT.FLAT | SWT.WRAP);
         bottom.setTopCenter(failureToolBar);
@@ -831,10 +830,10 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     void codeHasChanged() {
         dirtyListener.removeDirtyListener();
 
-        if (viewImage == iconProvider.imageFor(SubstepsIcon.TestRunOK))
-            viewImage = iconProvider.imageFor(SubstepsIcon.TestRunOKDirty);
-        else if (viewImage == iconProvider.imageFor(SubstepsIcon.TestRunFail))
-            viewImage = iconProvider.imageFor(SubstepsIcon.TestRunFailDirty);
+        if (viewImage == iconProvider.imageFor(SubstepsTestIcon.TestRunOK))
+            viewImage = iconProvider.imageFor(SubstepsTestIcon.TestRunOKDirty);
+        else if (viewImage == iconProvider.imageFor(SubstepsTestIcon.TestRunFail))
+            viewImage = iconProvider.imageFor(SubstepsTestIcon.TestRunFailDirty);
 
         final Runnable r = new Runnable() {
             @Override

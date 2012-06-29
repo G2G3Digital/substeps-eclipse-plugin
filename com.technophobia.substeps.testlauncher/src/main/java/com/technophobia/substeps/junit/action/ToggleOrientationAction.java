@@ -5,8 +5,8 @@ import org.eclipse.ui.PlatformUI;
 
 import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.eclipse.ui.view.ViewOrientation;
+import com.technophobia.substeps.junit.ui.SubstepsControlsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
-import com.technophobia.substeps.junit.ui.SubstepsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
 import com.technophobia.substeps.junit.ui.help.SubstepsHelpContextIds;
 
@@ -21,13 +21,13 @@ public class ToggleOrientationAction extends Action {
         this.viewOrientationNotifier = viewOrientationNotifier;
         if (orientation.equals(ViewOrientation.VIEW_ORIENTATION_HORIZONTAL)) {
             setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_toggle_horizontal_label);
-            setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.OrientationHorizontal)); //$NON-NLS-1$
+            setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.OrientationHorizontal)); //$NON-NLS-1$
         } else if (orientation.equals(ViewOrientation.VIEW_ORIENTATION_VERTICAL)) {
             setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_toggle_vertical_label);
-            setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.OrientationVertical)); //$NON-NLS-1$
+            setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.OrientationVertical)); //$NON-NLS-1$
         } else if (orientation.equals(ViewOrientation.VIEW_ORIENTATION_AUTOMATIC)) {
             setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_toggle_automatic_label);
-            setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.OrientationAutomatic)); //$NON-NLS-1$
+            setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.OrientationAutomatic)); //$NON-NLS-1$
         }
         actionOrientation = orientation;
         PlatformUI.getWorkbench().getHelpSystem()

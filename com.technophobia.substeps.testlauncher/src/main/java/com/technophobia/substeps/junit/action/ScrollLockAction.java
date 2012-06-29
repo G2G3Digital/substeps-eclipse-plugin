@@ -4,8 +4,8 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
 import com.technophobia.eclipse.ui.Notifier;
+import com.technophobia.substeps.junit.ui.SubstepsControlsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
-import com.technophobia.substeps.junit.ui.SubstepsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
 import com.technophobia.substeps.junit.ui.help.SubstepsHelpContextIds;
 
@@ -21,9 +21,9 @@ public class ScrollLockAction extends Action {
         super(SubstepsFeatureMessages.ScrollLockAction_action_label);
         this.autoScrollNotifier = autoScrollNotifier;
         setToolTipText(SubstepsFeatureMessages.ScrollLockAction_action_tooltip);
-        setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.ScrollLockDisabled)); //$NON-NLS-1$
-        setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.ScrollLockEnabled)); //$NON-NLS-1$
-        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.ScrollLockEnabled)); //$NON-NLS-1$
+        setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.ScrollLockDisabled)); //$NON-NLS-1$
+        setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.ScrollLockEnabled)); //$NON-NLS-1$
+        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.ScrollLockEnabled)); //$NON-NLS-1$
         PlatformUI.getWorkbench().getHelpSystem().setHelp(this, SubstepsHelpContextIds.OUTPUT_SCROLL_LOCK_ACTION);
         setChecked(false);
     }

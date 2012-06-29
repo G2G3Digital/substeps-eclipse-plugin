@@ -6,8 +6,8 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Shell;
 
 import com.technophobia.eclipse.transformer.Supplier;
+import com.technophobia.substeps.junit.ui.SubstepsControlsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
-import com.technophobia.substeps.junit.ui.SubstepsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
 import com.technophobia.substeps.junit.ui.dialog.CompareResultDialog;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
@@ -25,9 +25,9 @@ public class CompareResultsAction extends Action {
         setDescription(SubstepsFeatureMessages.CompareResultsAction_description);
         setToolTipText(SubstepsFeatureMessages.CompareResultsAction_tooltip);
 
-        setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.Compare)); //$NON-NLS-1$
-        setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.Compare)); //$NON-NLS-1$
-        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.Compare)); //$NON-NLS-1$
+        setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.CompareDisabled)); //$NON-NLS-1$
+        setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.CompareEnabled)); //$NON-NLS-1$
+        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.CompareEnabled)); //$NON-NLS-1$
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
         // IJUnitHelpContextIds.ENABLEFILTER_ACTION);
 

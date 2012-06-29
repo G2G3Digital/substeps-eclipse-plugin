@@ -8,8 +8,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import com.technophobia.substeps.model.SubstepsModel;
-
 public class TestSessionRunImporter {
     public static void importTestRunSession(final String url) {
         try {

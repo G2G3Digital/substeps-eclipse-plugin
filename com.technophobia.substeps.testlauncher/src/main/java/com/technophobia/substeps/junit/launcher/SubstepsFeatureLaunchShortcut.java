@@ -27,7 +27,7 @@ import com.technophobia.eclipse.transformer.Locator;
 import com.technophobia.eclipse.transformer.ProjectToJavaProjectTransformer;
 import com.technophobia.eclipse.transformer.Transformers;
 import com.technophobia.substeps.FeatureRunnerPlugin;
-import com.technophobia.substeps.junit.launcher.config.JunitResourceMappingDecorator;
+import com.technophobia.substeps.junit.launcher.config.ResourceMappingDecorator;
 import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorkingCopyDecorator;
 import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorkingCopyFactory;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
@@ -134,7 +134,7 @@ public class SubstepsFeatureLaunchShortcut implements ILaunchShortcut2 {
     private Collection<Decorator<ILaunchConfigurationWorkingCopy, IResource>> workingCopyDecorators(
             final ExceptionReporter exceptionReporter) {
         return Arrays.asList(new SubstepsLaunchConfigWorkingCopyDecorator(new ProjectToJavaProjectTransformer(),
-                exceptionReporter), new JunitResourceMappingDecorator(exceptionReporter));
+                exceptionReporter), new ResourceMappingDecorator(exceptionReporter));
     }
 
 

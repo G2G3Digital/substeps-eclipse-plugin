@@ -19,11 +19,13 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.transformer.Transformer;
 import com.technophobia.substeps.FeatureRunnerPlugin;
+import com.technophobia.substeps.junit.ui.SubstepsControlsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.SubstepsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
 import com.technophobia.substeps.junit.ui.SubstepsRunSession;
 import com.technophobia.substeps.junit.ui.SubstepsRunSessionManager;
+import com.technophobia.substeps.junit.ui.SubstepsTestIcon;
 import com.technophobia.substeps.model.structure.Result;
 import com.technophobia.substeps.preferences.PreferencesConstants;
 
@@ -60,9 +62,9 @@ public class RunnerViewHistory extends ViewHistory<SubstepsRunSession> {
     @Override
     public void configureHistoryDropDownAction(final IAction action) {
         action.setToolTipText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_test_run_history);
-        action.setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.HistoryListDisabled)); //$NON-NLS-1$
-        action.setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.HistoryListEnabled)); //$NON-NLS-1$
-        action.setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.HistoryListEnabled)); //$NON-NLS-1$
+        action.setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.HistoryListDisabled)); //$NON-NLS-1$
+        action.setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.HistoryListEnabled)); //$NON-NLS-1$
+        action.setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.HistoryListEnabled)); //$NON-NLS-1$
     }
 
 
@@ -131,20 +133,20 @@ public class RunnerViewHistory extends ViewHistory<SubstepsRunSession> {
     public ImageDescriptor getImageDescriptor(final Object element) {
         final SubstepsRunSession session = (SubstepsRunSession) element;
         if (session.isStopped())
-            return imageDescriptorTransformer.to(SubstepsIcon.Suite);
+            return imageDescriptorTransformer.to(SubstepsTestIcon.Suite);
 
         if (session.isRunning())
-            return imageDescriptorTransformer.to(SubstepsIcon.SuiteRunning);
+            return imageDescriptorTransformer.to(SubstepsTestIcon.SuiteRunning);
 
         final Result result = session.getTestResult(true);
         if (result == Result.OK)
-            return imageDescriptorTransformer.to(SubstepsIcon.SuiteOk);
+            return imageDescriptorTransformer.to(SubstepsTestIcon.SuiteOk);
         else if (result == Result.ERROR)
-            return imageDescriptorTransformer.to(SubstepsIcon.SuiteError);
+            return imageDescriptorTransformer.to(SubstepsTestIcon.SuiteError);
         else if (result == Result.FAILURE)
-            return imageDescriptorTransformer.to(SubstepsIcon.SuiteFail);
+            return imageDescriptorTransformer.to(SubstepsTestIcon.SuiteFail);
         else
-            return imageDescriptorTransformer.to(SubstepsIcon.Suite);
+            return imageDescriptorTransformer.to(SubstepsTestIcon.Suite);
     }
 
 

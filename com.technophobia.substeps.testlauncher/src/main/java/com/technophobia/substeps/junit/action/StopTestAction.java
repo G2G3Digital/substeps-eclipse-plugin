@@ -4,8 +4,8 @@ import org.eclipse.jface.action.Action;
 
 import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Notifier;
+import com.technophobia.substeps.junit.ui.SubstepsControlsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
-import com.technophobia.substeps.junit.ui.SubstepsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
 import com.technophobia.substeps.junit.ui.SubstepsRunSession;
 
@@ -20,9 +20,9 @@ public class StopTestAction extends Action {
         this.infoMessageUpdater = infoMessageUpdater;
         setText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_stopaction_text);
         setToolTipText(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_stopaction_text);
-        setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.StopDisbled)); //$NON-NLS-1$
-        setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.StopEnabled)); //$NON-NLS-1$
-        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsIcon.StopEnabled)); //$NON-NLS-1$
+        setDisabledImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.StopDisbled)); //$NON-NLS-1$
+        setHoverImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.StopEnabled)); //$NON-NLS-1$
+        setImageDescriptor(iconProvider.imageDescriptorFor(SubstepsControlsIcon.StopEnabled)); //$NON-NLS-1$
     }
 
 

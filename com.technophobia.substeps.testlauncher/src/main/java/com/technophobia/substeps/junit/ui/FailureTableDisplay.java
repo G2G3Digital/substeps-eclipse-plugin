@@ -17,13 +17,17 @@ public class FailureTableDisplay implements TraceDisplay {
 
     public FailureTableDisplay(final Table table, final SubstepsIconProvider iconProvider) {
         this.table = table;
-        exceptionIcon = iconProvider.imageFor(SubstepsIcon.Exception);
-        stackIcon = iconProvider.imageFor(SubstepsIcon.Stack);
+        exceptionIcon = iconProvider.imageFor(SubstepsFailureTraceIcon.Exception);
+        stackIcon = iconProvider.imageFor(SubstepsFailureTraceIcon.Stack);
     }
 
 
-    /* (non-Javadoc)
-     * @see com.technophobia.substeps.junit.ui.TraceDisplay#addTraceLine(com.technophobia.substeps.table.LineType, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.technophobia.substeps.junit.ui.TraceDisplay#addTraceLine(com.technophobia
+     * .substeps.table.LineType, java.lang.String)
      */
     @Override
     public void addTraceLine(final LineType lineType, final String label) {
