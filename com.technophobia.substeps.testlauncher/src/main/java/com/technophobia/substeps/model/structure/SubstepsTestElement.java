@@ -44,4 +44,7 @@ public interface SubstepsTestElement {
 
 
     SubstepsTestElementContainer getParentContainer();
+
+
+    SubstepsTestRootElement getRoot();
 }

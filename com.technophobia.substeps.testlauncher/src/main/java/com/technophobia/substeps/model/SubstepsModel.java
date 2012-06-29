@@ -22,6 +22,8 @@ import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.ui.SubstepsRunSession;
 import com.technophobia.substeps.junit.ui.SubstepsRunSessionImpl;
 import com.technophobia.substeps.junit.ui.SubstepsRunSessionListener;
+import com.technophobia.substeps.model.structure.DefaultSubstepsTestElementFactory;
+import com.technophobia.substeps.model.structure.SubstepsTestElementFactory;
 import com.technophobia.substeps.preferences.PreferencesConstants;
 
 public class SubstepsModel {
@@ -95,7 +97,8 @@ public class SubstepsModel {
 
 
         private void connectTestRunner(final ILaunch launch, final IJavaProject javaProject, final int port) {
-            final SubstepsRunSession substepsRunSession = new SubstepsRunSessionImpl(launch, javaProject, port);
+            final SubstepsRunSession substepsRunSession = new SubstepsRunSessionImpl(launch, testElementFactory,
+                    javaProject, port);
             addTestRunSession(substepsRunSession);
 
             final Object[] listeners = FeatureRunnerPlugin.instance().getSubstepsRunListeners().getListeners();
@@ -112,6 +115,9 @@ public class SubstepsModel {
      */
     private final LinkedList<SubstepsRunSession> substepsRunSessions = new LinkedList<SubstepsRunSession>();
     private final ILaunchListener launchListener = new SubstepsLaunchListener();
+
+    // for run session
+    private final SubstepsTestElementFactory testElementFactory = new DefaultSubstepsTestElementFactory();
 
 
     /**

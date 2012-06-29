@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -23,15 +22,22 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
 import com.technophobia.eclipse.launcher.config.SubstepsLaunchConfigurationConstants;
+import com.technophobia.eclipse.transformer.Callback1;
+import com.technophobia.eclipse.transformer.Supplier;
+import com.technophobia.eclipse.transformer.Transformer;
 import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.model.RemoteTestRunnerClient;
 import com.technophobia.substeps.model.SubstepsRunListener;
 import com.technophobia.substeps.model.SubstepsSessionListener;
 import com.technophobia.substeps.model.TestRunListenerAdapter;
 import com.technophobia.substeps.model.serialize.SubstepsModelExporter;
+import com.technophobia.substeps.model.structure.IncompleteParentItem;
+import com.technophobia.substeps.model.structure.LinkedParentItemManager;
+import com.technophobia.substeps.model.structure.PredicatedLinkedParentItemManager;
 import com.technophobia.substeps.model.structure.Result;
 import com.technophobia.substeps.model.structure.Status;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
+import com.technophobia.substeps.model.structure.SubstepsTestElementFactory;
 import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
 import com.technophobia.substeps.model.structure.SubstepsTestParentElement;
 import com.technophobia.substeps.model.structure.SubstepsTestRootElement;
@@ -74,9 +80,9 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
     private HashMap<String, SubstepsTestElement> idToTest;
 
     /**
-     * The TestSuites for which additional children are expected.
+     * The Parent items for which additional children are expected.
      */
-    private List<IncompleteTestSuite> incompleteTestSuites;
+    private final LinkedParentItemManager<IncompleteParentItem> incompleteParentItems;
 
     /**
      * Suite for unrooted test case elements, or <code>null</code>.
@@ -114,6 +120,7 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
     volatile boolean isRunning;
 
     volatile boolean fIsStopped;
+    private final SubstepsTestElementFactory testElementFactory;
 
 
     /**
@@ -124,12 +131,14 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
      * @param project
      *            may be <code>null</code>
      */
-    public SubstepsRunSessionImpl(final String testRunName, final IJavaProject project) {
+    public SubstepsRunSessionImpl(final String testRunName, final SubstepsTestElementFactory testElementFactory,
+            final IJavaProject project) {
         // TODO: check assumptions about non-null fields
 
-        launch = null;
+        this.testElementFactory = testElementFactory;
+        this.launch = null;
         this.project = project;
-        startTime = -System.currentTimeMillis();
+        this.startTime = -System.currentTimeMillis();
 
         Assert.isNotNull(testRunName);
         this.testRunName = testRunName;
@@ -137,6 +146,8 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
 
         testRoot = new SubstepsTestRootElement(this);
         idToTest = new HashMap<String, SubstepsTestElement>();
+        this.incompleteParentItems = new PredicatedLinkedParentItemManager<IncompleteParentItem>(testRootSupplier(),
+                decrementRemainingChildItemsCallback(), checkRemainingChildItemsPredicate());
 
         testRunnerClient = null;
 
@@ -144,7 +155,9 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
     }
 
 
-    public SubstepsRunSessionImpl(final ILaunch launch, final IJavaProject project, final int port) {
+    public SubstepsRunSessionImpl(final ILaunch launch, final SubstepsTestElementFactory testElementFactory,
+            final IJavaProject project, final int port) {
+        this.testElementFactory = testElementFactory;
         Assert.isNotNull(launch);
 
         this.launch = launch;
@@ -161,6 +174,8 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
 
         testRoot = new SubstepsTestRootElement(this);
         idToTest = new HashMap<String, SubstepsTestElement>();
+        this.incompleteParentItems = new PredicatedLinkedParentItemManager<IncompleteParentItem>(testRootSupplier(),
+                decrementRemainingChildItemsCallback(), checkRemainingChildItemsPredicate());
 
         testRunnerClient = new RemoteTestRunnerClient();
         testRunnerClient.startListening(new SubstepsRunListener[] { new TestSessionNotifier() }, port);
@@ -240,6 +255,12 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
         } else {
             return testResult;
         }
+    }
+
+
+    @Override
+    public int getChildCount() {
+        return getTestRoot().getChildCount();
     }
 
 
@@ -393,7 +414,7 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
             testRoot = null;
             testRunnerClient = null;
             idToTest = new HashMap<String, SubstepsTestElement>();
-            incompleteTestSuites = null;
+            incompleteParentItems.reset();
             unrootedSuite = null;
 
         } catch (final IllegalStateException e) {
@@ -552,79 +573,44 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
 
 
     private SubstepsTestElement addTreeEntry(final String treeEntry) {
-        // format: testId","testName","isSuite","testcount
-        final int index0 = treeEntry.indexOf(',');
-        final String id = treeEntry.substring(0, index0);
 
-        final StringBuffer testNameBuffer = new StringBuffer(100);
-        final int index1 = scanTestName(treeEntry, index0 + 1, testNameBuffer);
-        final String testName = testNameBuffer.toString().trim();
+        final SubstepsTestElement testElement = testElementFactory
+                .createForTestEntryString(treeEntry, parentSupplier());
 
-        final int index2 = treeEntry.indexOf(',', index1 + 1);
-        final boolean isSuite = treeEntry.substring(index1 + 1, index2).equals("true"); //$NON-NLS-1$
-
-        final int testCount = Integer.parseInt(treeEntry.substring(index2 + 1));
-
-        if (incompleteTestSuites.isEmpty()) {
-            return createTestElement(testRoot, id, testName, isSuite, testCount);
-        } else {
-            final int suiteIndex = incompleteTestSuites.size() - 1;
-            final IncompleteTestSuite openSuite = incompleteTestSuites.get(suiteIndex);
-            openSuite.outstandingChildren--;
-            if (openSuite.outstandingChildren <= 0)
-                incompleteTestSuites.remove(suiteIndex);
-            return createTestElement(openSuite.testSuiteElement, id, testName, isSuite, testCount);
+        if (!incompleteParentItems.isEmpty()) {
+            incompleteParentItems.processOutstandingChild();
         }
-    }
-
-
-    @Override
-    public SubstepsTestElement createTestElement(final SubstepsTestParentElement parent, final String id,
-            final String testName, final boolean isSuite, final int testCount) {
-        SubstepsTestElement testElement;
-        if (isSuite) {
-            final SubstepsTestParentElement testSuiteElement = new SubstepsTestParentElement(parent, id, testName,
-                    testCount);
-            testElement = testSuiteElement;
-            if (testCount > 0)
-                incompleteTestSuites.add(new IncompleteTestSuite(testSuiteElement, testCount));
-        } else {
-            testElement = new SubstepsTestLeafElement(parent, id, testName);
+        if (testElement instanceof SubstepsTestParentElement) {
+            final SubstepsTestParentElement parentElement = (SubstepsTestParentElement) testElement;
+            if (parentElement.getChildCount() > 0)
+                incompleteParentItems.addNode(new IncompleteParentItem(parentElement,
+                        parentElement.getChildren().length));
         }
-        idToTest.put(id, testElement);
+
+        idToTest.put(testElement.getId(), testElement);
+
         return testElement;
-    }
 
-
-    /**
-     * Append the test name from <code>s</code> to <code>testName</code>.
-     * 
-     * @param s
-     *            the string to scan
-     * @param start
-     *            the offset of the first character in <code>s</code>
-     * @param testName
-     *            the result
-     * 
-     * @return the index of the next ','
-     */
-    private int scanTestName(final String s, final int start, final StringBuffer testName) {
-        boolean inQuote = false;
-        int i = start;
-        for (; i < s.length(); i++) {
-            final char c = s.charAt(i);
-            if (c == '\\' && !inQuote) {
-                inQuote = true;
-                continue;
-            } else if (inQuote) {
-                inQuote = false;
-                testName.append(c);
-            } else if (c == ',')
-                break;
-            else
-                testName.append(c);
-        }
-        return i;
+        // SubstepsTestElement testElement =
+        // testElementFactory.createForTestEntryString(treeEntry);
+        // if(testElement instanceof SubstepsTestParentElement){
+        // SubstepsTestParentElement parent = (SubstepsTestParentElement)
+        // testElement;
+        // if(parent.getchil)
+        // }
+        //
+        // if (incompleteTestSuites.isEmpty()) {
+        // return createTestElement(testRoot, id, testName, isSuite, testCount);
+        // } else {
+        // final int suiteIndex = incompleteTestSuites.size() - 1;
+        // final IncompleteTestSuite openSuite =
+        // incompleteTestSuites.get(suiteIndex);
+        // openSuite.outstandingChildren--;
+        // if (openSuite.outstandingChildren <= 0)
+        // incompleteTestSuites.remove(suiteIndex);
+        // return createTestElement(openSuite.testSuiteElement, id, testName,
+        // isSuite, testCount);
+        // }
     }
 
     /**
@@ -636,7 +622,7 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
 
         @Override
         public void testRunStarted(final int testCount) {
-            incompleteTestSuites = new ArrayList<SubstepsRunSessionImpl.IncompleteTestSuite>();
+            incompleteParentItems.reset();
 
             startedCount = 0;
             ignoredCount = 0;
@@ -702,7 +688,8 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
 
         private SubstepsTestElement createUnrootedTestElement(final String testId, final String testName) {
             final SubstepsTestParentElement unrootedSuite = getUnrootedSuite();
-            final SubstepsTestElement testElement = createTestElement(unrootedSuite, testId, testName, false, 1);
+            final SubstepsTestElement testElement = testElementFactory.createTestElement(unrootedSuite, testId,
+                    testName, false, 1);
 
             final Object[] listeners = sessionListeners.getListeners();
             for (int i = 0; i < listeners.length; ++i) {
@@ -715,7 +702,7 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
 
         private SubstepsTestParentElement getUnrootedSuite() {
             if (unrootedSuite == null) {
-                unrootedSuite = (SubstepsTestParentElement) createTestElement(testRoot,
+                unrootedSuite = (SubstepsTestParentElement) testElementFactory.createTestElement(testRoot,
                         "-2", SubstepsFeatureMessages.SubstepsRunSession_unrootedTests, true, 0); //$NON-NLS-1$
             }
             return unrootedSuite;
@@ -871,17 +858,6 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
         }
     }
 
-    private static class IncompleteTestSuite {
-        public SubstepsTestParentElement testSuiteElement;
-        public int outstandingChildren;
-
-
-        public IncompleteTestSuite(final SubstepsTestParentElement testSuiteElement, final int outstandingChildren) {
-            this.testSuiteElement = testSuiteElement;
-            this.outstandingChildren = outstandingChildren;
-        }
-    }
-
 
     @Override
     public void registerTestFailureStatus(final SubstepsTestElement testElement, final Status status,
@@ -937,6 +913,46 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
                 addFailures(failures, children[i]);
             }
         }
+    }
+
+
+    private Transformer<IncompleteParentItem, Boolean> checkRemainingChildItemsPredicate() {
+        return new Transformer<IncompleteParentItem, Boolean>() {
+            @Override
+            public Boolean to(final IncompleteParentItem from) {
+                return from.hasOutstandingChildren();
+            }
+        };
+    }
+
+
+    private Callback1<IncompleteParentItem> decrementRemainingChildItemsCallback() {
+        return new Callback1<IncompleteParentItem>() {
+            @Override
+            public void callback(final IncompleteParentItem t) {
+                t.decrementOutstandingChildren();
+            }
+        };
+    }
+
+
+    private Supplier<IncompleteParentItem> testRootSupplier() {
+        return new Supplier<IncompleteParentItem>() {
+            @Override
+            public IncompleteParentItem get() {
+                return new IncompleteParentItem(testRoot, testRoot.getChildCount());
+            }
+        };
+    }
+
+
+    private Supplier<SubstepsTestParentElement> parentSupplier() {
+        return new Supplier<SubstepsTestParentElement>() {
+            @Override
+            public SubstepsTestParentElement get() {
+                return incompleteParentItems.get().getParentElement();
+            }
+        };
     }
 
 

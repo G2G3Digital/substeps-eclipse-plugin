@@ -2,7 +2,7 @@ package com.technophobia.substeps.model.structure;
 
 import com.technophobia.substeps.junit.ui.SubstepsRunSession;
 
-public class SubstepsTestRootElement extends SubstepsTestParentElement {
+public class SubstepsTestRootElement extends DefaultSubstepsTestParentElement {
 
     private final SubstepsRunSession session;
 

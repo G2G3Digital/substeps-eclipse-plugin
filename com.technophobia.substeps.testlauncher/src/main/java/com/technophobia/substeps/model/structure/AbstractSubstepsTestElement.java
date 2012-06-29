@@ -1,8 +1,5 @@
 package com.technophobia.substeps.model.structure;
 
-import org.eclipse.jdt.internal.junit.model.TestRoot;
-import org.eclipse.jdt.junit.model.ITestElementContainer;
-
 import com.technophobia.substeps.junit.ui.SubstepsRunSession;
 
 public abstract class AbstractSubstepsTestElement implements SubstepsTestElement {
@@ -126,6 +123,7 @@ public abstract class AbstractSubstepsTestElement implements SubstepsTestElement
     }
 
 
+    @Override
     public SubstepsTestRootElement getRoot() {
         return getParent().getRoot();
     }
@@ -149,6 +147,12 @@ public abstract class AbstractSubstepsTestElement implements SubstepsTestElement
             return getSubstepsRunSession();
         }
         return parent;
+    }
+
+
+    @Override
+    public String toString() {
+        return id + ": " + testName;
     }
 
 

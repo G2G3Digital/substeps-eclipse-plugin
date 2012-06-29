@@ -74,10 +74,6 @@ public interface SubstepsRunSession extends TestRunStats, SubstepsTestElementCon
     SubstepsTestRootElement getTestRoot();
 
 
-    SubstepsTestElement createTestElement(SubstepsTestParentElement rootElement, String nextId, String suiteName,
-            boolean b, int i);
-
-
     void registerTestEnded(SubstepsTestElement testElement, boolean completed);
 
 
