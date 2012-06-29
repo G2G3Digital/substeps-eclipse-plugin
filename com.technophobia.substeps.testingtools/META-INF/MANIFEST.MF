@@ -8,10 +8,10 @@ Bundle-ClassPath: jmock-2.5.1.jar,
  hamcrest-all-1.2.jar,
  slf4j-api-1.6.4.jar,
  slf4j-log4j12-1.6.4.jar,
- substeps-core-0.0.2-SNAPSHOT.jar,
  log4j-1.2.16.jar,
  guava-12.0.jar,
- velocity-1.5.jar
+ velocity-1.5.jar,
+ substeps-core-0.0.2-SNAPSHOT.jar
 Export-Package: com.google.common.base,
  com.google.common.collect,
  com.technophobia.substeps.model,

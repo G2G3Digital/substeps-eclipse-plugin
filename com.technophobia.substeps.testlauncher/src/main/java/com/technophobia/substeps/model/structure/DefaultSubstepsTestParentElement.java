@@ -64,7 +64,7 @@ public class DefaultSubstepsTestParentElement extends AbstractSubstepsTestElemen
             return;
         }
 
-        final SubstepsTestElement lastChild = children.get(children.size());
+        final SubstepsTestElement lastChild = children.get(getChildCount() - 1);
         if (child == lastChild) {
             if (childStatus.isComplete()) {
                 // all children done, collect cumulative status
