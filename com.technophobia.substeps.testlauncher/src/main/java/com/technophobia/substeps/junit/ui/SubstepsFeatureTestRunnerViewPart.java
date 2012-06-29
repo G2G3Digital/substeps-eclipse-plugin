@@ -325,6 +325,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
         final UiUpdater tooltipUpdater = new TooltipUpdater(tooltipNotifier());
         final UiUpdater statusMessageUpdater = new StatusMessageUiUpdater(getViewSite());
+        this.counterComposite = createProgressCountPanel(parent);
         final SashForm sashForm = createSashForm(parent);
 
         this.sessionManager = new SubstepsRunSessionManager(disposedSashFormChecker(), testViewer, tooltipUpdater,
@@ -333,7 +334,6 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         this.handlerServiceManager = new SubstepsHandlerServiceManager((IHandlerService) getSite().getWorkbenchWindow()
                 .getService(IHandlerService.class));
 
-        this.counterComposite = createProgressCountPanel(parent);
         this.counterComposite.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
         sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
 

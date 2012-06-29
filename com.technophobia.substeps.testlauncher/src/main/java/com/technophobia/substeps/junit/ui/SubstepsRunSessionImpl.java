@@ -359,7 +359,12 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
 
     @Override
     public TestRunState getState() {
-        return isRunning ? TestRunState.IN_PROGRESS : TestRunState.STOPPED;
+        if (isRunning()) {
+            return TestRunState.IN_PROGRESS;
+        } else if (isStopped()) {
+            return TestRunState.STOPPED;
+        }
+        return TestRunState.COMPLETE;
     }
 
 

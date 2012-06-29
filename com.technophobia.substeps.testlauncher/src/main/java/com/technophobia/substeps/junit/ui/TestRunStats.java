@@ -4,6 +4,7 @@ public interface TestRunStats {
 
     public enum TestRunState {
         STOPPED, //
+        COMPLETE, //
         IN_PROGRESS
     }
 
