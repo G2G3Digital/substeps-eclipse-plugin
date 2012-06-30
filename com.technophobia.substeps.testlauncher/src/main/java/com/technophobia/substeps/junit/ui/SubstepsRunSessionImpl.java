@@ -588,8 +588,7 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
         if (testElement instanceof SubstepsTestParentElement) {
             final SubstepsTestParentElement parentElement = (SubstepsTestParentElement) testElement;
             if (parentElement.getChildCount() > 0)
-                incompleteParentItems.addNode(new IncompleteParentItem(parentElement,
-                        parentElement.getChildren().length));
+                incompleteParentItems.addNode(new IncompleteParentItem(parentElement, parentElement.getChildCount()));
         }
 
         idToTest.put(testElement.getId(), testElement);
@@ -925,7 +924,7 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
         return new Transformer<IncompleteParentItem, Boolean>() {
             @Override
             public Boolean to(final IncompleteParentItem from) {
-                return from.hasOutstandingChildren();
+                return !from.hasOutstandingChildren();
             }
         };
     }
