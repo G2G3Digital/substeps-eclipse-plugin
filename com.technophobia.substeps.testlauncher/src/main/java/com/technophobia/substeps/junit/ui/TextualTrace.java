@@ -73,22 +73,24 @@ public class TextualTrace {
         for (int i = (patterns.length - 1); i >= 0; --i) {
             pattern = patterns[i];
             len = pattern.length() - 1;
-            if (pattern.charAt(len) == '*') {
-                // strip trailing * from a package filter
-                pattern = pattern.substring(0, len);
-            } else if (Character.isUpperCase(pattern.charAt(0))) {
-                // class in the default package
-                pattern = FailureTrace.FRAME_PREFIX + pattern + '.';
-            } else {
-                // class names start w/ an uppercase letter after the .
-                final int lastDotIndex = pattern.lastIndexOf('.');
-                if ((lastDotIndex != -1) && (lastDotIndex != len)
-                        && Character.isUpperCase(pattern.charAt(lastDotIndex + 1)))
-                    pattern += '.'; // append . to a class filter
-            }
+            if (pattern.length() > 0) {
+                if (pattern.charAt(len) == '*') {
+                    // strip trailing * from a package filter
+                    pattern = pattern.substring(0, len);
+                } else if (Character.isUpperCase(pattern.charAt(0))) {
+                    // class in the default package
+                    pattern = FailureTrace.FRAME_PREFIX + pattern + '.';
+                } else {
+                    // class names start w/ an uppercase letter after the .
+                    final int lastDotIndex = pattern.lastIndexOf('.');
+                    if ((lastDotIndex != -1) && (lastDotIndex != len)
+                            && Character.isUpperCase(pattern.charAt(lastDotIndex + 1)))
+                        pattern += '.'; // append . to a class filter
+                }
 
-            if (line.indexOf(pattern) > 0)
-                return true;
+                if (line.indexOf(pattern) > 0)
+                    return true;
+            }
         }
         return false;
     }
