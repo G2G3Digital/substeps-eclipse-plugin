@@ -7,36 +7,30 @@ import com.technophobia.substeps.junit.ui.component.FeatureViewer;
 
 public class SubstepsFeatureUiUpdater extends NonDisposedUiUpdater {
 
-    private String infoMessage;
     private final UiUpdater infoMessageRenderer;
     private final UiUpdater testCounterRenderer;
     private final UiUpdater viewTitleRenderer;
     private final Supplier<TestRunStats> testRunStats;
-    private final UiUpdater toolbarRenderer;
     private final FeatureViewer testViewer;
+    private final SubstepsActionManager actionManager;
 
 
     public SubstepsFeatureUiUpdater(final Supplier<Boolean> disposedChecker, final UiUpdater infoMessageRenderer,
-            final UiUpdater testCounterRenderer, final UiUpdater viewTitleRenderer, final UiUpdater toolbarRenderer,
-            final FeatureViewer testViewer, final Supplier<TestRunStats> testRunStats) {
+            final UiUpdater testCounterRenderer, final UiUpdater viewTitleRenderer, final FeatureViewer testViewer,
+            final Supplier<TestRunStats> testRunStats, final SubstepsActionManager actionManager) {
         super(disposedChecker);
         this.infoMessageRenderer = infoMessageRenderer;
         this.testCounterRenderer = testCounterRenderer;
         this.viewTitleRenderer = viewTitleRenderer;
-        this.toolbarRenderer = toolbarRenderer;
         this.testViewer = testViewer;
         this.testRunStats = testRunStats;
+        this.actionManager = actionManager;
     }
 
 
     @Override
     public void reset() {
 
-    }
-
-
-    public void registerInfoMessage(final String message) {
-        this.infoMessage = message;
     }
 
 
@@ -51,6 +45,10 @@ public class SubstepsFeatureUiUpdater extends NonDisposedUiUpdater {
         viewTitleRenderer.doUpdate();
 
         testViewer.processChangesInUI();
+
+        final boolean hasErrorsOrFailures = testRunStats.get().hasErrorsOrFailures();
+        actionManager.nextAction().setEnabled(hasErrorsOrFailures);
+        actionManager.prevAction().setEnabled(hasErrorsOrFailures);
     }
 
 }

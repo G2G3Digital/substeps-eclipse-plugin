@@ -314,7 +314,6 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         addResizeListener(parent);
         this.clipboard = new Clipboard(parent.getDisplay());
 
-        this.actionManager = createActionManager();
         this.testResultsView = new JunitTestResultsView(getSite().getWorkbenchWindow());
 
         final GridLayout gridLayout = new GridLayout();
@@ -326,6 +325,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         final UiUpdater statusMessageUpdater = new StatusMessageUiUpdater(getViewSite());
         this.counterComposite = createProgressCountPanel(parent);
         final SashForm sashForm = createSashForm(parent);
+        this.actionManager = createActionManager();
 
         this.sessionManager = new SubstepsRunSessionManager(disposedSashFormChecker(), testViewer, tooltipUpdater,
                 infoMessageUpdater, viewTitleUiUpdater, statusMessageUpdater, failureTrace, testResultsView,
@@ -381,7 +381,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         this.viewTitleUiUpdater = new ViewTitleUiUpdater(partMonitor, sessionManager, testRunStatsSupplier,
                 iconProvider, originalViewImage, progressImages, this);
         this.uiUpdater = new SubstepsFeatureUiUpdater(disposedChecker, infoMessageUpdater, testCounterUpdater,
-                viewTitleUiUpdater, toolbarUiUpdater, testViewer, testRunStatsSupplier);
+                viewTitleUiUpdater, testViewer, testRunStatsSupplier, actionManager);
 
     }
 
