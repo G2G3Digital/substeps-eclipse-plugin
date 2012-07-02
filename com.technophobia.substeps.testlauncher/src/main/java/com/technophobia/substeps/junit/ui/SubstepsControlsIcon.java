@@ -4,10 +4,10 @@ public enum SubstepsControlsIcon implements SubstepsIcon {
 
     StopEnabled("elcl16/stop.gif"), //
     StopDisbled("dlcl16/stop.gif"), //
-    RelaunchEnabled("elc16/relaunch.gif"), //
-    RelaunchDisabled("dlc16/relaunch.gif"), //
-    RelaunchFailedEnabled("elc16/relaunchf.gif"), //
-    RelaunchFailedDisabled("dlc16/relaunchf.gif"), //
+    RelaunchEnabled("elcl16/relaunch.gif"), //
+    RelaunchDisabled("dlcl16/relaunch.gif"), //
+    RelaunchFailedEnabled("elcl16/relaunchf.gif"), //
+    RelaunchFailedDisabled("dlcl16/relaunchf.gif"), //
     StackFilterEnabled("elcl16/cfilter.gif"), //
     StackFilterDisabled("dlcl16/cfilter.gif"), //
     ScrollLockEnabled("elcl16/lock.gif"), //

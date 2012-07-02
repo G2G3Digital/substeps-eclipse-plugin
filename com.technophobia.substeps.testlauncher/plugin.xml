@@ -31,6 +31,18 @@
             categoryId="org.eclipse.debug.ui.category.run"
             id="com.technophobia.substeps.junit.substepsFeatureShortcut.run">
       </command>
+      <command
+            name="%SubstepsFeatureShortcut.description.rerunLast"
+            description="%SubstepsFeatureShortcut.description.rerunLast"
+            categoryId="org.eclipse.debug.ui.category.run"
+            id="com.technophobia.substeps.junit.rerunLast">
+      </command>
+      <command
+            name="%SubstepsFeatureShortcut.description.rerunFailedFirst"
+            description="%SubstepsFeatureShortcut.description.rerunFailedFirst"
+            categoryId="org.eclipse.debug.ui.category.run"
+            id="com.technophobia.substeps.junit.rerunFailedFirst">
+      </command>
   </extension>
   <extension
         point="org.eclipse.debug.ui.launchShortcuts">

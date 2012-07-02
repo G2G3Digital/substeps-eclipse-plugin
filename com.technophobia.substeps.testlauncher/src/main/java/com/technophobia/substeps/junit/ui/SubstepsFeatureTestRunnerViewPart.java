@@ -230,13 +230,13 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
 
     private SubstepsActionManager createActionManager() {
-        final Action stopAction = new StopTestAction(sessionManager, infoMessageUpdater, iconProvider);
+        final Action stopAction = new StopTestAction(runSessionSupplier(), infoMessageUpdater, iconProvider);
         final Action copyAction = new SubstepsCopyAction(getSite().getShell(), failureTrace, clipboard);
         final Action rerunFailedFirstAction = new RerunFailedFirstAction(RERUN_FAILED_FIRST_COMMAND,
-                new FailedTestFirstTestRelauncher(sessionManager, getSite().getShell(), infoMessageUpdater),
+                new FailedTestFirstTestRelauncher(runSessionSupplier(), getSite().getShell(), infoMessageUpdater),
                 iconProvider);
         final Action rerunLastTestAction = new RerunLastTestAction(RERUN_LAST_COMMAND, new TestRelauncher(
-                sessionManager, getSite().getShell(), infoMessageUpdater), iconProvider);
+                runSessionSupplier(), getSite().getShell(), infoMessageUpdater), iconProvider);
         final Action nextAction = new ShowNextFailureAction(testViewer, iconProvider);
         final Action prevAction = new ShowPreviousFailureAction(testViewer, iconProvider);
         return new SubstepsActionManager(stopAction, copyAction, rerunFailedFirstAction, rerunLastTestAction,
@@ -252,19 +252,6 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         }
 
         decorateMemento(memento);
-    }
-
-
-    /**
-     * Stops the currently running test and shuts down the RemoteTestRunner
-     */
-    public void rerunTestRun() {
-        new TestRelauncher(sessionManager, getSite().getShell(), infoMessageUpdater).run();
-    }
-
-
-    public void rerunTestFailedFirst() {
-        new FailedTestFirstTestRelauncher(sessionManager, getSite().getShell(), infoMessageUpdater).run();
     }
 
 
@@ -325,8 +312,8 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         final UiUpdater statusMessageUpdater = new StatusMessageUiUpdater(getViewSite());
         this.counterComposite = createProgressCountPanel(parent);
         final SashForm sashForm = createSashForm(parent);
-        this.actionManager = createActionManager();
 
+        this.actionManager = createActionManager();
         this.sessionManager = new SubstepsRunSessionManager(disposedSashFormChecker(), testViewer, tooltipUpdater,
                 infoMessageUpdater, viewTitleUiUpdater, statusMessageUpdater, failureTrace, testResultsView,
                 actionManager, this, testSessionListenerSupplier());
@@ -1164,6 +1151,16 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         return new Supplier<TestRunStats>() {
             @Override
             public TestRunStats get() {
+                return sessionManager.get();
+            }
+        };
+    }
+
+
+    private Supplier<SubstepsRunSession> runSessionSupplier() {
+        return new Supplier<SubstepsRunSession>() {
+            @Override
+            public SubstepsRunSession get() {
                 return sessionManager.get();
             }
         };

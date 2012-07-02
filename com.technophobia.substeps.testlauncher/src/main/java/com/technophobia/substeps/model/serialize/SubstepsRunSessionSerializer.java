@@ -108,7 +108,8 @@ public class SubstepsRunSessionSerializer implements XMLReader {
 
             final AttributesImpl atts = new AttributesImpl();
             addCDATA(atts, IXMLTags.ATTR_NAME, leafElement.getTestMethodName());
-            addCDATA(atts, IXMLTags.ATTR_CLASSNAME, leafElement.getClassName());
+            // addCDATA(atts, IXMLTags.ATTR_CLASSNAME,
+            // leafElement.getClassName());
             if (!Double.isNaN(leafElement.getElapsedTimeInSeconds()))
                 addCDATA(atts, IXMLTags.ATTR_TIME, timeFormat.format(leafElement.getElapsedTimeInSeconds()));
             if (!testElement.getStatus().isComplete())

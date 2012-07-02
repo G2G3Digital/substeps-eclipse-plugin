@@ -61,10 +61,10 @@ public class SubstepsRunSessionListenerImpl implements SubstepsRunSessionListene
 
             @Override
             public void sessionEnded(final long elapsedTime) {
-                final SubstepsRunListener[] testRunListeners = FeatureRunnerPlugin.instance().getModel()
-                        .getTestRunListeners();
+                final Object[] testRunListeners = FeatureRunnerPlugin.instance().getSubstepsRunListeners()
+                        .getListeners();
                 for (int i = 0; i < testRunListeners.length; i++) {
-                    testRunListeners[i].testRunEnded(elapsedTime);
+                    ((SubstepsRunListener) testRunListeners[i]).testRunEnded(elapsedTime);
                 }
                 sessionRemoved(activeTestRunSession);
             }
@@ -78,10 +78,11 @@ public class SubstepsRunSessionListenerImpl implements SubstepsRunSessionListene
 
             @Override
             public void testStarted(final SubstepsTestLeafElement testElement) {
-                final SubstepsRunListener[] testRunListeners = FeatureRunnerPlugin.instance().getModel()
-                        .getTestRunListeners();
+                final Object[] testRunListeners = FeatureRunnerPlugin.instance().getSubstepsRunListeners()
+                        .getListeners();
                 for (int i = 0; i < testRunListeners.length; i++) {
-                    testRunListeners[i].testStarted(testElement.getId(), testElement.getTestName());
+                    ((SubstepsRunListener) testRunListeners[i]).testStarted(testElement.getId(),
+                            testElement.getTestName());
                 }
             }
 
@@ -89,21 +90,22 @@ public class SubstepsRunSessionListenerImpl implements SubstepsRunSessionListene
             @Override
             public void testFailed(final SubstepsTestElement testElement, final Status status, final String trace,
                     final String expected, final String actual) {
-                final SubstepsRunListener[] testRunListeners = FeatureRunnerPlugin.instance().getModel()
-                        .getTestRunListeners();
+                final Object[] testRunListeners = FeatureRunnerPlugin.instance().getSubstepsRunListeners()
+                        .getListeners();
                 for (int i = 0; i < testRunListeners.length; i++) {
-                    testRunListeners[i].testFailed(status, testElement.getId(), testElement.getTestName(), trace,
-                            expected, actual);
+                    ((SubstepsRunListener) testRunListeners[i]).testFailed(status, testElement.getId(),
+                            testElement.getTestName(), trace, expected, actual);
                 }
             }
 
 
             @Override
             public void testEnded(final SubstepsTestLeafElement testCaseElement) {
-                final SubstepsRunListener[] testRunListeners = FeatureRunnerPlugin.instance().getModel()
-                        .getTestRunListeners();
+                final Object[] testRunListeners = FeatureRunnerPlugin.instance().getSubstepsRunListeners()
+                        .getListeners();
                 for (int i = 0; i < testRunListeners.length; i++) {
-                    testRunListeners[i].testEnded(testCaseElement.getId(), testCaseElement.getTestName());
+                    ((SubstepsRunListener) testRunListeners[i]).testEnded(testCaseElement.getId(),
+                            testCaseElement.getTestName());
                 }
             }
 
