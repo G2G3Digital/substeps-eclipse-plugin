@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Testingtools
+Bundle-SymbolicName: com.technophobia.substeps.core.bundle
+Bundle-Version: 0.0.1.qualifier
+Export-Package: com.technophobia.substeps.model,
+ com.technophobia.substeps.runner,
+ com.technophobia.substeps.runner.runtime,
+ com.technophobia.substeps.runner.setupteardown,
+ com.technophobia.substeps.runner.syntax
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ClassPath: substeps-core-0.0.5.jar
