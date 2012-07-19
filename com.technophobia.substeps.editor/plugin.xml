@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- Copyright Technophobia.Ltd 2012 -->
 <plugin>
-  <extension
+	<extension
         point="org.eclipse.ui.actionSets">
      <actionSet
            id="com.technophobia.substeps.actionSet1"
@@ -108,6 +108,4 @@
             id="org.eclipse.jdt.ui.edit.text.java.format">
       </command>
   </extension>
-  
-  
 </plugin>

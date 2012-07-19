@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Copyright Technophobia.Ltd 2012 -->
-<?pde version="3.6"?>
+<?pde version="3.8"?>
 
-<target name="Running Platform" sequenceNumber="64">
+<target name="Running Platform" sequenceNumber="67">
 <locations>
-<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.sdk.ide" version="3.7.2.M20120208-0800"/>
-<repository location="http://download.eclipse.org/releases/indigo"/>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.sdk.ide" version="4.2.0.I20120608-1400"/>
+<repository location="http://download.eclipse.org/releases/juno"/>
 </location>
-<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.swtbot.eclipse.feature.group" version="2.0.4.20110304_0338-e5aff47-dev-e35"/>
 <unit id="org.eclipse.swtbot.feature.group" version="2.0.4.20110304_0338-e5aff47-dev-e35"/>
 <unit id="org.eclipse.swtbot.ide.feature.group" version="2.0.4.20110304_0338-e5aff47-dev-e35"/>

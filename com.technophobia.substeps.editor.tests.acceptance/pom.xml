@@ -13,7 +13,10 @@
 	<artifactId>com.technophobia.substeps.editor.tests.acceptance</artifactId>
 	
 	<packaging>eclipse-test-plugin</packaging>
-	
+
+	<!--profiles>
+	  <profile>
+	    <id>run-tests</id-->	
 	<build>
 		<plugins>
 			<plugin>
@@ -41,4 +44,6 @@
 			</plugin>
 		</plugins>
 	</build>
+	    <!--/profile>
+	  </profiles-->
 </project>

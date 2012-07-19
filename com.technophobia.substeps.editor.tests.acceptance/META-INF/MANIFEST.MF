@@ -6,13 +6,13 @@ Bundle-ClassPath: ., lib/log4j-1.2.16.jar
 Bundle-Version: 0.0.1.qualifier
 Fragment-Host: com.technophobia.substeps.editor;bundle-version="0.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  org.eclipse.swtbot.swt.finder;bundle-version="2.0.4",
  org.eclipse.swtbot.eclipse.core;bundle-version="2.0.4",
  org.eclipse.swtbot.eclipse.finder;bundle-version="2.0.4",
  org.eclipse.swtbot.eclipse.junit4.headless;bundle-version="2.0.4",
  org.eclipse.swtbot.junit4_x;bundle-version="2.0.4",
- org.eclipse.swt;bundle-version="3.7.2",
+ org.eclipse.swt;bundle-version="3.100.0",
  org.junit;bundle-version="4.8.2",
- com.technophobia.substeps.bundle.core;bundle-version="0.0.1",
- com.technophobia.substeps.testingtools;bundle-version="0.0.1"
+ com.technophobia.substeps.testingtools;bundle-version="0.0.1",
+ com.sun.el;bundle-version="2.2.0"
