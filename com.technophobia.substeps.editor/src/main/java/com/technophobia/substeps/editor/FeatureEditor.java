@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.editors.text.TextEditor;
@@ -46,6 +47,7 @@ import com.technophobia.substeps.document.formatting.partition.PartitionedFormat
 import com.technophobia.substeps.document.partition.PartitionScannedDocumentProvider;
 import com.technophobia.substeps.runner.runtime.ClassLocator;
 import com.technophobia.substeps.runner.runtime.StepClassLocator;
+import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Supplier;
 
 public class FeatureEditor extends TextEditor {
@@ -53,6 +55,7 @@ public class FeatureEditor extends TextEditor {
     private final ColourManager colourManager;
 
 
+    @SuppressWarnings("unchecked")
     public FeatureEditor() {
 
         final ContentTypeDefinitionFactory contentTypeDefinitionFactory = new FeatureContentTypeDefinitionFactory();
@@ -60,7 +63,7 @@ public class FeatureEditor extends TextEditor {
                 contentTypeDefinitionFactory);
         final ContentAssistantFactory contentAssistantFactory = new ProcessedContentAssistantFactory(
                 FeatureContentTypeDefinition.FEATURE.name(), processorSupplier(),
-                new AutoActivatingContentAssistantDecorator());
+                (Callback1<IContentAssistant>) new AutoActivatingContentAssistantDecorator());
         colourManager = new ColourManager();
 
         setSourceViewerConfiguration(new ContentTypeViewConfiguration(colourManager, contentTypeDefinitionFactory,
