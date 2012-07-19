@@ -1,9 +1,12 @@
 package com.technophobia.substeps.document.content.assist;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 
+import com.technophobia.substeps.document.content.ContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.FeatureContentTypeDefinition;
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Supplier;
 
@@ -27,7 +30,11 @@ public class ProcessedContentAssistantFactory implements ContentAssistantFactory
     public IContentAssistant contentAssist() {
 
         final ContentAssistant assistant = new ContentAssistant();
-        assistant.setContentAssistProcessor(processorSupplier.get(), contentType);
+        IContentAssistProcessor processor = processorSupplier.get();
+        
+        for(ContentTypeDefinition contentTypeDefinition : FeatureContentTypeDefinition.values()){
+        	assistant.setContentAssistProcessor(processor, contentTypeDefinition.id());
+        }
 
         for (final Callback1<IContentAssistant> callback : contentAssistantDecorators) {
             callback.doCallback(assistant);

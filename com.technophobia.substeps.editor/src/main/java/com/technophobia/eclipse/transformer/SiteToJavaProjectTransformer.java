@@ -2,10 +2,14 @@ package com.technophobia.eclipse.transformer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchSite;
 
@@ -16,7 +20,6 @@ public class SiteToJavaProjectTransformer implements Transformer<IWorkbenchSite,
 
     @Override
     public IJavaProject to(final IWorkbenchSite site) {
-
         final IProject project = projectFor(site);
         if (project != null) {
             try {
@@ -34,11 +37,17 @@ public class SiteToJavaProjectTransformer implements Transformer<IWorkbenchSite,
 
 
     private IProject projectFor(final IWorkbenchSite site) {
-        final IWorkbenchPage activePage = site.getWorkbenchWindow().getActivePage();
-        if (activePage != null) {
-            final IFile file = (IFile) activePage.getActiveEditor().getEditorInput().getAdapter(IFile.class);
-            return file.getProject();
-        }
+    	ISelection selection = site.getWorkbenchWindow().getSelectionService().getSelection();
+    	if(selection != null && selection instanceof IStructuredSelection){
+    		Object element = ((IStructuredSelection)selection).getFirstElement();
+    		if(element instanceof IResource){
+    			return ((IResource)element).getProject();
+    		} else if(element instanceof IAdaptable){
+    			IAdaptable adaptable = (IAdaptable) element;
+    			IResource resource = (IResource) adaptable.getAdapter(IResource.class);
+    			return resource.getProject();
+    		}
+    	}
         return null;
     }
 

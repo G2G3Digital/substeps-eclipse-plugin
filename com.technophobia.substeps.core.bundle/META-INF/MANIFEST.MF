@@ -11,4 +11,5 @@ Export-Package: com.technophobia.substeps.model,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: substeps-core-0.0.6-SNAPSHOT.jar,
  guava-10.0.jar,
- slf4j-api-1.6.4.jar
+ slf4j-api-1.6.4.jar,
+ commons-io-2.1.jar

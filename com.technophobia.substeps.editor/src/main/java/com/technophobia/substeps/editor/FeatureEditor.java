@@ -20,6 +20,8 @@ package com.technophobia.substeps.editor;
 
 import java.util.ResourceBundle;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
@@ -91,7 +93,9 @@ public class FeatureEditor extends TextEditor {
         try {
             final IJavaProject project = new SiteToJavaProjectTransformer().to(site);
             if (project != null) {
-                return project.getOutputLocation().toOSString();
+            	IPath projectLocation = project.getResource().getLocation().makeAbsolute();
+				IPath outputLocation = project.getOutputLocation();
+				return projectLocation.append(outputLocation.removeFirstSegments(1)).toOSString();
             }
         } catch (final JavaModelException e) {
             FeatureEditorPlugin.log(Status.ERROR, "Could not get output folder for site " + site);
