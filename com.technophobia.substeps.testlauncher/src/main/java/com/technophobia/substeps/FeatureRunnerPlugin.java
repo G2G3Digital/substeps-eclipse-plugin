@@ -29,192 +29,171 @@ import com.technophobia.substeps.model.SubstepsRunListener;
 
 public class FeatureRunnerPlugin extends AbstractUIPlugin implements BundleActivator {
 
-    public static final String PLUGIN_ID = "com.technophobia.substeps.runner";
-    private static final String HISTORY_DIR_NAME = "history";
-    private static final String ID_EXTENSION_POINT_SUBSTEPS_RUN_LISTENERS = PLUGIN_ID + ".substepsRunListeners";
+	public static final String PLUGIN_ID = "com.technophobia.substeps.runner";
+	private static final String HISTORY_DIR_NAME = "history";
+	private static final String ID_EXTENSION_POINT_SUBSTEPS_RUN_LISTENERS = PLUGIN_ID + ".substepsRunListeners";
 
-    private static FeatureRunnerPlugin pluginInstance;
+	private static FeatureRunnerPlugin pluginInstance;
 
-    private ILog log;
+	private ILog log;
 
-    private final SubstepsModel model;
+	private final SubstepsModel model;
 
-    private boolean isStarted;
+	private boolean isStarted;
 
-    private ListenerList listeners = null;
+	private ListenerList listeners = null;
 
+	public FeatureRunnerPlugin() {
+		super();
+		this.isStarted = false;
+		FeatureRunnerPlugin.pluginInstance = this;
+		this.model = new SubstepsModel();
+	}
 
-    public FeatureRunnerPlugin() {
-        super();
-        this.isStarted = false;
-        FeatureRunnerPlugin.pluginInstance = this;
-        this.model = new SubstepsModel();
-    }
+	@Override
+	public void start(final BundleContext bundleContext) throws Exception {
+		super.start(bundleContext);
+		log = Platform.getLog(bundleContext.getBundle());
+		model.start();
+		this.isStarted = true;
+	}
 
+	@Override
+	public void stop(final BundleContext bundleContext) throws Exception {
+		this.isStarted = false;
+		log = null;
+		try {
+			InstanceScope.INSTANCE.getNode(FeatureRunnerPlugin.PLUGIN_ID).flush();
+			model.stop();
+		} finally {
+			super.stop(bundleContext);
+		}
+	}
 
-    @Override
-    public void start(final BundleContext bundleContext) throws Exception {
-        super.start(bundleContext);
-        log = Platform.getLog(bundleContext.getBundle());
-        model.start();
-        this.isStarted = true;
-    }
+	public Bundle getBundle(final String bundleName) {
+		final Bundle[] bundles = getBundles(bundleName, null);
+		if (bundles != null && bundles.length > 0)
+			return bundles[0];
+		return null;
+	}
 
+	@SuppressWarnings("deprecation")
+	public Bundle[] getBundles(final String bundleName, final String version) {
+		Bundle[] bundles = Platform.getBundles(bundleName, version);
+		if (bundles != null)
+			return bundles;
 
-    @Override
-    public void stop(final BundleContext bundleContext) throws Exception {
-        this.isStarted = false;
-        log = null;
-        try {
-            InstanceScope.INSTANCE.getNode(FeatureRunnerPlugin.PLUGIN_ID).flush();
-            model.stop();
-        } finally {
-            super.stop(bundleContext);
-        }
-    }
+		// Accessing unresolved bundle
+		final BundleContext bundleContext = getBundle().getBundleContext();
+		final ServiceReference<?> serviceRef = bundleContext.getServiceReference(PackageAdmin.class.getName());
+		final PackageAdmin admin = (PackageAdmin) bundleContext.getService(serviceRef);
+		bundles = admin.getBundles(bundleName, version);
+		if (bundles != null && bundles.length > 0)
+			return bundles;
+		return null;
+	}
 
+	public boolean isStopped() {
+		return !isStarted;
+	}
 
-    public Bundle getBundle(final String bundleName) {
-        final Bundle[] bundles = getBundles(bundleName, null);
-        if (bundles != null && bundles.length > 0)
-            return bundles[0];
-        return null;
-    }
+	public Shell getActiveShell() {
+		return getActiveWorkbenchWindow().getShell();
+	}
 
+	public IWorkbenchWindow getActiveWorkbenchWindow() {
+		final IWorkbench workBench = getWorkbench();
+		if (workBench == null)
+			return null;
+		return workBench.getActiveWorkbenchWindow();
+	}
 
-    @SuppressWarnings("deprecation")
-    public Bundle[] getBundles(final String bundleName, final String version) {
-        Bundle[] bundles = Platform.getBundles(bundleName, version);
-        if (bundles != null)
-            return bundles;
+	public static void log(final int status, final String message) {
+		instance().log.log(new Status(status, PLUGIN_ID, message));
+	}
 
-        // Accessing unresolved bundle
-        final BundleContext bundleContext = getBundle().getBundleContext();
-        final ServiceReference<?> serviceRef = bundleContext.getServiceReference(PackageAdmin.class.getName());
-        final PackageAdmin admin = (PackageAdmin) bundleContext.getService(serviceRef);
-        bundles = admin.getBundles(bundleName, version);
-        if (bundles != null && bundles.length > 0)
-            return bundles;
-        return null;
-    }
+	public static void log(final Throwable ex) {
+		instance().log.log(new Status(Status.ERROR, PLUGIN_ID, Status.ERROR, "Error", ex));
+	}
 
+	public static FeatureRunnerPlugin instance() {
+		return pluginInstance;
+	}
 
-    public boolean isStopped() {
-        return !isStarted;
-    }
+	public ListenerList getSubstepsRunListeners() {
+		if (listeners == null) {
+			listeners = loadFromRegistry();
+		}
+		return listeners;
+	}
 
+	private ListenerList loadFromRegistry() {
+		final IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(ID_EXTENSION_POINT_SUBSTEPS_RUN_LISTENERS);
+		if (extensionPoint == null) {
+			return null;
+		}
+		final IConfigurationElement[] configs = extensionPoint.getConfigurationElements();
+		final ListenerList loadedListeners = new ListenerList();
+		for (int i = 0; i < configs.length; i++) {
+			try {
+				final Object substepsRunListener = configs[i].createExecutableExtension("class"); //$NON-NLS-1$
+				if (substepsRunListener instanceof SubstepsRunListener) {
+					loadedListeners.add(substepsRunListener);
+				}
+			} catch (final CoreException e) {
+				log(e);
+			}
+		}
+		return loadedListeners;
+	}
 
-    public Shell getActiveShell() {
-        return getActiveWorkbenchWindow().getShell();
-    }
+	public File getHistoryDirectory() throws IllegalStateException {
+		final File historyDir = getStateLocation().append(HISTORY_DIR_NAME).toFile();
+		if (!historyDir.isDirectory()) {
+			historyDir.mkdir();
+		}
+		return historyDir;
+	}
 
+	public SubstepsModel getModel() {
+		return model;
+	}
 
-    public IWorkbenchWindow getActiveWorkbenchWindow() {
-        final IWorkbench workBench = getWorkbench();
-        if (workBench == null)
-            return null;
-        return workBench.getActiveWorkbenchWindow();
-    }
+	public void asyncShowSubstepsRunnerViewPart() {
+		getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				showTestRunnerViewPartInActivePage();
+			}
+		});
+	}
 
+	private Display getDisplay() {
+		Display display = Display.getCurrent();
+		if (display == null) {
+			display = Display.getDefault();
+		}
+		return display;
+	}
 
-    public static void log(final int status, final String message) {
-        instance().log.log(new Status(status, PLUGIN_ID, message));
-    }
-
-
-    public static void log(final Throwable ex) {
-        instance().log.log(new Status(Status.ERROR, PLUGIN_ID, Status.ERROR, "Error", ex));
-    }
-
-
-    public static FeatureRunnerPlugin instance() {
-        return pluginInstance;
-    }
-
-
-    public ListenerList getSubstepsRunListeners() {
-        if (listeners == null) {
-            listeners = loadFromRegistry();
-        }
-        return listeners;
-    }
-
-
-    private ListenerList loadFromRegistry() {
-        final IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(
-                ID_EXTENSION_POINT_SUBSTEPS_RUN_LISTENERS);
-        if (extensionPoint == null) {
-            return null;
-        }
-        final IConfigurationElement[] configs = extensionPoint.getConfigurationElements();
-        final ListenerList loadedListeners = new ListenerList();
-        for (int i = 0; i < configs.length; i++) {
-            try {
-                final Object substepsRunListener = configs[i].createExecutableExtension("class"); //$NON-NLS-1$
-                if (substepsRunListener instanceof SubstepsRunListener) {
-                    loadedListeners.add(substepsRunListener);
-                }
-            } catch (final CoreException e) {
-                log(e);
-            }
-        }
-        return loadedListeners;
-    }
-
-
-    public File getHistoryDirectory() throws IllegalStateException {
-        final File historyDir = getStateLocation().append(HISTORY_DIR_NAME).toFile();
-        if (!historyDir.isDirectory()) {
-            historyDir.mkdir();
-        }
-        return historyDir;
-    }
-
-
-    public SubstepsModel getModel() {
-        return model;
-    }
-
-
-    public void asyncShowSubstepsRunnerViewPart() {
-        getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                showTestRunnerViewPartInActivePage();
-            }
-        });
-    }
-
-
-    private Display getDisplay() {
-        Display display = Display.getCurrent();
-        if (display == null) {
-            display = Display.getDefault();
-        }
-        return display;
-    }
-
-
-    public SubstepsFeatureTestRunnerViewPart showTestRunnerViewPartInActivePage() {
-        try {
-            // Have to force the creation of view part contents
-            // otherwise the UI will not be updated
-            final IWorkbenchWindow window = getActiveWorkbenchWindow();
-            final IWorkbenchPage page = window != null ? window.getActivePage() : null;
-            if (page == null)
-                return null;
-            final SubstepsFeatureTestRunnerViewPart view = (SubstepsFeatureTestRunnerViewPart) page
-                    .findView(SubstepsFeatureTestRunnerViewPart.NAME);
-            if (view == null) {
-                // create and show the result view if it isn't created yet.
-                return (SubstepsFeatureTestRunnerViewPart) page.showView(SubstepsFeatureTestRunnerViewPart.NAME, null,
-                        IWorkbenchPage.VIEW_VISIBLE);
-            } else {
-                return view;
-            }
-        } catch (final PartInitException pie) {
-            log(pie);
-            return null;
-        }
-    }
+	public SubstepsFeatureTestRunnerViewPart showTestRunnerViewPartInActivePage() {
+		try {
+			// Have to force the creation of view part contents
+			// otherwise the UI will not be updated
+			final IWorkbenchWindow window = getActiveWorkbenchWindow();
+			final IWorkbenchPage page = window != null ? window.getActivePage() : null;
+			if (page == null)
+				return null;
+			final SubstepsFeatureTestRunnerViewPart view = (SubstepsFeatureTestRunnerViewPart) page.findView(SubstepsFeatureTestRunnerViewPart.NAME);
+			if (view == null) {
+				// create and show the result view if it isn't created yet.
+				return (SubstepsFeatureTestRunnerViewPart) page.showView(SubstepsFeatureTestRunnerViewPart.NAME, null, IWorkbenchPage.VIEW_VISIBLE);
+			} else {
+				return view;
+			}
+		} catch (final PartInitException pie) {
+			log(pie);
+			return null;
+		}
+	}
 }
