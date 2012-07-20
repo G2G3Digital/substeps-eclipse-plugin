@@ -13,3 +13,4 @@ Bundle-ClassPath: guava-10.0.jar,
  slf4j-api-1.6.4.jar,
  commons-io-2.1.jar,
  substeps-core-0.0.6-SNAPSHOT.jar
+Require-Bundle: org.junit;bundle-version="4.10.0"

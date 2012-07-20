@@ -10,7 +10,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchSite;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
@@ -37,17 +37,23 @@ public class SiteToJavaProjectTransformer implements Transformer<IWorkbenchSite,
 
 
     private IProject projectFor(final IWorkbenchSite site) {
-    	ISelection selection = site.getWorkbenchWindow().getSelectionService().getSelection();
-    	if(selection != null && selection instanceof IStructuredSelection){
-    		Object element = ((IStructuredSelection)selection).getFirstElement();
-    		if(element instanceof IResource){
-    			return ((IResource)element).getProject();
-    		} else if(element instanceof IAdaptable){
-    			IAdaptable adaptable = (IAdaptable) element;
-    			IResource resource = (IResource) adaptable.getAdapter(IResource.class);
-    			return resource.getProject();
-    		}
-    	}
+        final ISelection selection = site.getWorkbenchWindow().getSelectionService().getSelection();
+        if (selection != null && selection instanceof IStructuredSelection) {
+            final Object element = ((IStructuredSelection) selection).getFirstElement();
+            if (element instanceof IResource) {
+                return ((IResource) element).getProject();
+            } else if (element instanceof IAdaptable) {
+                final IAdaptable adaptable = (IAdaptable) element;
+                final IResource resource = (IResource) adaptable.getAdapter(IResource.class);
+                return resource.getProject();
+            }
+        }
+
+        final IEditorPart activeEditor = site.getPage().getActiveEditor();
+        if (activeEditor != null) {
+            final IFile file = (IFile) activeEditor.getEditorInput().getAdapter(IFile.class);
+            return file.getProject();
+        }
         return null;
     }
 
