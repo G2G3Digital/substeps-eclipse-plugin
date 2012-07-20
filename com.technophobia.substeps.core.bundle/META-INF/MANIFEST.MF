@@ -9,7 +9,7 @@ Export-Package: com.technophobia.substeps.model,
  com.technophobia.substeps.runner.setupteardown,
  com.technophobia.substeps.runner.syntax
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: substeps-core-0.0.6-SNAPSHOT.jar,
- guava-10.0.jar,
+Bundle-ClassPath: guava-10.0.jar,
  slf4j-api-1.6.4.jar,
- commons-io-2.1.jar
+ commons-io-2.1.jar,
+ substeps-core-0.0.6-SNAPSHOT.jar

@@ -54,4 +54,3 @@ Export-Package: com.google.common.base,
  org.jmock.syntax,
  org.slf4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit;bundle-version="4.8.2"
