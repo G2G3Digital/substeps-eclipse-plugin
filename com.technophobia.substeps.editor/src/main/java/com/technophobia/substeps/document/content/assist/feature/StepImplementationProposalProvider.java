@@ -3,72 +3,87 @@ package com.technophobia.substeps.document.content.assist.feature;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.IWorkbenchSite;
 
-import com.technophobia.eclipse.transformer.SiteToJavaProjectTransformer;
 import com.technophobia.substeps.FeatureEditorPlugin;
-import com.technophobia.substeps.classloader.ClassLoadedClassAnalyser;
-import com.technophobia.substeps.classloader.JavaProjectClassLoader;
 import com.technophobia.substeps.document.content.assist.CompletionProposalProvider;
 import com.technophobia.substeps.model.StepImplementation;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.render.StepImplementationRenderer;
-import com.technophobia.substeps.runner.runtime.ClassLocator;
-import com.technophobia.substeps.runner.runtime.StepClassLocator;
-import com.technophobia.substeps.runner.syntax.SyntaxBuilder;
+import com.technophobia.substeps.supplier.Transformer;
 
+/**
+ * Implementation of {@link CompletionProposalProvider} that looks up all class
+ * files in the current {@link IJavaProject}, locates their step definition
+ * methods (if any), and filters out non-applicable ones, returning the
+ * remainder as {@link ICompletionProposal}s
+ * 
+ * @author sforbes
+ * 
+ */
 public class StepImplementationProposalProvider implements CompletionProposalProvider {
 
     private final IWorkbenchPartSite site;
     private final StepImplementationRenderer stepRenderer;
+    private final Transformer<IWorkbenchSite, Syntax> siteToSyntaxTransformer;
 
 
     public StepImplementationProposalProvider(final IWorkbenchPartSite site,
-            final StepImplementationRenderer stepRenderer) {
+            final StepImplementationRenderer stepRenderer,
+            final Transformer<IWorkbenchSite, Syntax> siteToSyntaxTransformer) {
         this.site = site;
         this.stepRenderer = stepRenderer;
+        this.siteToSyntaxTransformer = siteToSyntaxTransformer;
     }
 
 
     @Override
     public ICompletionProposal[] get(final IDocument document, final int offset) {
-        final IJavaProject project = new SiteToJavaProjectTransformer().to(site);
-        final JavaProjectClassLoader classLoader = new JavaProjectClassLoader(project);
-        final String outputFolder = outputFolderForProject(project);
-        final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
-
-        final List<Class<?>> stepClasses = stepClasses(outputFolder, classLocator);
-
-        final Syntax syntax = SyntaxBuilder.buildSyntax(stepClasses, null, true, null, new ClassLoadedClassAnalyser(
-                classLoader));
-
+        final Syntax syntax = siteToSyntaxTransformer.to(site);
         final Collection<String> sortedSuggestions = getSuggestionsForSteps(syntax.getStepImplementations());
         return createCompletionsForSuggestions(document, offset, sortedSuggestions);
     }
 
 
+    /**
+     * Convert {@link StepImplementation}s into strings, and sort
+     * 
+     * @param steps
+     *            The steps provided
+     * @return sorted list of steps, in string format
+     */
     private List<String> getSuggestionsForSteps(final List<StepImplementation> steps) {
         final List<String> suggestions = new ArrayList<String>();
         for (final StepImplementation step : steps) {
-            final String stepText = stepRenderer.render(step);
-            suggestions.add(stepText);
+            suggestions.add(stepRenderer.render(step));
         }
         Collections.sort(suggestions);
         return suggestions;
     }
 
 
+    /**
+     * Filter out non-applicable steps, based on the current position of the
+     * cursor in the document. Convert the remainder to
+     * {@link ICompletionProposal}
+     * 
+     * @param document
+     *            The currently edited document
+     * @param offset
+     *            position in the document of the cursor
+     * @param suggestions
+     *            All suggestions
+     * @return Applicable {@link ICompletionProposal}s
+     */
     private ICompletionProposal[] createCompletionsForSuggestions(final IDocument document, final int offset,
             final Collection<String> suggestions) {
 
@@ -103,6 +118,15 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
     }
 
 
+    /**
+     * Returns the current line, up to the point offset
+     * 
+     * @param document
+     *            The currently edited document
+     * @param offset
+     *            position in the document of the cursor
+     * @return
+     */
     private String getLastWord(final IDocument document, final int offset) {
         try {
             final int lineNumber = document.getLineOfOffset(offset);
@@ -116,32 +140,6 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
             // ... log the exception ...
         }
         return null;
-    }
-
-
-    private String outputFolderForProject(final IJavaProject project) {
-        try {
-            final IPath projectLocation = project.getResource().getLocation().makeAbsolute();
-            final IPath outputLocation = project.getOutputLocation();
-            return projectLocation.append(outputLocation.removeFirstSegments(1)).toOSString();
-        } catch (final JavaModelException e) {
-            FeatureEditorPlugin.log(IStatus.ERROR, "Could not get output folder for project " + project);
-        }
-        return null;
-    }
-
-
-    private List<Class<?>> stepClasses(final String outputFolder, final ClassLocator classLocator) {
-        return toList(classLocator.fromPath(outputFolder));
-    }
-
-
-    private List<Class<?>> toList(final Iterator<Class<?>> it) {
-        final List<Class<?>> list = new ArrayList<Class<?>>();
-        while (it.hasNext()) {
-            list.add(it.next());
-        }
-        return list;
     }
 
 }

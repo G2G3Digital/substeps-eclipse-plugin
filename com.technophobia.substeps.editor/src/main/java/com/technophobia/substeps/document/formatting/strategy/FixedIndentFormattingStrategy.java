@@ -18,17 +18,25 @@
  */
 package com.technophobia.substeps.document.formatting.strategy;
 
+/**
+ * Sub-class of {@link IndentationFormattingStrategy} providing a fixed indent
+ * 
+ * @author sforbes
+ * 
+ */
 public class FixedIndentFormattingStrategy extends IndentationFormattingStrategy {
 
-	private final String indent;
+    private final String indent;
 
-	public FixedIndentFormattingStrategy(final String indent) {
-		this.indent = indent;
-	}
 
-	@Override
-	protected String indent() {
-		return indent;
-	}
+    public FixedIndentFormattingStrategy(final String indent) {
+        this.indent = indent;
+    }
+
+
+    @Override
+    protected String indent() {
+        return indent;
+    }
 
 }

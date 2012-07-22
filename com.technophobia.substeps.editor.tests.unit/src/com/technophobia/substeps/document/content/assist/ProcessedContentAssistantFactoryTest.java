@@ -36,8 +36,7 @@ public class ProcessedContentAssistantFactoryTest {
         this.decorator1 = context.mock(Callback1.class, "decorator1");
         this.decorator2 = context.mock(Callback1.class, "decorator2");
 
-        this.contentAssistantFactory = new ProcessedContentAssistantFactory("contentType", processorSupplier,
-                decorator1, decorator2);
+        this.contentAssistantFactory = new ProcessedContentAssistantFactory(processorSupplier, decorator1, decorator2);
     }
 
 
@@ -56,7 +55,7 @@ public class ProcessedContentAssistantFactoryTest {
             }
         });
 
-        final IContentAssistant contentAssist = contentAssistantFactory.contentAssist();
+        final IContentAssistant contentAssist = contentAssistantFactory.createContentAssist();
         assertThat(contentAssist.getContentAssistProcessor("contentType"), is(contentAssistantProcessor));
     }
 }

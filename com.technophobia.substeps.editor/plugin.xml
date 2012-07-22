@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- Copyright Technophobia.Ltd 2012 -->
 <plugin>
-	<extension
+	<!--extension
         point="org.eclipse.ui.actionSets">
      <actionSet
            id="com.technophobia.substeps.actionSet1"
@@ -30,7 +30,7 @@
               retarget="true">
         </action>
      </actionSet>
-  </extension>
+  </extension-->
   <extension
         id="substeps_product"
         point="org.eclipse.core.runtime.products">

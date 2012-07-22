@@ -22,22 +22,28 @@ import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.NullContentTypeDefinition;
 
+/**
+ * Implementation of {@link ContentTypeDefinitionFactory} returning
+ * {@link FeatureContentTypeDefinition} items
+ */
 public class FeatureContentTypeDefinitionFactory implements ContentTypeDefinitionFactory {
 
-	private static final ContentTypeDefinition DEFAULT_CONTENT_TYPEDEFINITION = new NullContentTypeDefinition();
+    private static final ContentTypeDefinition DEFAULT_CONTENT_TYPEDEFINITION = new NullContentTypeDefinition();
 
-	@Override
-	public ContentTypeDefinition contentTypeDefintionByName(final String contentTypeName) {
-		for (final ContentTypeDefinition contentTypeDefinition : FeatureContentTypeDefinition.values()) {
-			if (contentTypeName.equals(contentTypeDefinition.id())) {
-				return contentTypeDefinition;
-			}
-		}
-		return DEFAULT_CONTENT_TYPEDEFINITION;
-	}
 
-	@Override
-	public ContentTypeDefinition[] contentTypeDefinitions() {
-		return FeatureContentTypeDefinition.values();
-	}
+    @Override
+    public ContentTypeDefinition contentTypeDefintionByName(final String contentTypeName) {
+        for (final ContentTypeDefinition contentTypeDefinition : FeatureContentTypeDefinition.values()) {
+            if (contentTypeName.equals(contentTypeDefinition.id())) {
+                return contentTypeDefinition;
+            }
+        }
+        return DEFAULT_CONTENT_TYPEDEFINITION;
+    }
+
+
+    @Override
+    public ContentTypeDefinition[] contentTypeDefinitions() {
+        return FeatureContentTypeDefinition.values();
+    }
 }

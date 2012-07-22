@@ -5,6 +5,12 @@ import org.eclipse.jface.text.contentassist.IContentAssistant;
 
 import com.technophobia.substeps.supplier.Callback1;
 
+/**
+ * Define default state on a {@link IContentAssistant}
+ * 
+ * @author sforbes
+ * 
+ */
 public class AutoActivatingContentAssistantDecorator implements Callback1<IContentAssistant> {
 
     @Override

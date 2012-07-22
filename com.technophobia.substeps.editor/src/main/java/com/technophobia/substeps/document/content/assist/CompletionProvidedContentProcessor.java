@@ -6,6 +6,13 @@ import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 
+/**
+ * Implementation of {@link IContentAssistProcessor} that uses a
+ * {@link CompletionProposalProvider} to get the details
+ * 
+ * @author sforbes
+ * 
+ */
 public class CompletionProvidedContentProcessor implements IContentAssistProcessor {
 
     private final CompletionProposalProvider completionProposalProvider;

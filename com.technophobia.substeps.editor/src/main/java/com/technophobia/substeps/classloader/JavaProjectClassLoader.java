@@ -15,6 +15,13 @@ import org.eclipse.jdt.launching.JavaRuntime;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 
+/**
+ * Classloader that loads entries within a java project into a delegate
+ * classloader
+ * 
+ * @author sforbes
+ * 
+ */
 public class JavaProjectClassLoader extends ClassLoader {
 
     private final ClassLoader classLoader;
@@ -32,6 +39,14 @@ public class JavaProjectClassLoader extends ClassLoader {
     }
 
 
+    /**
+     * Looks up classpath entries for project, and creates a new Classloader
+     * with them
+     * 
+     * @param project
+     *            The java project
+     * @return Classloader with all classpath entries in project
+     */
     private ClassLoader createProjectClassLoader(final IJavaProject project) {
         final String[] classPathEntries = classPathEntriesFor(project);
         final List<URL> urls = new ArrayList<URL>(classPathEntries.length);
@@ -45,6 +60,13 @@ public class JavaProjectClassLoader extends ClassLoader {
     }
 
 
+    /**
+     * Finds all classpath entries in project
+     * 
+     * @param project
+     *            The current project
+     * @return All classpath entries
+     */
     private String[] classPathEntriesFor(final IJavaProject project) {
         try {
             return JavaRuntime.computeDefaultRuntimeClassPath(project);
@@ -56,6 +78,13 @@ public class JavaProjectClassLoader extends ClassLoader {
     }
 
 
+    /**
+     * Converts a classpath entry to a url
+     * 
+     * @param entry
+     *            The classpath entry
+     * @return url representation of the entry
+     */
     private URL entryToUrl(final String entry) {
         try {
             final IPath path = new Path(entry);
@@ -68,6 +97,15 @@ public class JavaProjectClassLoader extends ClassLoader {
     }
 
 
+    /**
+     * Creates a new UrlClassLoader with the specified urls and java project
+     * 
+     * @param urls
+     *            To be loaded in the classloader
+     * @param project
+     *            which contains the classes
+     * @return Classloader for this java project
+     */
     private ClassLoader createUrlClassLoaderFor(final List<URL> urls, final IJavaProject project) {
         return new URLClassLoader(urls.toArray(new URL[urls.size()]), project.getClass().getClassLoader());
     }

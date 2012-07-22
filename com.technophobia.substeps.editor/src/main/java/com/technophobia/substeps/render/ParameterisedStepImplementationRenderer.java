@@ -2,6 +2,13 @@ package com.technophobia.substeps.render;
 
 import com.technophobia.substeps.model.StepImplementation;
 
+/**
+ * For rendering during content assist - render the {@link StepImplementation},
+ * replacing any regex text with the string <value>
+ * 
+ * @author sforbes
+ * 
+ */
 public class ParameterisedStepImplementationRenderer implements StepImplementationRenderer {
 
     @Override
@@ -17,6 +24,15 @@ public class ParameterisedStepImplementationRenderer implements StepImplementati
     }
 
 
+    /**
+     * Find any regex, and replace
+     * 
+     * @param line
+     *            The unprocessed line
+     * @param replacementText
+     *            The text to replace regex
+     * @return The processed line
+     */
     public String replaceRegExParams(final String line, final String replacementText) {
 
         String out = line;

@@ -33,7 +33,6 @@ import com.technophobia.substeps.document.content.assist.AutoActivatingContentAs
 import com.technophobia.substeps.document.content.assist.ContentAssistantFactory;
 import com.technophobia.substeps.document.content.assist.ProcessedContentAssistantFactory;
 import com.technophobia.substeps.document.content.assist.feature.StepImplementationProcessorSupplier;
-import com.technophobia.substeps.document.content.feature.FeatureContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.FeatureContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.partition.ContentTypeRuleBasedPartitionScannerFactory;
 import com.technophobia.substeps.document.content.view.ContentTypeViewConfiguration;
@@ -43,6 +42,12 @@ import com.technophobia.substeps.document.partition.PartitionScannedDocumentProv
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Supplier;
 
+/**
+ * TextEditor whose text is configured to view as a feature file
+ * 
+ * @author sforbes
+ * 
+ */
 public class FeatureEditor extends TextEditor {
 
     private final ColourManager colourManager;
@@ -55,8 +60,7 @@ public class FeatureEditor extends TextEditor {
         final FormattingContextFactory formattingContextFactory = new PartitionedFormattingContextFactory(
                 contentTypeDefinitionFactory);
         final ContentAssistantFactory contentAssistantFactory = new ProcessedContentAssistantFactory(
-                FeatureContentTypeDefinition.FEATURE.name(), processorSupplier(),
-                (Callback1<IContentAssistant>) new AutoActivatingContentAssistantDecorator());
+                processorSupplier(), (Callback1<IContentAssistant>) new AutoActivatingContentAssistantDecorator());
         colourManager = new ColourManager();
 
         setSourceViewerConfiguration(new ContentTypeViewConfiguration(colourManager, contentTypeDefinitionFactory,
@@ -66,6 +70,11 @@ public class FeatureEditor extends TextEditor {
     }
 
 
+    /**
+     * Return a new {@link Supplier} of type {@link IContentAssistProcessor}
+     * 
+     * @return
+     */
     private Supplier<IContentAssistProcessor> processorSupplier() {
         return new Supplier<IContentAssistProcessor>() {
             @Override

@@ -18,9 +18,28 @@
  */
 package com.technophobia.substeps.document.content;
 
+/**
+ * Factory interface for {@link ContentTypeDefinition}
+ * 
+ * @author sforbes
+ * 
+ */
 public interface ContentTypeDefinitionFactory {
 
-	ContentTypeDefinition[] contentTypeDefinitions();
+    /**
+     * All {@link ContentTypeDefinition}s
+     * 
+     * @return ContentTypeDefinitions
+     */
+    ContentTypeDefinition[] contentTypeDefinitions();
 
-	ContentTypeDefinition contentTypeDefintionByName(String contentTypeName);
+
+    /**
+     * Find {@link ContentTypeDefinition} by unique name
+     * 
+     * @param contentTypeName
+     *            the unique identifying name
+     * @return ContentTypeDefinition
+     */
+    ContentTypeDefinition contentTypeDefintionByName(String contentTypeName);
 }

@@ -18,50 +18,55 @@
  */
 package com.technophobia.substeps.document.formatting.strategy;
 
-import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.text.formatter.IFormattingStrategy;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.document.formatting.FormattingContext;
 import com.technophobia.substeps.supplier.Supplier;
 
+/**
+ * Implementation of {@link IFormattingStrategy} that defers formatting to a
+ * different {@link IFormattingStrategy}, wrapping it with relevant newlines
+ * 
+ * @author sforbes
+ * 
+ */
 public class StartOfUnitFormattingStrategy extends DefaultFormattingStrategy {
 
-	private final IFormattingStrategy formattingStrategy;
-	private final Supplier<FormattingContext> formattingContextSupplier;
+    private final IFormattingStrategy formattingStrategy;
+    private final Supplier<FormattingContext> formattingContextSupplier;
 
-	public StartOfUnitFormattingStrategy(
-			final Supplier<FormattingContext> formattingContextSupplier,
-			final IFormattingStrategy formattingStrategy) {
-		this.formattingContextSupplier = formattingContextSupplier;
-		this.formattingStrategy = formattingStrategy;
 
-	}
+    public StartOfUnitFormattingStrategy(final Supplier<FormattingContext> formattingContextSupplier,
+            final IFormattingStrategy formattingStrategy) {
+        this.formattingContextSupplier = formattingContextSupplier;
+        this.formattingStrategy = formattingStrategy;
 
-	@Override
-	public String format(final String content, final boolean isLineStart,
-			final String indentation, final int[] positions) {
-		FeatureEditorPlugin.log(Status.INFO, "Formatting line: " + content
-				+ ", isLineStart: " + isLineStart + ", indentation: "
-				+ indentation);
-		boolean prefixNewLine = false;
-		if (isLineStart) {
-			final FormattingContext formattingContext = formattingContextSupplier
-					.get();
-			if (formattingContext.hasPreviousContentType()) {
-				if (!formattingContext.previousContentType().isOptional()) {
-					prefixNewLine = true;
-				}
-			}
-		}
-		final String formattedContent = formattingStrategy.format(content,
-				isLineStart, indentation, positions);
+    }
 
-		final StringBuffer sb = new StringBuffer();
-		if (prefixNewLine) {
-			sb.append("\n");
-		}
-		sb.append(formattedContent);
-		return sb.toString();
-	}
+
+    @Override
+    public String format(final String content, final boolean isLineStart, final String indentation,
+            final int[] positions) {
+        FeatureEditorPlugin.log(IStatus.INFO, "Formatting line: " + content + ", isLineStart: " + isLineStart
+                + ", indentation: " + indentation);
+        boolean prefixNewLine = false;
+        if (isLineStart) {
+            final FormattingContext formattingContext = formattingContextSupplier.get();
+            if (formattingContext.hasPreviousContentType()) {
+                if (!formattingContext.previousContentType().isOptional()) {
+                    prefixNewLine = true;
+                }
+            }
+        }
+        final String formattedContent = formattingStrategy.format(content, isLineStart, indentation, positions);
+
+        final StringBuffer sb = new StringBuffer();
+        if (prefixNewLine) {
+            sb.append("\n");
+        }
+        sb.append(formattedContent);
+        return sb.toString();
+    }
 }

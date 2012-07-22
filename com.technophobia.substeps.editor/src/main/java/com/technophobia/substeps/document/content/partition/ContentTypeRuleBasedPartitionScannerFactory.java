@@ -24,39 +24,40 @@ import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.partition.PartitionScannerFactory;
 
-public class ContentTypeRuleBasedPartitionScannerFactory implements
-		PartitionScannerFactory {
+/**
+ * Implementation of {@link PartitionScannerFactory} that backs onto a
+ * {@link ContentTypeDefinitionFactory}
+ * 
+ * @author sforbes
+ * 
+ */
+public class ContentTypeRuleBasedPartitionScannerFactory implements PartitionScannerFactory {
 
-	private final ContentTypeDefinitionFactory contentTypeDefinitionFactory;
+    private final ContentTypeDefinitionFactory contentTypeDefinitionFactory;
 
-	public ContentTypeRuleBasedPartitionScannerFactory(
-			final ContentTypeDefinitionFactory contentTypeDefinitionFactory) {
-		this.contentTypeDefinitionFactory = contentTypeDefinitionFactory;
-	}
 
-	@Override
-	public IPartitionTokenScanner createScanner() {
-		return new ContentTypeRuleBasedPartitionScanner(
-				contentTypeDefinitionFactory);
-	}
+    public ContentTypeRuleBasedPartitionScannerFactory(final ContentTypeDefinitionFactory contentTypeDefinitionFactory) {
+        this.contentTypeDefinitionFactory = contentTypeDefinitionFactory;
+    }
 
-	@Override
-	public String[] legalContentTypes() {
-		return idsFrom(contentTypeDefinitionFactory);
-	}
 
-	private String[] idsFrom(
-			final ContentTypeDefinitionFactory contentTypeDefinitionFactory) {
-		final ContentTypeDefinition[] contentTypeDefinitions = contentTypeDefinitionFactory
-				.contentTypeDefinitions();
+    @Override
+    public IPartitionTokenScanner createScanner() {
+        return new ContentTypeRuleBasedPartitionScanner(contentTypeDefinitionFactory);
+    }
 
-		final String[] ids = new String[contentTypeDefinitions.length];
-		int i = 0;
-		for (final ContentTypeDefinition contentTypeDefinition : contentTypeDefinitions) {
-			ids[i] = contentTypeDefinition.id();
-			i++;
-		}
 
-		return ids;
-	}
+    @Override
+    public String[] legalContentTypes() {
+        final ContentTypeDefinition[] contentTypeDefinitions = contentTypeDefinitionFactory.contentTypeDefinitions();
+
+        final String[] ids = new String[contentTypeDefinitions.length];
+        int i = 0;
+        for (final ContentTypeDefinition contentTypeDefinition : contentTypeDefinitions) {
+            ids[i] = contentTypeDefinition.id();
+            i++;
+        }
+
+        return ids;
+    }
 }
