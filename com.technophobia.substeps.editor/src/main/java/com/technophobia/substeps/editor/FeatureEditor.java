@@ -56,7 +56,7 @@ public class FeatureEditor extends TextEditor {
     @SuppressWarnings("unchecked")
     public FeatureEditor() {
 
-        final ContentTypeDefinitionFactory contentTypeDefinitionFactory = new FeatureContentTypeDefinitionFactory();
+        final ContentTypeDefinitionFactory contentTypeDefinitionFactory = contentTypeDefinitionFactory();
         final FormattingContextFactory formattingContextFactory = new PartitionedFormattingContextFactory(
                 contentTypeDefinitionFactory);
         final ContentAssistantFactory contentAssistantFactory = new ProcessedContentAssistantFactory(
@@ -68,6 +68,16 @@ public class FeatureEditor extends TextEditor {
                 formattingContextFactory, contentAssistantFactory));
         setDocumentProvider(new PartitionScannedDocumentProvider(new ContentTypeRuleBasedPartitionScannerFactory(
                 contentTypeDefinitionFactory)));
+    }
+
+
+    /**
+     * Return a new {@link ContentTypeDefinitionFactory}
+     * 
+     * @return
+     */
+    protected ContentTypeDefinitionFactory contentTypeDefinitionFactory() {
+        return new FeatureContentTypeDefinitionFactory();
     }
 
 

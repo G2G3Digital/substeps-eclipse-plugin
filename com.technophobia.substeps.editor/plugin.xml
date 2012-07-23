@@ -77,10 +77,19 @@
            class="com.technophobia.substeps.editor.FeatureEditor"
            contributorClass="com.technophobia.substeps.editor.FeatureEditorActionContributor"
            default="true"
-           filenames="*.feature, *.substeps"
+           filenames="*.feature"
            icon="src/main/resources/feature_file.gif"
            id="com.technophobia.substeps.editor.featureEditor"
            name="FeatureFileEditor">
+     </editor>
+     <editor
+           class="com.technophobia.substeps.editor.SubstepsEditor"
+           contributorClass="com.technophobia.substeps.editor.FeatureEditorActionContributor"
+           default="true"
+           filenames="*.substeps"
+           icon="src/main/resources/feature_file.gif"
+           id="com.technophobia.substeps.editor.substepsEditor"
+           name="SubstepsFileEditor">
      </editor>
   </extension>
   <extension

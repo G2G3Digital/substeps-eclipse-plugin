@@ -340,7 +340,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
     private void format(final TypedPosition[] ranges) {
         final TypedPosition[] allTypedPositions = allTypedPositions();
 
-        for (int i = ranges.length - 1; i >= 0; i--) {
+        // for (int i = ranges.length - 1; i >= 0; i--) {
+        for (int i = 0; i < ranges.length; i++) {
             final IFormattingStrategy s = getFormattingStrategy(ranges[i].getType());
             updateCurrentContext(allTypedPositions, i);
             if (s != null) {
