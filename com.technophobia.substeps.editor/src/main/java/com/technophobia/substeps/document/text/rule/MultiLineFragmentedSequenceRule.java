@@ -35,7 +35,7 @@ public class MultiLineFragmentedSequenceRule extends MultiLineRule {
 
 
     public MultiLineFragmentedSequenceRule(final String startString, final String endSequence, final IToken token) {
-        super(startString, endSequence, token);
+        super(startString, endSequence, token, (char) 0, true);
     }
 
 

@@ -261,6 +261,24 @@ public enum FeatureContentTypeDefinition implements ContentTypeDefinition {
         public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
             return new FixedIndentFormattingStrategy("\t  ");
         }
+    },
+    DEFINE("__substeps_define", false) {
+        @Override
+        public IPredicateRule partitionRule() {
+            return paragraphRule("Define", id());
+        }
+
+
+        @Override
+        public IRule damageRepairerRule(final ColourManager colourManager) {
+            return fixedWordRule("Define", colourToken(FeatureColour.BLUE, colourManager));
+        }
+
+
+        @Override
+        public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
+            return new MultiLineFixedIndentFormattingStrategy("", "\t");
+        }
     };
 
     private FeatureContentTypeDefinition(final String id, final boolean optional) {

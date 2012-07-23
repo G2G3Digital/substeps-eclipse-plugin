@@ -36,8 +36,8 @@ import com.technophobia.substeps.document.formatting.InvalidFormatPositionExcept
 public class PartitionedFormattingContext implements FormattingContext {
 
     private final TypedPosition[] positions;
-    private final int currentPosition;
     private final ContentTypeDefinitionFactory contentTypeDefinitionFactory;
+    private final int currentPosition;
 
 
     public PartitionedFormattingContext(final TypedPosition[] positions, final int currentPosition,
@@ -49,34 +49,40 @@ public class PartitionedFormattingContext implements FormattingContext {
 
 
     @Override
-    public boolean hasPreviousContentType() {
+    public ContentTypeDefinition currentContentType() {
+        return contentTypeDefinitionFactory.contentTypeDefintionByName(positions[currentPosition].getType());
+    }
+
+
+    @Override
+    public boolean hasPreviousContent() {
         return locatePreviousContentTypeOrNull() != null;
     }
 
 
     @Override
-    public ContentTypeDefinition previousContentType() throws InvalidFormatPositionException {
-        final ContentTypeDefinition prevContentType = locatePreviousContentTypeOrNull();
+    public FormattingContext previousContentContext() throws InvalidFormatPositionException {
+        final PositionalContentTypeDefinitionHolder prevContentType = locatePreviousContentTypeOrNull();
         if (prevContentType == null) {
             throw new InvalidFormatPositionException("No content type exists before current position");
         }
-        return prevContentType;
+        return new PartitionedFormattingContext(positions, prevContentType.getPosition(), contentTypeDefinitionFactory);
     }
 
 
     @Override
-    public boolean hasNextContentType() {
+    public boolean hasNextContent() {
         return locateNextContentTypeOrNull() != null;
     }
 
 
     @Override
-    public ContentTypeDefinition nextContentType() throws InvalidFormatPositionException {
-        final ContentTypeDefinition nextContentType = locateNextContentTypeOrNull();
+    public FormattingContext nextContentContext() throws InvalidFormatPositionException {
+        final PositionalContentTypeDefinitionHolder nextContentType = locateNextContentTypeOrNull();
         if (nextContentType == null) {
             throw new InvalidFormatPositionException("No content type exists after current position");
         }
-        return nextContentType;
+        return new PartitionedFormattingContext(positions, nextContentType.getPosition(), contentTypeDefinitionFactory);
     }
 
 
@@ -85,12 +91,12 @@ public class PartitionedFormattingContext implements FormattingContext {
     }
 
 
-    private ContentTypeDefinition locatePreviousContentTypeOrNull() {
+    private PositionalContentTypeDefinitionHolder locatePreviousContentTypeOrNull() {
         int pos = currentPosition - 1;
         while (pos >= 0) {
             final String type = positions[pos].getType();
             if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
-                return contentTypeFor(type);
+                return new PositionalContentTypeDefinitionHolder(pos, contentTypeFor(type));
             }
             pos--;
         }
@@ -98,15 +104,38 @@ public class PartitionedFormattingContext implements FormattingContext {
     }
 
 
-    private ContentTypeDefinition locateNextContentTypeOrNull() {
+    private PositionalContentTypeDefinitionHolder locateNextContentTypeOrNull() {
         int pos = currentPosition + 1;
         while (pos < positions.length) {
             final String type = positions[pos].getType();
             if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
-                return contentTypeFor(type);
+                return new PositionalContentTypeDefinitionHolder(pos, contentTypeFor(type));
             }
             pos++;
         }
         return null;
+    }
+
+    private static final class PositionalContentTypeDefinitionHolder {
+        private final int position;
+        private final ContentTypeDefinition contentTypeDefinition;
+
+
+        public PositionalContentTypeDefinitionHolder(final int position,
+                final ContentTypeDefinition contentTypeDefinition) {
+            super();
+            this.position = position;
+            this.contentTypeDefinition = contentTypeDefinition;
+        }
+
+
+        public int getPosition() {
+            return position;
+        }
+
+
+        public ContentTypeDefinition getContentTypeDefinition() {
+            return contentTypeDefinition;
+        }
     }
 }

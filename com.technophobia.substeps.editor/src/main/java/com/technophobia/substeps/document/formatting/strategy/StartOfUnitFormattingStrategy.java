@@ -54,8 +54,9 @@ public class StartOfUnitFormattingStrategy extends DefaultFormattingStrategy {
         boolean prefixNewLine = false;
         if (isLineStart) {
             final FormattingContext formattingContext = formattingContextSupplier.get();
-            if (formattingContext.hasPreviousContentType()) {
-                if (!formattingContext.previousContentType().isOptional()) {
+            if (formattingContext.hasPreviousContent()) {
+                final FormattingContext previousContext = formattingContext.previousContentContext();
+                if (!previousContext.currentContentType().isOptional()) {
                     prefixNewLine = true;
                 }
             }

@@ -45,10 +45,22 @@ public class OptionalUnitPrefixFormattingStrategy extends DefaultFormattingStrat
     public String format(final String content, final boolean isLineStart, final String indentation,
             final int[] positions) {
         final FormattingContext formattingContext = formattingContextSupplier.get();
-        if (formattingContext.hasNextContentType()) {
-            return formattingContext.nextContentType().formattingStrategy(formattingContextSupplier)
+        if (formattingContext.hasNextContent()) {
+            final FormattingContext nextFormattingContext = formattingContext.nextContentContext();
+            return nextFormattingContext.currentContentType()
+                    .formattingStrategy(formattingContextSupplierFor(nextFormattingContext))
                     .format(content, isLineStart, indentation, positions);
         }
         return "";
+    }
+
+
+    private Supplier<FormattingContext> formattingContextSupplierFor(final FormattingContext formattingContext) {
+        return new Supplier<FormattingContext>() {
+            @Override
+            public FormattingContext get() {
+                return formattingContext;
+            }
+        };
     }
 }

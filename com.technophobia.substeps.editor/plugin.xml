@@ -77,7 +77,7 @@
            class="com.technophobia.substeps.editor.FeatureEditor"
            contributorClass="com.technophobia.substeps.editor.FeatureEditorActionContributor"
            default="true"
-           filenames="*.feature"
+           filenames="*.feature, *.substeps"
            icon="src/main/resources/feature_file.gif"
            id="com.technophobia.substeps.editor.featureEditor"
            name="FeatureFileEditor">
