@@ -60,7 +60,8 @@ public class FeatureEditor extends TextEditor {
         final FormattingContextFactory formattingContextFactory = new PartitionedFormattingContextFactory(
                 contentTypeDefinitionFactory);
         final ContentAssistantFactory contentAssistantFactory = new ProcessedContentAssistantFactory(
-                processorSupplier(), (Callback1<IContentAssistant>) new AutoActivatingContentAssistantDecorator());
+                processorSupplier(), contentTypeDefinitionFactory,
+                (Callback1<IContentAssistant>) new AutoActivatingContentAssistantDecorator());
         colourManager = new ColourManager();
 
         setSourceViewerConfiguration(new ContentTypeViewConfiguration(colourManager, contentTypeDefinitionFactory,

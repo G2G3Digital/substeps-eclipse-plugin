@@ -22,167 +22,206 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import com.technophobia.substeps.document.content.feature.FeatureContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.FeatureContentTypeDefinitionFactory;
+import com.technophobia.substeps.document.content.feature.definition.AndContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.BackgroundContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.CommentContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.DefineContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.FeatureContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.GivenContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleRowContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioOutlineContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.TagContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ThenContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.WhenContentTypeDefinition;
 
 public class ContentTypeRuleBasedPartitionScannerTest {
 
-	ContentTypeRuleBasedPartitionScanner partitionScanner;
+    ContentTypeRuleBasedPartitionScanner partitionScanner;
 
-	@Before
-	public void initScanner() {
-		this.partitionScanner = new ContentTypeRuleBasedPartitionScanner(new FeatureContentTypeDefinitionFactory());
-	}
 
-	@Test
-	public void canPartitionComments() {
-		final String text = "#This is comment line 1\nBackground:\nGiven something\n#This is comment line 2";
-		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+    @Before
+    public void initScanner() {
+        this.partitionScanner = new ContentTypeRuleBasedPartitionScanner(new FeatureContentTypeDefinitionFactory());
+    }
 
-		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-		assertEquals(4, result.length);
 
-		checkType(result[0], FeatureContentTypeDefinition.COMMENT.id(), "#This is comment line 1\n");
-		checkType(result[3], FeatureContentTypeDefinition.COMMENT.id(), "#This is comment line 2");
-	}
+    @Test
+    public void canPartitionComments() {
+        final String text = "#This is comment line 1\nBackground:\nGiven something\n#This is comment line 2";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
-	@Test
-	public void canPartitionSingleTagOnLine() {
-		final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario:A scenario";
-		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(4, result.length);
 
-		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-		assertEquals(6, result.length);
+        checkType(result[0], CommentContentTypeDefinition.CONTENT_TYPE_ID, "#This is comment line 1\n");
+        checkType(result[3], CommentContentTypeDefinition.CONTENT_TYPE_ID, "#This is comment line 2");
+    }
 
-		checkType(result[4], FeatureContentTypeDefinition.TAG.id(), "Tags: tag-1\n");
-	}
 
-	@Test
-	public void canPartitionBackground() {
-		final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario:A scenario";
-		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+    @Test
+    public void canPartitionSingleTagOnLine() {
+        final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario:A scenario";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
-		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-		assertEquals(6, result.length);
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(6, result.length);
 
-		checkType(result[1], FeatureContentTypeDefinition.BACKGROUND.id(), "Background:\n");
-	}
+        checkType(result[4], TagContentTypeDefinition.CONTENT_TYPE_ID, "Tags: tag-1\n");
+    }
 
-	@Test
-	public void canPartitionScenario() {
 
-		final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario:A scenario";
-		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+    @Test
+    public void canPartitionBackground() {
+        final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario:A scenario";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
-		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-		assertEquals(6, result.length);
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(6, result.length);
 
-		checkType(result[5], FeatureContentTypeDefinition.SCENARIO.id(), "Scenario:A scenario");
-	}
+        checkType(result[1], BackgroundContentTypeDefinition.CONTENT_TYPE_ID, "Background:\n");
+    }
 
-	@Test
-	public void canPartitionScenarioOutline() {
-		final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario Outline:A scenario";
-		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
-		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-		assertEquals(6, result.length);
+    @Test
+    public void canPartitionScenario() {
 
-		checkType(result[5], FeatureContentTypeDefinition.SCENARIO_OUTLINE.id(), "Scenario Outline:A scenario");
-	}
+        final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario:A scenario";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
-	@Test
-	public void canPartitionExample() {
-		final String text = "@tag-1\nScenario Outline:A scenario\nGiven Something\nWhen something else\nThen a result\n\nExamples:\n\t|example1|example2|";
-		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(6, result.length);
 
-		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-		assertEquals(9, result.length);
+        checkType(result[5], ScenarioContentTypeDefinition.CONTENT_TYPE_ID, "Scenario:A scenario");
+    }
 
-		checkType(result[6], FeatureContentTypeDefinition.EXAMPLE.id(), "Examples:\n");
-	}
 
-	@Test
-	public void canPartitionExampleRow() {
-		final String text = "@tag-1\nScenario Outline:A scenario\nGiven Something\nWhen something else\nThen a result\n\nExamples:\n\t|example1|example2|";
-		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+    @Test
+    public void canPartitionScenarioOutline() {
+        final String text = "#This is comment line 1\nBackground:\nGiven something\n\nTags: tag-1\nScenario Outline:A scenario";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
-		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-		assertEquals(9, result.length);
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(6, result.length);
 
-		checkType(result[8], FeatureContentTypeDefinition.EXAMPLE_ROW.id(), "|example1|example2|");
-	}
+        checkType(result[5], ScenarioOutlineContentTypeDefinition.CONTENT_TYPE_ID, "Scenario Outline:A scenario");
+    }
 
-	@Test
-	public void canPartitionGiven() {
-		final String text = "@tag-1\nScenario:A scenario\nGiven Something\nWhen something else\nThen a result";
-		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
-		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-		assertEquals(5, result.length);
+    @Test
+    public void canPartitionExample() {
+        final String text = "@tag-1\nScenario Outline:A scenario\nGiven Something\nWhen something else\nThen a result\n\nExamples:\n\t|example1|example2|";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
-		checkType(result[2], FeatureContentTypeDefinition.GIVEN.id(), "Given Something\n");
-	}
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(9, result.length);
 
-	@Test
-	public void canPartitionWhen() {
-		final String text = "@tag-1\nScenario:A scenario\nGiven Something\nWhen something else\nThen a result";
-		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+        checkType(result[6], ScenarioExampleContentTypeDefinition.CONTENT_TYPE_ID, "Examples:\n");
+    }
 
-		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-		assertEquals(5, result.length);
 
-		checkType(result[3], FeatureContentTypeDefinition.WHEN.id(), "When something else\n");
-	}
+    @Test
+    public void canPartitionExampleRow() {
+        final String text = "@tag-1\nScenario Outline:A scenario\nGiven Something\nWhen something else\nThen a result\n\nExamples:\n\t|example1|example2|";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
-	@Test
-	public void canPartitionThen() {
-		final String text = "@tag-1\nScenario:A scenario\nGiven Something\nWhen something else\nThen a result";
-		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(9, result.length);
 
-		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-		assertEquals(5, result.length);
+        checkType(result[8], ScenarioExampleRowContentTypeDefinition.CONTENT_TYPE_ID, "|example1|example2|");
+    }
 
-		checkType(result[4], FeatureContentTypeDefinition.THEN.id(), "Then a result");
-	}
 
-	@Test
-	public void canPartitionAnd() {
-		final String text = "@tag-1\nScenario:A scenario\nGiven Something\nWhen something else\nAnd another thing\nThen a result";
-		final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+    @Test
+    public void canPartitionGiven() {
+        final String text = "@tag-1\nScenario:A scenario\nGiven Something\nWhen something else\nThen a result";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
-		final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-		assertEquals(6, result.length);
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(5, result.length);
 
-		checkType(result[4], FeatureContentTypeDefinition.AND.id(), "And another thing\n");
-	}
+        checkType(result[2], GivenContentTypeDefinition.CONTENT_TYPE_ID, "Given Something\n");
+    }
 
-	private void checkType(final ITypedRegion typedRegion, final String type, final String text) {
-		assertThat(typedRegion.getType(), is(type));
-		assertThat(typedRegion.getLength(), is(text.length()));
-	}
 
-	private IDocumentPartitioner createPartitionerForDocumentWithText(final String text) {
-		final IDocumentPartitioner partitioner = createPartitioner();
-		final Document document = new Document(text);
-		partitioner.connect(document);
-		document.setDocumentPartitioner(partitioner);
-		return partitioner;
-	}
+    @Test
+    public void canPartitionWhen() {
+        final String text = "@tag-1\nScenario:A scenario\nGiven Something\nWhen something else\nThen a result";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
-	private IDocumentPartitioner createPartitioner() {
-		final String[] ids = new String[FeatureContentTypeDefinition.values().length];
-		for (int i = 0; i < FeatureContentTypeDefinition.values().length; i++) {
-			ids[i] = FeatureContentTypeDefinition.values()[i].id();
-		}
-		return new FastPartitioner(partitionScanner, ids);
-	}
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(5, result.length);
+
+        checkType(result[3], WhenContentTypeDefinition.CONTENT_TYPE_ID, "When something else\n");
+    }
+
+
+    @Test
+    public void canPartitionThen() {
+        final String text = "@tag-1\nScenario:A scenario\nGiven Something\nWhen something else\nThen a result";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(5, result.length);
+
+        checkType(result[4], ThenContentTypeDefinition.CONTENT_TYPE_ID, "Then a result");
+    }
+
+
+    @Test
+    public void canPartitionAnd() {
+        final String text = "@tag-1\nScenario:A scenario\nGiven Something\nWhen something else\nAnd another thing\nThen a result";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(6, result.length);
+
+        checkType(result[4], AndContentTypeDefinition.CONTENT_TYPE_ID, "And another thing\n");
+    }
+
+
+    private void checkType(final ITypedRegion typedRegion, final String type, final String text) {
+        assertThat(typedRegion.getType(), is(type));
+        assertThat(typedRegion.getLength(), is(text.length()));
+    }
+
+
+    private IDocumentPartitioner createPartitionerForDocumentWithText(final String text) {
+        final IDocumentPartitioner partitioner = createPartitioner();
+        final Document document = new Document(text);
+        partitioner.connect(document);
+        document.setDocumentPartitioner(partitioner);
+        return partitioner;
+    }
+
+
+    private IDocumentPartitioner createPartitioner() {
+        final Collection<String> ids = new ArrayList<String>(13);
+        ids.add(FeatureContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(BackgroundContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(CommentContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(TagContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(ScenarioContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(ScenarioOutlineContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(ScenarioExampleContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(ScenarioExampleRowContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(GivenContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(WhenContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(ThenContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(AndContentTypeDefinition.CONTENT_TYPE_ID);
+        ids.add(DefineContentTypeDefinition.CONTENT_TYPE_ID);
+        return new FastPartitioner(partitionScanner, ids.toArray(new String[ids.size()]));
+    }
 }

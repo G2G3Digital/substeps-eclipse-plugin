@@ -27,6 +27,14 @@ package com.technophobia.substeps.document.content;
 public interface ContentTypeDefinitionFactory {
 
     /**
+     * All possible content type ids
+     * 
+     * @return
+     */
+    String[] contentTypeIds();
+
+
+    /**
      * All {@link ContentTypeDefinition}s
      * 
      * @return ContentTypeDefinitions

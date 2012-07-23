@@ -18,9 +18,25 @@
  */
 package com.technophobia.substeps.document.content.feature;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.NullContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.AndContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.BackgroundContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.CommentContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.DefineContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.FeatureContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.GivenContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleRowContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioOutlineContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.TagContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ThenContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.WhenContentTypeDefinition;
 
 /**
  * Implementation of {@link ContentTypeDefinitionFactory} returning
@@ -30,20 +46,48 @@ public class FeatureContentTypeDefinitionFactory implements ContentTypeDefinitio
 
     private static final ContentTypeDefinition DEFAULT_CONTENT_TYPEDEFINITION = new NullContentTypeDefinition();
 
+    private final Map<String, ContentTypeDefinition> contentDefinitionsByName;
+
+
+    public FeatureContentTypeDefinitionFactory() {
+        contentDefinitionsByName = new HashMap<String, ContentTypeDefinition>();
+        addDefinition(new FeatureContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new BackgroundContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new CommentContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new TagContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new ScenarioContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new ScenarioOutlineContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new ScenarioExampleContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new ScenarioExampleRowContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new GivenContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new WhenContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new ThenContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new AndContentTypeDefinition(), contentDefinitionsByName);
+        addDefinition(new DefineContentTypeDefinition(), contentDefinitionsByName);
+    }
+
+
+    @Override
+    public String[] contentTypeIds() {
+        return contentDefinitionsByName.keySet().toArray(new String[contentDefinitionsByName.size()]);
+    }
+
 
     @Override
     public ContentTypeDefinition contentTypeDefintionByName(final String contentTypeName) {
-        for (final ContentTypeDefinition contentTypeDefinition : FeatureContentTypeDefinition.values()) {
-            if (contentTypeName.equals(contentTypeDefinition.id())) {
-                return contentTypeDefinition;
-            }
-        }
-        return DEFAULT_CONTENT_TYPEDEFINITION;
+        return contentDefinitionsByName.containsKey(contentTypeName) ? contentDefinitionsByName.get(contentTypeName)
+                : DEFAULT_CONTENT_TYPEDEFINITION;
     }
 
 
     @Override
     public ContentTypeDefinition[] contentTypeDefinitions() {
-        return FeatureContentTypeDefinition.values();
+        return contentDefinitionsByName.values().toArray(new ContentTypeDefinition[contentDefinitionsByName.size()]);
+    }
+
+
+    private void addDefinition(final ContentTypeDefinition contentTypeDefinition,
+            final Map<String, ContentTypeDefinition> definitionMap) {
+        definitionMap.put(contentTypeDefinition.id(), contentTypeDefinition);
     }
 }
