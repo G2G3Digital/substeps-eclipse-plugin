@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.text.BadLocationException;
@@ -17,13 +18,13 @@ import org.eclipse.ui.internal.texteditor.spelling.NoCompletionsProposal;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.document.content.assist.CompletionProposalProvider;
-import com.technophobia.substeps.document.content.assist.feature.suggestion.StepImplementationSuggestion;
-import com.technophobia.substeps.document.content.assist.feature.suggestion.SubstepSuggestion;
-import com.technophobia.substeps.document.content.assist.feature.suggestion.Suggestion;
+import com.technophobia.substeps.glossary.StepDescriptor;
+import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
 import com.technophobia.substeps.model.ParentStep;
 import com.technophobia.substeps.model.StepImplementation;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.render.StepImplementationRenderer;
+import com.technophobia.substeps.step.StepImplementationManager;
 import com.technophobia.substeps.supplier.Transformer;
 
 /**
@@ -40,45 +41,94 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
     private final IWorkbenchPartSite site;
     private final StepImplementationRenderer stepRenderer;
     private final Transformer<IWorkbenchSite, Syntax> siteToSyntaxTransformer;
+    private final StepImplementationManager stepImplementationManager;
 
 
     public StepImplementationProposalProvider(final IWorkbenchPartSite site,
             final StepImplementationRenderer stepRenderer,
-            final Transformer<IWorkbenchSite, Syntax> siteToSyntaxTransformer) {
+            final Transformer<IWorkbenchSite, Syntax> siteToSyntaxTransformer,
+            final StepImplementationManager stepImplementationManager) {
         this.site = site;
         this.stepRenderer = stepRenderer;
         this.siteToSyntaxTransformer = siteToSyntaxTransformer;
+        this.stepImplementationManager = stepImplementationManager;
     }
 
 
     @Override
     public ICompletionProposal[] get(final IDocument document, final int offset) {
         final Syntax syntax = siteToSyntaxTransformer.to(site);
-        final Collection<Suggestion> sortedSuggestions = getSuggestionsForSyntax(syntax);
-        return createCompletionsForSuggestions(document, offset, sortedSuggestions);
+        final List<String> suggestions = new ArrayList<String>();
+        suggestions.addAll(getSuggestionsForStepImplementations(syntax.getStepImplementations()));
+        suggestions.addAll(getSuggestionsForSubsteps(syntax.getSortedRootSubSteps()));
+        suggestions.addAll(getSuggestionsInDependencies());
+
+        Collections.sort(suggestions);
+        return createCompletionsForSuggestions(document, offset, suggestions);
     }
 
 
     /**
-     * Convert {@link Syntax} into its {@link StepImplementation} and
-     * {@link ParentStep} substeps, and sort
+     * Convert {@link StepImplementation} into suggestions
      * 
      * @param syntax
-     *            The syntax provided
-     * @return sorted list of suggestions
+     *            The step implementations
+     * @return list of suggestions
      */
-    private List<Suggestion> getSuggestionsForSyntax(final Syntax syntax) {
-        final List<Suggestion> suggestions = new ArrayList<Suggestion>();
-        for (final StepImplementation step : syntax.getStepImplementations()) {
-            suggestions.add(new StepImplementationSuggestion(stepRenderer.render(step)));
-        }
+    private List<String> getSuggestionsForStepImplementations(final List<StepImplementation> stepImplementations) {
 
-        for (final ParentStep substep : syntax.getSortedRootSubSteps()) {
-            suggestions.add(new SubstepSuggestion(substep.getParent().getLine()));
+        final List<String> suggestions = new ArrayList<String>();
+        for (final StepImplementation step : stepImplementations) {
+            suggestions.add(stepRenderer.render(step));
         }
-
-        Collections.sort(suggestions);
         return suggestions;
+    }
+
+
+    /**
+     * Convert {@link ParentStep} substeps into suggestions
+     * 
+     * @param substeps
+     *            The substeps
+     * @return list of suggestions
+     */
+    private List<String> getSuggestionsForSubsteps(final List<ParentStep> substeps) {
+        final List<String> suggestions = new ArrayList<String>();
+        for (final ParentStep substep : substeps) {
+            suggestions.add(substep.getParent().getLine());
+        }
+
+        return suggestions;
+    }
+
+
+    /**
+     * Find step implementations in this projects dependencies
+     * 
+     * @return
+     */
+    private List<String> getSuggestionsInDependencies() {
+        final List<String> suggestions = new ArrayList<String>();
+        final List<StepImplementationsDescriptor> stepImplementations = stepImplementationManager
+                .stepImplementationsFor(activeEditorResource());
+        for (final StepImplementationsDescriptor stepImplementation : stepImplementations) {
+            final List<StepDescriptor> stepDescriptors = stepImplementation.getExpressions();
+            for (final StepDescriptor stepDescriptor : stepDescriptors) {
+                suggestions.add(stepDescriptor.getExpression());
+            }
+        }
+        return suggestions;
+    }
+
+
+    /**
+     * Find the current resource for the active editor
+     * 
+     * @return
+     */
+    private IResource activeEditorResource() {
+        return (IResource) site.getWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()
+                .getAdapter(IResource.class);
     }
 
 
@@ -96,7 +146,7 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
      * @return Applicable {@link ICompletionProposal}s
      */
     private ICompletionProposal[] createCompletionsForSuggestions(final IDocument document, final int offset,
-            final Collection<Suggestion> suggestions) {
+            final Collection<String> suggestions) {
 
         final Collection<ICompletionProposal> completionProposals = createPopulatedCompletionsForSuggestions(document,
                 offset, suggestions);
@@ -110,29 +160,28 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
 
 
     private Collection<ICompletionProposal> createPopulatedCompletionsForSuggestions(final IDocument document,
-            final int offset, final Collection<Suggestion> suggestions) {
+            final int offset, final Collection<String> suggestions) {
         final List<ICompletionProposal> completionProposals = new ArrayList<ICompletionProposal>();
 
         // filter the list based on current text
         final String startOfLastWord = getLastWord(document, offset);
 
-        for (final Suggestion suggestion : suggestions) {
-            final String suggestionStr = suggestion.getSuggestionString();
+        for (final String suggestion : suggestions) {
             // TODO - position the cursor at the first < in order to be able
             // to replace with something sensible
             if (startOfLastWord == null) {
-                completionProposals.add(new CompletionProposal(suggestionStr, offset, 0, suggestionStr.length()));
+                completionProposals.add(new CompletionProposal(suggestion, offset, 0, suggestion.length()));
             } else {
                 // only include if the suggestion matches
-                if (suggestionStr.toUpperCase().startsWith(startOfLastWord.toUpperCase())) {
+                if (suggestion.toUpperCase().startsWith(startOfLastWord.toUpperCase())) {
                     // String actualReplacement =
                     // replacement.substring(startOfLastWord.length());
                     // result.add(
                     // new CompletionProposal(actualReplacement, offset, 0,
                     // actualReplacement.length()));
 
-                    completionProposals.add(new CompletionProposal(suggestionStr, offset - startOfLastWord.length(),
-                            startOfLastWord.length(), suggestionStr.length()));
+                    completionProposals.add(new CompletionProposal(suggestion, offset - startOfLastWord.length(),
+                            startOfLastWord.length(), suggestion.length()));
 
                 }
             }

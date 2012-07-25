@@ -11,7 +11,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ui.IWorkbenchSite;
 
-import com.technophobia.eclipse.transformer.ProjectToJavaProjectTransformer;
 import com.technophobia.eclipse.transformer.SiteToJavaProjectTransformer;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.classloader.ClassLoadedClassAnalyser;
@@ -26,7 +25,7 @@ public class SiteToSyntaxTransformer implements Transformer<IWorkbenchSite, Synt
 
     @Override
     public Syntax to(final IWorkbenchSite site) {
-        final IJavaProject project = new SiteToJavaProjectTransformer(new ProjectToJavaProjectTransformer()).to(site);
+        final IJavaProject project = new SiteToJavaProjectTransformer().to(site);
         final ClassLoader classLoader = new JavaProjectClassLoader(project);
         final String outputFolder = outputFolderForProject(project);
         final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);

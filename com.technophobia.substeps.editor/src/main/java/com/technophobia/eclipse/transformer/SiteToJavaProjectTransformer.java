@@ -26,6 +26,11 @@ public class SiteToJavaProjectTransformer implements Transformer<IWorkbenchSite,
     private final Transformer<IProject, IJavaProject> projectToJavaProjectTransformer;
 
 
+    public SiteToJavaProjectTransformer() {
+        this(new ProjectToJavaProjectTransformer());
+    }
+
+
     public SiteToJavaProjectTransformer(final Transformer<IProject, IJavaProject> projectToJavaProjectTransformer) {
         this.projectToJavaProjectTransformer = projectToJavaProjectTransformer;
     }

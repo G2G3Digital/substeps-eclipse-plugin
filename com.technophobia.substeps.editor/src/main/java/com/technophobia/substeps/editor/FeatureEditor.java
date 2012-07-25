@@ -89,7 +89,8 @@ public class FeatureEditor extends TextEditor {
         return new Supplier<IContentAssistProcessor>() {
             @Override
             public IContentAssistProcessor get() {
-                return new StepImplementationProcessorSupplier(getSite()).get();
+                return new StepImplementationProcessorSupplier(getSite(), FeatureEditorPlugin.instance()
+                        .getStepImplementationManager()).get();
             }
 
         };
