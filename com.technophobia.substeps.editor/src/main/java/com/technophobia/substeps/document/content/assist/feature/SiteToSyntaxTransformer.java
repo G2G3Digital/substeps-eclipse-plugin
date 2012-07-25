@@ -1,5 +1,6 @@
 package com.technophobia.substeps.document.content.assist.feature;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,19 +32,25 @@ public class SiteToSyntaxTransformer implements Transformer<IWorkbenchSite, Synt
         final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
 
         final List<Class<?>> stepClasses = stepClasses(outputFolder, classLocator);
-        return SyntaxBuilder.buildSyntax(stepClasses, null, true, null, new ClassLoadedClassAnalyser(classLoader));
+        return SyntaxBuilder.buildSyntax(stepClasses, new File(projectLocationPath(project).toOSString()), true, null,
+                new ClassLoadedClassAnalyser(classLoader));
     }
 
 
     private String outputFolderForProject(final IJavaProject project) {
         try {
-            final IPath projectLocation = project.getResource().getLocation().makeAbsolute();
+            final IPath projectLocation = projectLocationPath(project);
             final IPath outputLocation = project.getOutputLocation();
             return projectLocation.append(outputLocation.removeFirstSegments(1)).toOSString();
         } catch (final JavaModelException e) {
             FeatureEditorPlugin.log(IStatus.ERROR, "Could not get output folder for project " + project);
         }
         return null;
+    }
+
+
+    private IPath projectLocationPath(final IJavaProject project) {
+        return project.getResource().getLocation().makeAbsolute();
     }
 
 
