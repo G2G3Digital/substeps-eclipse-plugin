@@ -46,9 +46,8 @@ public class DefaultSubstepsTestElementFactory implements SubstepsTestElementFac
             final String testName, final boolean suite, final int testCount) {
         if (suite) {
             return new DefaultSubstepsTestParentElement(parent, id, testName, testCount);
-        } else {
-            return new SubstepsTestLeafElement(parent, id, testName);
         }
+        return new SubstepsTestLeafElement(parent, id, testName);
     }
 
 

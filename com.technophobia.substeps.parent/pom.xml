@@ -22,7 +22,7 @@
     </licenses>
 	
 	<properties>
-		<tycho.version>0.12.0</tycho.version>
+		<tycho.version>0.15.0</tycho.version>
 	</properties>
 	
 	<repositories> 
@@ -37,9 +37,9 @@
             <url>file:/home/sforbes/Desktop/repo/repo</url>
           </repository-->
       <repository> 
-	    <id>indigo</id> 
+	    <id>juno</id> 
  	    <layout>p2</layout> 
-	    <url>http://download.eclipse.org/releases/indigo</url> 
+	    <url>http://download.eclipse.org/releases/juno</url> 
 	  </repository>
 	  <repository>
 	  	<id>swtbot</id>
@@ -62,6 +62,7 @@
 				<version>${tycho.version}</version>
 				<configuration>
 					<resolver>p2</resolver>
+					<allowConflictingDependencies>true</allowConflictingDependencies>
 					<target>
 						<artifact>
 							<groupId>com.technophobia.substeps</groupId>
@@ -83,11 +84,12 @@
 	</build>
 	
 	<modules>
-		<module>../com.technophobia.substeps.testingtools</module>
 		<module>../com.technophobia.substeps.target</module>
+		<module>../com.technophobia.substeps.core.bundle</module>
+		<module>../com.technophobia.substeps.testingtools</module>
 		<module>../com.technophobia.substeps.editor</module>
 		<module>../com.technophobia.substeps.editor.tests.unit</module>
-		<module>../com.technophobia.substeps.editor.tests.acceptance</module>
+		<!--module>../com.technophobia.substeps.editor.tests.acceptance</module-->
 		<module>../com.technophobia.substeps.testlauncher</module>
 		<module>../com.technophobia.substeps.feature</module>
 		<module>../com.technophobia.substeps.repository</module>

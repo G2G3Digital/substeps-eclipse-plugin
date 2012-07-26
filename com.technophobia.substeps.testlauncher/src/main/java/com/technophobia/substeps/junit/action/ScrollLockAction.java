@@ -34,6 +34,6 @@ public class ScrollLockAction extends Action {
      */
     @Override
     public void run() {
-        autoScrollNotifier.notify(!isChecked());
+        autoScrollNotifier.notify(Boolean.valueOf(!isChecked()));
     }
 }

@@ -33,6 +33,7 @@ import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.ui.editors.text.TextEditor;
 
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
@@ -42,6 +43,13 @@ import com.technophobia.substeps.document.formatting.ContextAwareContentFormatte
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
 import com.technophobia.substeps.document.formatting.strategy.NullFormattingStrategy;
 
+/**
+ * SourceViewerConfiguration for rendering {@link TextEditor}s using a
+ * {@link ContentTypeDefinitionFactory}
+ * 
+ * @author sforbes
+ * 
+ */
 public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
 
     private final ColourManager colourManager;
@@ -98,13 +106,13 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IContentAssistant getContentAssistant(final ISourceViewer sourceViewer) {
-        return contentAssistantFactory.contentAssist();
+        return contentAssistantFactory.createContentAssist();
     }
 
 
     private Map<String, ContentTypeDefinition> definitionMap() {
         if (contentTypeDefinitionMap == null) {
-            contentTypeDefinitionMap = buildViewConfigurationStatusFrom(contentTypeDefinitionFactory);
+            contentTypeDefinitionMap = buildViewConfigurationStatusForContentTypes();
         }
         return contentTypeDefinitionMap;
     }
@@ -117,8 +125,7 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
     }
 
 
-    private Map<String, ContentTypeDefinition> buildViewConfigurationStatusFrom(
-            final ContentTypeDefinitionFactory contentTypeDefinitionFactory) {
+    private Map<String, ContentTypeDefinition> buildViewConfigurationStatusForContentTypes() {
 
         final ContentTypeDefinition[] contentTypeDefinitions = contentTypeDefinitionFactory.contentTypeDefinitions();
 

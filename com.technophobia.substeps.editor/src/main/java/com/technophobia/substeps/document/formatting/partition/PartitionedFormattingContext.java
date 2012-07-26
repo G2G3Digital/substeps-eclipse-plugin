@@ -26,78 +26,116 @@ import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.formatting.FormattingContext;
 import com.technophobia.substeps.document.formatting.InvalidFormatPositionException;
 
+/**
+ * Implementation of {@link FormattingContext} that is
+ * {@link ContentTypeDefinition} aware
+ * 
+ * @author sforbes
+ * 
+ */
 public class PartitionedFormattingContext implements FormattingContext {
 
-	private final TypedPosition[] positions;
-	private final int currentPosition;
-	private final ContentTypeDefinitionFactory contentTypeDefinitionFactory;
+    private final TypedPosition[] positions;
+    private final ContentTypeDefinitionFactory contentTypeDefinitionFactory;
+    private final int currentPosition;
 
-	public PartitionedFormattingContext(final TypedPosition[] positions,
-			final int currentPosition,
-			final ContentTypeDefinitionFactory contentTypeDefinitionFactory) {
-		this.positions = positions;
-		this.currentPosition = currentPosition;
-		this.contentTypeDefinitionFactory = contentTypeDefinitionFactory;
-	}
 
-	@Override
-	public boolean hasPreviousContentType() {
-		return locatePreviousContentTypeOrNull() != null;
-	}
+    public PartitionedFormattingContext(final TypedPosition[] positions, final int currentPosition,
+            final ContentTypeDefinitionFactory contentTypeDefinitionFactory) {
+        this.positions = positions;
+        this.currentPosition = currentPosition;
+        this.contentTypeDefinitionFactory = contentTypeDefinitionFactory;
+    }
 
-	@Override
-	public ContentTypeDefinition previousContentType()
-			throws InvalidFormatPositionException {
-		final ContentTypeDefinition prevContentType = locatePreviousContentTypeOrNull();
-		if (prevContentType == null) {
-			throw new InvalidFormatPositionException(
-					"No content type exists before current position");
-		}
-		return prevContentType;
-	}
 
-	@Override
-	public boolean hasNextContentType() {
-		return locateNextContentTypeOrNull() != null;
-	}
+    @Override
+    public ContentTypeDefinition currentContentType() {
+        return contentTypeDefinitionFactory.contentTypeDefintionByName(positions[currentPosition].getType());
+    }
 
-	@Override
-	public ContentTypeDefinition nextContentType()
-			throws InvalidFormatPositionException {
-		final ContentTypeDefinition nextContentType = locateNextContentTypeOrNull();
-		if (nextContentType == null) {
-			throw new InvalidFormatPositionException(
-					"No content type exists after current position");
-		}
-		return nextContentType;
-	}
 
-	private ContentTypeDefinition contentTypeFor(final String contentType) {
-		return contentTypeDefinitionFactory
-				.contentTypeDefintionByName(contentType);
-	}
+    @Override
+    public boolean hasPreviousContent() {
+        return locatePreviousContentTypeOrNull() != null;
+    }
 
-	private ContentTypeDefinition locatePreviousContentTypeOrNull() {
-		int pos = currentPosition - 1;
-		while (pos >= 0) {
-			final String type = positions[pos].getType();
-			if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
-				return contentTypeFor(type);
-			}
-			pos--;
-		}
-		return null;
-	}
 
-	private ContentTypeDefinition locateNextContentTypeOrNull() {
-		int pos = currentPosition + 1;
-		while (pos < positions.length) {
-			final String type = positions[pos].getType();
-			if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
-				return contentTypeFor(type);
-			}
-			pos++;
-		}
-		return null;
-	}
+    @Override
+    public FormattingContext previousContentContext() throws InvalidFormatPositionException {
+        final PositionalContentTypeDefinitionHolder prevContentType = locatePreviousContentTypeOrNull();
+        if (prevContentType == null) {
+            throw new InvalidFormatPositionException("No content type exists before current position");
+        }
+        return new PartitionedFormattingContext(positions, prevContentType.getPosition(), contentTypeDefinitionFactory);
+    }
+
+
+    @Override
+    public boolean hasNextContent() {
+        return locateNextContentTypeOrNull() != null;
+    }
+
+
+    @Override
+    public FormattingContext nextContentContext() throws InvalidFormatPositionException {
+        final PositionalContentTypeDefinitionHolder nextContentType = locateNextContentTypeOrNull();
+        if (nextContentType == null) {
+            throw new InvalidFormatPositionException("No content type exists after current position");
+        }
+        return new PartitionedFormattingContext(positions, nextContentType.getPosition(), contentTypeDefinitionFactory);
+    }
+
+
+    private ContentTypeDefinition contentTypeFor(final String contentType) {
+        return contentTypeDefinitionFactory.contentTypeDefintionByName(contentType);
+    }
+
+
+    private PositionalContentTypeDefinitionHolder locatePreviousContentTypeOrNull() {
+        int pos = currentPosition - 1;
+        while (pos >= 0) {
+            final String type = positions[pos].getType();
+            if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
+                return new PositionalContentTypeDefinitionHolder(pos, contentTypeFor(type));
+            }
+            pos--;
+        }
+        return null;
+    }
+
+
+    private PositionalContentTypeDefinitionHolder locateNextContentTypeOrNull() {
+        int pos = currentPosition + 1;
+        while (pos < positions.length) {
+            final String type = positions[pos].getType();
+            if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
+                return new PositionalContentTypeDefinitionHolder(pos, contentTypeFor(type));
+            }
+            pos++;
+        }
+        return null;
+    }
+
+    private static final class PositionalContentTypeDefinitionHolder {
+        private final int position;
+        private final ContentTypeDefinition contentTypeDefinition;
+
+
+        public PositionalContentTypeDefinitionHolder(final int position,
+                final ContentTypeDefinition contentTypeDefinition) {
+            super();
+            this.position = position;
+            this.contentTypeDefinition = contentTypeDefinition;
+        }
+
+
+        public int getPosition() {
+            return position;
+        }
+
+
+        public ContentTypeDefinition getContentTypeDefinition() {
+            return contentTypeDefinition;
+        }
+    }
 }

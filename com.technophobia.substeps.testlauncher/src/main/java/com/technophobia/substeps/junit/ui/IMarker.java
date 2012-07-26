@@ -5,4 +5,5 @@ package com.technophobia.substeps.junit.ui;
  */
 public interface IMarker {
 
+    // No-op
 }

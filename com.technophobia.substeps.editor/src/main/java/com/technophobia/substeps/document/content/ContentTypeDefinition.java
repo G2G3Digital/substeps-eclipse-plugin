@@ -26,15 +26,53 @@ import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.formatting.FormattingContext;
 import com.technophobia.substeps.supplier.Supplier;
 
+/**
+ * Representation of a content type allowed in the editor
+ * 
+ * @author sforbes
+ * 
+ */
 public interface ContentTypeDefinition {
 
-	String id();
-	
-	boolean isOptional();
+    /**
+     * Unique id of the content type
+     * 
+     * @return id
+     */
+    String id();
 
-	IPredicateRule partitionRule();
 
-	IRule damageRepairerRule(ColourManager colourManager);
+    /**
+     * Is this item optional in the editor
+     * 
+     * @return true if content type is optional, false otherwise
+     */
+    boolean isOptional();
 
-	IFormattingStrategy formattingStrategy(Supplier<FormattingContext> formattingContextSupplier);
+
+    /**
+     * Return the {@link PredicateRule} associated with this content type
+     * 
+     * @return PredicateRule
+     */
+    IPredicateRule partitionRule();
+
+
+    /**
+     * Return the DamageRepairer {@link IRule} associated with this content type
+     * 
+     * @return DamageRepairer Rule
+     */
+    IRule damageRepairerRule(ColourManager colourManager);
+
+
+    /**
+     * Returns the {@link IFormattingStrategy} based on the supplied
+     * {@link FormattingContext}
+     * 
+     * @param formattingContextSupplier
+     *            Supplies the formatting context
+     * @return IFormattingStrategy
+     */
+    IFormattingStrategy formattingStrategy(Supplier<FormattingContext> formattingContextSupplier);
 }

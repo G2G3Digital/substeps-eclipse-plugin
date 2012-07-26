@@ -22,13 +22,17 @@ import com.technophobia.substeps.document.content.ContentTypeDefinition;
 
 public interface FormattingContext {
 
-	boolean hasPreviousContentType();
+    boolean hasPreviousContent();
 
-	ContentTypeDefinition previousContentType()
-			throws InvalidFormatPositionException;
 
-	boolean hasNextContentType();
+    FormattingContext previousContentContext() throws InvalidFormatPositionException;
 
-	ContentTypeDefinition nextContentType()
-			throws InvalidFormatPositionException;
+
+    boolean hasNextContent();
+
+
+    FormattingContext nextContentContext() throws InvalidFormatPositionException;
+
+
+    ContentTypeDefinition currentContentType();
 }

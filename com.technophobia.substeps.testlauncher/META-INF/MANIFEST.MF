@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SubstepsEclipseRunner
-Bundle-SymbolicName: com.technophobia.substeps.runner;singleton:=true
+Bundle-SymbolicName: com.technophobia.substeps.testlauncher;singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Bundle-Activator: com.technophobia.substeps.FeatureRunnerPlugin
 Bundle-ActivationPolicy: lazy

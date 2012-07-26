@@ -24,31 +24,44 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
 
+/**
+ * DocumentProvider that attaches an {@link IDocumentPartitioner} to the
+ * document when it is created
+ * 
+ * @author sforbes
+ * 
+ */
 public class PartitionScannedDocumentProvider extends FileDocumentProvider {
 
-	private final PartitionScannerFactory partitionScannerFactory;
+    private final PartitionScannerFactory partitionScannerFactory;
 
-	public PartitionScannedDocumentProvider(
-			final PartitionScannerFactory partitionScannerFactory) {
-		this.partitionScannerFactory = partitionScannerFactory;
-	}
 
-	@Override
-	protected IDocument createDocument(final Object element)
-			throws CoreException {
-		final IDocument document = super.createDocument(element);
-		if (document != null) {
-			attachPartitionerTo(document);
-		}
+    public PartitionScannedDocumentProvider(final PartitionScannerFactory partitionScannerFactory) {
+        this.partitionScannerFactory = partitionScannerFactory;
+    }
 
-		return document;
-	}
 
-	private void attachPartitionerTo(final IDocument document) {
-		final IDocumentPartitioner partitioner = new FastPartitioner(
-				partitionScannerFactory.createScanner(),
-				partitionScannerFactory.legalContentTypes());
-		partitioner.connect(document);
-		document.setDocumentPartitioner(partitioner);
-	}
+    @Override
+    protected IDocument createDocument(final Object element) throws CoreException {
+        final IDocument document = super.createDocument(element);
+        if (document != null) {
+            attachPartitionerTo(document);
+        }
+
+        return document;
+    }
+
+
+    /**
+     * Create a new {@link IDocumentPartitioner} and attach it do document
+     * 
+     * @param document
+     *            The document to attach the partitioner to
+     */
+    private void attachPartitionerTo(final IDocument document) {
+        final IDocumentPartitioner partitioner = new FastPartitioner(partitionScannerFactory.createScanner(),
+                partitionScannerFactory.legalContentTypes());
+        partitioner.connect(document);
+        document.setDocumentPartitioner(partitioner);
+    }
 }

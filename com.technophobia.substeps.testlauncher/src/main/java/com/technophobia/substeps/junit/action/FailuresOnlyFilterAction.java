@@ -23,6 +23,6 @@ public class FailuresOnlyFilterAction extends Action {
 
     @Override
     public void run() {
-        showFailuresNotifier.notify(isChecked());
+        showFailuresNotifier.notify(Boolean.valueOf(isChecked()));
     }
 }

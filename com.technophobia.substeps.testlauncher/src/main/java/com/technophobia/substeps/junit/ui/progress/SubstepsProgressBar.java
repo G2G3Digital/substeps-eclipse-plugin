@@ -78,11 +78,11 @@ public class SubstepsProgressBar extends Canvas implements ProgressBar {
 
 
     @Override
-    public void reset(final boolean hasErrors, final boolean stopped, final int ticksDone, final int maximum) {
-        final boolean noChange = this.error == hasErrors && stopped == this.stopped
+    public void reset(final boolean hasErrors, final boolean hasStopped, final int ticksDone, final int maximum) {
+        final boolean noChange = this.error == hasErrors && hasStopped == this.stopped
                 && this.currentTickCount == ticksDone && this.maxTickCount == maximum;
         this.error = hasErrors;
-        this.stopped = stopped;
+        this.stopped = hasStopped;
         this.currentTickCount = ticksDone;
         this.maxTickCount = maximum;
         this.colorBarWidth = scale(ticksDone);
@@ -91,12 +91,12 @@ public class SubstepsProgressBar extends Canvas implements ProgressBar {
     }
 
 
-    private void paintStep(int startX, final int endX) {
+    private void paintStep(final int startX, final int endX) {
         final GC gc = new GC(this);
         setStatusColor(gc);
         final Rectangle rect = getClientArea();
-        startX = Math.max(1, startX);
-        gc.fillRectangle(startX, 1, endX - startX, rect.height - 2);
+        final int sanitisedStartX = Math.max(1, startX);
+        gc.fillRectangle(sanitisedStartX, 1, endX - sanitisedStartX, rect.height - 2);
         gc.dispose();
     }
 

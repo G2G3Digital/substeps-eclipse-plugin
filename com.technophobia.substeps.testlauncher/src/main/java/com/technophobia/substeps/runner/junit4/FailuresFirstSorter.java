@@ -60,11 +60,10 @@ public class FailuresFirstSorter implements Comparator<Description> {
     private boolean hasFailures(final Description d) {
         if (failuresList.contains(d.getDisplayName())) {
             return true;
-        } else {
-            for (final Description child : d.getChildren()) {
-                if (hasFailures(child)) {
-                    return true;
-                }
+        }
+        for (final Description child : d.getChildren()) {
+            if (hasFailures(child)) {
+                return true;
             }
         }
         return false;

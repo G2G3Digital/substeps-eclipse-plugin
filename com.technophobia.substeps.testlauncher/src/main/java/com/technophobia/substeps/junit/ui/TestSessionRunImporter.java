@@ -9,7 +9,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 public class TestSessionRunImporter {
-    public static void importTestRunSession(final String url) {
+    public static void importTestRunSession(@SuppressWarnings("unused") final String url) {
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
                 @Override

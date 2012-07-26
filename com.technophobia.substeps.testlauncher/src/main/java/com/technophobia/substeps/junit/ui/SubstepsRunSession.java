@@ -9,7 +9,6 @@ import com.technophobia.substeps.model.structure.Result;
 import com.technophobia.substeps.model.structure.Status;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
 import com.technophobia.substeps.model.structure.SubstepsTestElementContainer;
-import com.technophobia.substeps.model.structure.SubstepsTestParentElement;
 import com.technophobia.substeps.model.structure.SubstepsTestRootElement;
 
 public interface SubstepsRunSession extends TestRunStats, SubstepsTestElementContainer {

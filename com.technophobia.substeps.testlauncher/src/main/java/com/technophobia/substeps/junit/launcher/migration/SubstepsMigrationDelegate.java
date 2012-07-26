@@ -32,17 +32,16 @@ public class SubstepsMigrationDelegate implements ILaunchConfigurationMigrationD
         final IResource target = getResource(candidate);
         if (target == null) {
             return mapped == null;
-        } else {
-            if (mapped == null) {
-                return true;
-            } else {
-                if (mapped.length != 1) {
-                    return true;
-                } else {
-                    return !target.equals(mapped[0]);
-                }
-            }
         }
+
+        if (mapped == null) {
+            return true;
+        }
+
+        if (mapped.length != 1) {
+            return true;
+        }
+        return !target.equals(mapped[0]);
     }
 
 

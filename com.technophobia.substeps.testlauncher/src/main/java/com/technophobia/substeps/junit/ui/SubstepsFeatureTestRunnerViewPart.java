@@ -115,6 +115,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     public static final String NAME = "com.technophobia.substeps.runner.SubstepsResultView";
 
     private static final IMarker FAMILY_SUBSTEPS_FEATURE_RUN = new IMarker() {
+        // No-op
     };
 
     private static final String RERUN_LAST_COMMAND = "com.technophobia.substeps.junit.rerunLast"; //$NON-NLS-1$
@@ -153,8 +154,8 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     private UiUpdater uiUpdater;
     private UiUpdater testCounterUpdater;
     private UiUpdater viewTitleUiUpdater;
-    private UiUpdater toolbarUiUpdater;
-    private UiUpdater statusMessageUpdater;
+    // private UiUpdater toolbarUiUpdater;
+    // private UiUpdater statusMessageUpdater;
 
     private final NotifyingUiUpdater<String> infoMessageUpdater;
 
@@ -198,7 +199,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
             @Override
             public Boolean get() {
-                return isDisposed();
+                return Boolean.valueOf(isDisposed());
             }
         };
         this.iconProvider = new SubstepsIconProvider(new ImageDescriptorImageLoader(), new ImageDescriptorLoader());
@@ -214,9 +215,9 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
 
     @Override
-    public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-        super.init(site, memento);
-        this.memento = memento;
+    public void init(final IViewSite site, final IMemento m) throws PartInitException {
+        super.init(site, m);
+        this.memento = m;
         this.partMonitor = new DefaultVisibilityPartMonitor(getSite());
         this.dirtyListener = new JavaCoreDirtyListener();
         this.currentOrientation = ViewOrientation.VIEW_ORIENTATION_AUTOMATIC;
@@ -245,13 +246,13 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
 
     @Override
-    public void saveState(final IMemento memento) {
-        if (sashForm == null && memento != null) { // Keep the old state;
-            memento.putMemento(this.memento);
+    public void saveState(final IMemento m) {
+        if (sashForm == null && m != null) { // Keep the old state;
+            m.putMemento(this.memento);
             return;
         }
 
-        decorateMemento(memento);
+        decorateMemento(m);
     }
 
 
@@ -296,22 +297,22 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
 
     @Override
-    public void createPartControl(final Composite parent) {
-        this.parent = parent;
-        addResizeListener(parent);
-        this.clipboard = new Clipboard(parent.getDisplay());
+    public void createPartControl(final Composite parentComposite) {
+        this.parent = parentComposite;
+        addResizeListener(parentComposite);
+        this.clipboard = new Clipboard(parentComposite.getDisplay());
 
         this.testResultsView = new JunitTestResultsView(getSite().getWorkbenchWindow());
 
         final GridLayout gridLayout = new GridLayout();
         gridLayout.marginWidth = 0;
         gridLayout.marginHeight = 0;
-        parent.setLayout(gridLayout);
+        parentComposite.setLayout(gridLayout);
 
         final UiUpdater tooltipUpdater = new TooltipUpdater(tooltipNotifier());
         final UiUpdater statusMessageUpdater = new StatusMessageUiUpdater(getViewSite());
-        this.counterComposite = createProgressCountPanel(parent);
-        final SashForm sashForm = createSashForm(parent);
+        this.counterComposite = createProgressCountPanel(parentComposite);
+        final SashForm sash = createSashForm(parentComposite);
 
         this.actionManager = createActionManager();
         this.sessionManager = new SubstepsRunSessionManager(disposedSashFormChecker(), testViewer, tooltipUpdater,
@@ -321,28 +322,28 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
                 .getService(IHandlerService.class));
 
         this.counterComposite.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
-        sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
+        sash.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         final IActionBars actionBars = getViewSite().getActionBars();
 
-        final Action copyAction = new SubstepsCopyAction(parent.getShell(), failureTrace, clipboard);
+        final Action copyAction = new SubstepsCopyAction(parentComposite.getShell(), failureTrace, clipboard);
         copyAction.setActionDefinitionId(ActionFactory.COPY.getCommandId());
         actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(), copyAction);
 
-        final Action pasteAction = new SubstepsPasteAction(parent.getShell(), clipboard);
+        final Action pasteAction = new SubstepsPasteAction(parentComposite.getShell(), clipboard);
         pasteAction.setActionDefinitionId(ActionFactory.PASTE.getCommandId());
         actionBars.setGlobalActionHandler(ActionFactory.PASTE.getId(), pasteAction);
 
-        this.viewHistory = new RunnerViewHistory(sessionManager, parent.getShell(), sessionManager,
+        this.viewHistory = new RunnerViewHistory(sessionManager, parentComposite.getShell(), sessionManager,
                 new ImageDescriptorLoader(), iconProvider, pasteAction);
         configureToolBar();
 
         initPageSwitcher();
-        addDropAdapter(parent);
+        addDropAdapter();
 
         originalViewImage = getTitleImage();
         progressImages = new ProgressImages(iconProvider);
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, SubstepsHelpContextIds.RESULTS_VIEW);
+        PlatformUI.getWorkbench().getHelpSystem().setHelp(parentComposite, SubstepsHelpContextIds.RESULTS_VIEW);
 
         getViewSite().getPage().addPartListener(partMonitor);
 
@@ -373,16 +374,16 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     }
 
 
-    private void decorateMemento(final IMemento memento) {
-        memento.putString(TAG_SCROLL, scrollLockAction.isChecked() ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
+    private void decorateMemento(final IMemento m) {
+        m.putString(TAG_SCROLL, scrollLockAction.isChecked() ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
         final int weigths[] = sashForm.getWeights();
         final int ratio = (weigths[0] * 1000) / (weigths[0] + weigths[1]);
-        memento.putInteger(TAG_RATIO, ratio);
-        memento.putInteger(TAG_ORIENTATION, orientation.value());
+        m.putInteger(TAG_RATIO, ratio);
+        m.putInteger(TAG_ORIENTATION, orientation.value());
 
-        memento.putString(TAG_FAILURES_ONLY, failuresOnlyFilterAction.isChecked() ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
-        memento.putInteger(TAG_LAYOUT, layout.value());
-        memento.putString(TAG_SHOW_TIME, showTimeAction.isChecked() ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
+        m.putString(TAG_FAILURES_ONLY, failuresOnlyFilterAction.isChecked() ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
+        m.putInteger(TAG_LAYOUT, layout.value());
+        m.putString(TAG_SHOW_TIME, showTimeAction.isChecked() ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 
@@ -457,32 +458,32 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     }
 
 
-    private void restoreLayoutState(final IMemento memento) {
-        final Integer ratio = memento.getInteger(TAG_RATIO);
+    private void restoreLayoutState(final IMemento m) {
+        final Integer ratio = m.getInteger(TAG_RATIO);
         if (ratio != null)
             sashForm.setWeights(new int[] { ratio.intValue(), 1000 - ratio.intValue() });
-        final Integer newOrientation = memento.getInteger(TAG_ORIENTATION);
+        final Integer newOrientation = m.getInteger(TAG_ORIENTATION);
         if (newOrientation != null)
             orientation = ViewOrientation.forValue(newOrientation.intValue());
 
         computeOrientation();
-        final String scrollLock = memento.getString(TAG_SCROLL);
+        final String scrollLock = m.getString(TAG_SCROLL);
         if (scrollLock != null) {
             scrollLockAction.setChecked(scrollLock.equals("true")); //$NON-NLS-1$
             setAutoScroll(!scrollLockAction.isChecked());
         }
 
-        final Integer layout = memento.getInteger(TAG_LAYOUT);
+        final Integer l = m.getInteger(TAG_LAYOUT);
         ViewLayout layoutValue = ViewLayout.HIERARCHICAL;
         if (layout != null)
-            layoutValue = ViewLayout.forValue(layout.intValue());
+            layoutValue = ViewLayout.forValue(l.intValue());
 
-        final String failuresOnly = memento.getString(TAG_FAILURES_ONLY);
+        final String failuresOnly = m.getString(TAG_FAILURES_ONLY);
         boolean showFailuresOnly = false;
         if (failuresOnly != null)
             showFailuresOnly = failuresOnly.equals("true"); //$NON-NLS-1$
 
-        final String time = memento.getString(TAG_SHOW_TIME);
+        final String time = m.getString(TAG_SHOW_TIME);
         boolean showTime = true;
         if (time != null)
             showTime = time.equals("true"); //$NON-NLS-1$
@@ -497,8 +498,8 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     }
 
 
-    private SashForm createSashForm(final Composite parent) {
-        sashForm = new SashForm(parent, SWT.VERTICAL);
+    private SashForm createSashForm(final Composite parentComposite) {
+        sashForm = new SashForm(parentComposite, SWT.VERTICAL);
 
         final ViewForm top = new ViewForm(sashForm, SWT.NONE);
         this.testViewer = new FeatureViewer(top, siteSupplier(), failedTestNotifier(), testRerunner(),
@@ -516,6 +517,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
             @Override
             protected void layout(final Composite composite, final boolean flushCache) {
+                // No-op
             }
         });
         top.setTopLeft(empty); // makes ViewForm draw the horizontal separator
@@ -538,7 +540,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     }
 
 
-    private void addDropAdapter(final Composite parent) {
+    private void addDropAdapter() {
         final DropTarget dropTarget = new DropTarget(parent, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK
                 | DND.DROP_DEFAULT);
         dropTarget.setTransfer(new Transfer[] { TextTransfer.getInstance() });
@@ -567,8 +569,8 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
             @Override
             public void drop(final DropTargetEvent event) {
                 if (TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
-                    final String url = (String) event.data;
-                    importTestRunSession(url);
+                    // final String url = (String) event.data;
+                    importTestRunSession();
                 }
             }
         }
@@ -611,10 +613,11 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     }
 
 
-    private void addResizeListener(final Composite parent) {
-        parent.addControlListener(new ControlListener() {
+    private void addResizeListener(final Composite parentComposite) {
+        parentComposite.addControlListener(new ControlListener() {
             @Override
             public void controlMoved(final ControlEvent e) {
+                // No-op
             }
 
 
@@ -740,6 +743,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     }
 
 
+    @SuppressWarnings("unused")
     private IStatusLineManager getStatusLine() {
         // we want to show messages globally hence we
         // have to go through the active part
@@ -764,11 +768,11 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     }
 
 
-    protected Composite createProgressCountPanel(final Composite parent) {
-        final Composite composite = new Composite(parent, SWT.NONE);
-        final GridLayout layout = new GridLayout();
-        composite.setLayout(layout);
-        setCounterColumns(layout);
+    protected Composite createProgressCountPanel(final Composite parentComposite) {
+        final Composite composite = new Composite(parentComposite, SWT.NONE);
+        final GridLayout l = new GridLayout();
+        composite.setLayout(l);
+        setCounterColumns(l);
 
         counterPanel = new SubstepsCounterPanel(composite, iconProvider);
         counterPanel.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
@@ -892,8 +896,8 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         for (int i = 0; i < toggleOrientationActions.length; ++i)
             toggleOrientationActions[i].setChecked(orientation == toggleOrientationActions[i].getOrientation());
         currentOrientation = ViewOrientation.forValue(orientation);
-        final GridLayout layout = (GridLayout) counterComposite.getLayout();
-        setCounterColumns(layout);
+        final GridLayout l = (GridLayout) counterComposite.getLayout();
+        setCounterColumns(l);
         parent.layout();
     }
 
@@ -912,7 +916,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
     }
 
 
-    static void importTestRunSession(final String url) {
+    static void importTestRunSession() {
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
                 @Override
@@ -989,7 +993,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
             @Override
             public Boolean currentValue() {
-                return failuresOnlyFilterAction.isChecked();
+                return Boolean.valueOf(failuresOnlyFilterAction.isChecked());
             }
         };
     }
@@ -1127,7 +1131,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         return new Supplier<Boolean>() {
             @Override
             public Boolean get() {
-                return sashForm.isDisposed();
+                return Boolean.valueOf(sashForm.isDisposed());
             }
         };
     }

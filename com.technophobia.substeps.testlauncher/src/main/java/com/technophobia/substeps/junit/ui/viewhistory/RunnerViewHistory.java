@@ -155,11 +155,10 @@ public class RunnerViewHistory extends ViewHistory<SubstepsRunSession> {
         final String testRunLabel = session.getTestRunName();
         if (session.getStartTime() <= 0) {
             return testRunLabel;
-        } else {
-            final String startTime = DateFormat.getDateTimeInstance().format(new Date(session.getStartTime()));
-            return MessageFormat.format(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_testName_startTime,
-                    testRunLabel, startTime);
         }
+        final String startTime = DateFormat.getDateTimeInstance().format(new Date(session.getStartTime()));
+        return MessageFormat.format(SubstepsFeatureMessages.SubstepsFeatureTestRunnerViewPart_testName_startTime,
+                testRunLabel, startTime);
     }
 
 

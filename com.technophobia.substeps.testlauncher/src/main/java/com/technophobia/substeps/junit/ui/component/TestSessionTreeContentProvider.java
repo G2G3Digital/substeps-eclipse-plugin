@@ -14,6 +14,7 @@ public class TestSessionTreeContentProvider implements ITreeContentProvider {
 
     @Override
     public void dispose() {
+        // No-op
     }
 
 
@@ -21,8 +22,7 @@ public class TestSessionTreeContentProvider implements ITreeContentProvider {
     public Object[] getChildren(final Object parentElement) {
         if (parentElement instanceof SubstepsTestParentElement)
             return ((SubstepsTestParentElement) parentElement).getChildren();
-        else
-            return NO_CHILDREN;
+        return NO_CHILDREN;
     }
 
 
@@ -42,12 +42,12 @@ public class TestSessionTreeContentProvider implements ITreeContentProvider {
     public boolean hasChildren(final Object element) {
         if (element instanceof SubstepsTestParentElement)
             return ((SubstepsTestParentElement) element).getChildren().length != 0;
-        else
-            return false;
+        return false;
     }
 
 
     @Override
     public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+        // No-op
     }
 }
