@@ -1,6 +1,7 @@
 package com.technophobia.eclipse.launcher.exception;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -24,7 +25,7 @@ public class DialogExceptionReporter implements ExceptionReporter {
     @Override
     public void report(final CoreException ex) {
 
-        ErrorDialog.openError(parentShell, dialogTitle, message, new Status(Status.ERROR,
+        ErrorDialog.openError(parentShell, dialogTitle, message, new Status(IStatus.ERROR,
                 FeatureRunnerPlugin.PLUGIN_ID, message, ex));
     }
 

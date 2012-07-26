@@ -24,6 +24,7 @@ public class SubstepsRunSessionListenerImpl implements SubstepsRunSessionListene
         this.substepsSessionListener = new SubstepsSessionListener() {
             @Override
             public void testAdded(final SubstepsTestElement testElement) {
+                // No-op
             }
 
 
@@ -129,7 +130,7 @@ public class SubstepsRunSessionListenerImpl implements SubstepsRunSessionListene
 
 
             @Override
-            public void sessionLaunched(final SubstepsRunSession substepsRunSession) {
+            public void sessionLaunched(final SubstepsRunSession session) {
                 // TODO Auto-generated method stub
 
             }

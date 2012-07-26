@@ -130,7 +130,7 @@
       </launchConfigType>
    </extension>
    <extension
-         point="com.technophobia.substeps.runner.substepsRunListeners">
+         point="com.technophobia.substeps.testlauncher.substepsRunListeners">
       <substepsRunListener
             class="com.technophobia.substeps.junit.ui.UITestRunListener">
       </substepsRunListener>

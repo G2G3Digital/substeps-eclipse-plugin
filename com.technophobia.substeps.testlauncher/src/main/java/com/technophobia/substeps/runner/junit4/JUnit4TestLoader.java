@@ -13,15 +13,14 @@ public class JUnit4TestLoader implements ITestLoader {
         final ITestReference[] refs = new ITestReference[testClasses.length];
         for (int i = 0; i < testClasses.length; i++) {
             final Class<?> clazz = testClasses[i];
-            final ITestReference ref = createTest(clazz, testName, failureNames, listener);
+            final ITestReference ref = createTest(clazz, testName, failureNames);
             refs[i] = ref;
         }
         return refs;
     }
 
 
-    private ITestReference createTest(final Class<?> clazz, final String testName, final String[] failureNames,
-            final RemoteTestRunner listener) {
+    private ITestReference createTest(final Class<?> clazz, final String testName, final String[] failureNames) {
         if (clazz == null)
             return null;
         if (testName == null)

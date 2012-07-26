@@ -147,6 +147,7 @@ public class RemoteTestRunnerClient {
          * subclasses can override to do special things when end message is read
          */
         void entireStringRead() {
+            // No-op
         }
     }
 
@@ -292,9 +293,9 @@ public class RemoteTestRunnerClient {
      * @param port
      *            port on which the server socket will be opened
      */
-    public synchronized void startListening(final SubstepsRunListener[] listeners, final int port) {
-        this.listeners = listeners;
-        this.port = port;
+    public synchronized void startListening(final SubstepsRunListener[] l, final int p) {
+        this.listeners = l;
+        this.port = p;
         final ServerConnection connection = new ServerConnection(port);
         connection.start();
     }
@@ -333,6 +334,7 @@ public class RemoteTestRunnerClient {
                 pushbackReader = null;
             }
         } catch (final IOException e) {
+            // No-op
         }
         try {
             if (socket != null) {
@@ -340,6 +342,7 @@ public class RemoteTestRunnerClient {
                 socket = null;
             }
         } catch (final IOException e) {
+            // No-op
         }
         try {
             if (serverSocket != null) {
@@ -347,6 +350,7 @@ public class RemoteTestRunnerClient {
                 serverSocket = null;
             }
         } catch (final IOException e) {
+            // No-op
         }
     }
 
@@ -611,8 +615,7 @@ public class RemoteTestRunnerClient {
         if (last == '\n') {
             if (length > 1 && buf.charAt(length - 2) == '\r')
                 return buf.substring(0, length - 2);
-            else
-                return buf.substring(0, length - 1);
+            return buf.substring(0, length - 1);
         } else if (last == '\r') {
             return buf.substring(0, length - 1);
         }

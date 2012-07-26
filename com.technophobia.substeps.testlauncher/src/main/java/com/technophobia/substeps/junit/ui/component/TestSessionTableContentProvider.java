@@ -14,6 +14,7 @@ public class TestSessionTableContentProvider implements IStructuredContentProvid
 
     @Override
     public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+        // No-op
     }
 
 
@@ -41,5 +42,6 @@ public class TestSessionTableContentProvider implements IStructuredContentProvid
 
     @Override
     public void dispose() {
+        // No-op
     }
 }

@@ -29,6 +29,6 @@ public class TestToolbar implements UiUpdater {
 
     @Override
     public void reset() {
-
+        // No-op
     }
 }

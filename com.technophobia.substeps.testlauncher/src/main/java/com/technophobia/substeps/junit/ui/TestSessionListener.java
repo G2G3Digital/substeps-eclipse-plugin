@@ -88,7 +88,7 @@ public class TestSessionListener implements SubstepsSessionListener {
         postSyncNotifier.notify(new Runnable() {
             @Override
             public void run() {
-                if (disposedChecker.get())
+                if (disposedChecker.get().booleanValue())
                     return;
                 actionManager.setStopActionEnabled(sessionManager.get().isKeptAlive());
                 sessionManager.updateRerunFailedFirstAction();
@@ -129,7 +129,7 @@ public class TestSessionListener implements SubstepsSessionListener {
 
     @Override
     public void runningBegins() {
-        if (!showOnErrorOnlyNotifier.currentValue()) {
+        if (!showOnErrorOnlyNotifier.currentValue().booleanValue()) {
             postShowTestResultsView();
         }
     }
@@ -152,13 +152,13 @@ public class TestSessionListener implements SubstepsSessionListener {
     @Override
     public void testFailed(final SubstepsTestElement testElement, final Status status, final String trace,
             final String expected, final String actual) {
-        if (autoScrollNotifier.currentValue()) {
+        if (autoScrollNotifier.currentValue().booleanValue()) {
             testViewer.registerFailedForAutoScroll(testElement);
         }
         testViewer.registerViewerUpdate(testElement);
 
         // show the view on the first error only
-        if (showOnErrorOnlyNotifier.currentValue()
+        if (showOnErrorOnlyNotifier.currentValue().booleanValue()
                 && (testRunStatsSupplier.get().getErrorCount() + testRunStatsSupplier.get().getFailureCount() == 1))
             postShowTestResultsView();
 
@@ -207,7 +207,7 @@ public class TestSessionListener implements SubstepsSessionListener {
 
             @Override
             public void run() {
-                if (!disposedChecker.get())
+                if (!disposedChecker.get().booleanValue())
                     failureTrace.showFailure(testCaseElement);
             }
         });
@@ -235,7 +235,7 @@ public class TestSessionListener implements SubstepsSessionListener {
         postSyncNotifier.notify(new Runnable() {
             @Override
             public void run() {
-                if (disposedChecker.get())
+                if (disposedChecker.get().booleanValue())
                     return;
                 viewIconResetter.reset();
                 actionManager.setStopActionEnabled(false);
@@ -251,7 +251,7 @@ public class TestSessionListener implements SubstepsSessionListener {
 
             @Override
             public void run() {
-                if (!disposedChecker.get()) {
+                if (!disposedChecker.get().booleanValue()) {
                     testResultsView.showTestResultsView();
                 }
             }

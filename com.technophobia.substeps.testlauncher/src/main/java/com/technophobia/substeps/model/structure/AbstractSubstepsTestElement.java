@@ -156,10 +156,10 @@ public abstract class AbstractSubstepsTestElement implements SubstepsTestElement
     }
 
 
-    private void updateTime(final Status status) {
-        if (status.equals(Status.RUNNING)) {
+    private void updateTime(final Status s) {
+        if (s.equals(Status.RUNNING)) {
             time = -System.currentTimeMillis() / 1000d;
-        } else if (status.isComplete()) {
+        } else if (s.isComplete()) {
             if (time < 0) {
                 final double endTime = System.currentTimeMillis() / 1000.0d;
                 time = endTime + time;

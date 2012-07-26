@@ -177,9 +177,9 @@ public class SubstepsRunSessionSerializer implements XMLReader {
     }
 
 
-    private void addCharacters(String string) throws SAXException {
-        string = escapeNonUnicodeChars(string);
-        handler.characters(string.toCharArray(), 0, string.length());
+    private void addCharacters(final String string) throws SAXException {
+        final String escapedString = escapeNonUnicodeChars(string);
+        handler.characters(escapedString.toCharArray(), 0, escapedString.length());
     }
 
 
@@ -243,11 +243,13 @@ public class SubstepsRunSessionSerializer implements XMLReader {
 
     @Override
     public void parse(final String systemId) throws IOException, SAXException {
+        // No-op
     }
 
 
     @Override
     public void setDTDHandler(final DTDHandler handler) {
+        // No-op
     }
 
 
@@ -259,6 +261,7 @@ public class SubstepsRunSessionSerializer implements XMLReader {
 
     @Override
     public void setEntityResolver(final EntityResolver resolver) {
+        // No-op
     }
 
 
@@ -270,6 +273,7 @@ public class SubstepsRunSessionSerializer implements XMLReader {
 
     @Override
     public void setProperty(final java.lang.String name, final java.lang.Object value) {
+        // No-op
     }
 
 
@@ -281,6 +285,7 @@ public class SubstepsRunSessionSerializer implements XMLReader {
 
     @Override
     public void setFeature(final java.lang.String name, final boolean value) {
+        // No-op
     }
 
 

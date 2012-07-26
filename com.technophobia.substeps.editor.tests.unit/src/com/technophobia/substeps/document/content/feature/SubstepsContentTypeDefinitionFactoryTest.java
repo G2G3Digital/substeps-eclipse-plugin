@@ -27,47 +27,32 @@ import org.junit.Test;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.NullContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.AndContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.BackgroundContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.CommentContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.FeatureContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.DefineContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.GivenContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.ScenarioContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleRowContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.ScenarioOutlineContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.TagContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ThenContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.WhenContentTypeDefinition;
 
-public class FeatureContentTypeDefinitionFactoryTest {
+public class SubstepsContentTypeDefinitionFactoryTest {
 
     private ContentTypeDefinitionFactory contentTypeDefinitionFactory;
 
 
     @Before
     public void initialiseFactory() {
-        this.contentTypeDefinitionFactory = new FeatureContentTypeDefinitionFactory();
+        this.contentTypeDefinitionFactory = new SubstepsContentDefinitionFactory();
     }
 
 
     @Test
-    public void canGetAllFeatureContentTypeDefinitionsByName() {
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_feature"),
-                is(FeatureContentTypeDefinition.class));
+    public void canGetAllSubstepsContentTypeDefinitionsByName() {
+        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__substeps_define"),
+                is(DefineContentTypeDefinition.class));
         assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_tag"),
                 is(TagContentTypeDefinition.class));
         assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_comment"),
                 is(CommentContentTypeDefinition.class));
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_background"),
-                is(BackgroundContentTypeDefinition.class));
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_scenario"),
-                is(ScenarioContentTypeDefinition.class));
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_scenario_outline"),
-                is(ScenarioOutlineContentTypeDefinition.class));
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_example"),
-                is(ScenarioExampleContentTypeDefinition.class));
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_example_row"),
-                is(ScenarioExampleRowContentTypeDefinition.class));
         assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_given"),
                 is(GivenContentTypeDefinition.class));
         assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_when"),

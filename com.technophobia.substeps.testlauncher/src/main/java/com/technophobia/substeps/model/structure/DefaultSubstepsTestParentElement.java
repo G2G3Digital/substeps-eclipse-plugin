@@ -127,14 +127,15 @@ public class DefaultSubstepsTestParentElement extends AbstractSubstepsTestElemen
 
     private Status getCumulatedStatus() {
         // copy list to avoid concurrency problems
-        final SubstepsTestElement[] children = this.children.toArray(new SubstepsTestElement[this.children.size()]);
-        if (children.length == 0)
+        final SubstepsTestElement[] childTestElements = this.children.toArray(new SubstepsTestElement[this.children
+                .size()]);
+        if (childTestElements.length == 0)
             return getSuiteStatus();
 
-        Status cumulated = children[0].getStatus();
+        Status cumulated = childTestElements[0].getStatus();
 
-        for (int i = 1; i < children.length; i++) {
-            final Status childStatus = children[i].getStatus();
+        for (int i = 1; i < childTestElements.length; i++) {
+            final Status childStatus = childTestElements[i].getStatus();
             cumulated = Status.combineStatus(cumulated, childStatus);
         }
         // not necessary, see special code in Status.combineProgress()
