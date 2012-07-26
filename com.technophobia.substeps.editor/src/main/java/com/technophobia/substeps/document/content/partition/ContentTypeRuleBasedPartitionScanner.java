@@ -18,7 +18,6 @@
  */
 package com.technophobia.substeps.document.content.partition;
 
-import org.eclipse.jdt.internal.ui.propertiesfileeditor.LeadingWhitespacePredicateRule;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
@@ -33,7 +32,6 @@ import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
  * @author sforbes
  * 
  */
-@SuppressWarnings("restriction")
 public class ContentTypeRuleBasedPartitionScanner extends RuleBasedPartitionScanner {
 
     private final String[] contentTypes;
