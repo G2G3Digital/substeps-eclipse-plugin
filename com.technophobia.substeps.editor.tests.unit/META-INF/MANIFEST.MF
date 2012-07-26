@@ -3,10 +3,9 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Unit Tests
 Bundle-SymbolicName: com.technophobia.substeps.editor.tests.unit
 Bundle-Version: 0.0.1.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ClassPath: .
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Fragment-Host: com.technophobia.substeps.editor;bundle-version="0.0.1"
+Fragment-Host: com.technophobia.substeps.editor
 Require-Bundle: com.technophobia.substeps.core.bundle;bundle-version="0.0.1",
  com.technophobia.substeps.testingtools;bundle-version="0.0.1",
  org.eclipse.core.runtime;bundle-version="3.8.0",
