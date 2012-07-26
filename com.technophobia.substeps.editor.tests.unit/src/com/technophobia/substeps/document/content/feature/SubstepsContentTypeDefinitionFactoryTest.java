@@ -18,8 +18,7 @@
  */
 package com.technophobia.substeps.document.content.feature;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,27 +46,19 @@ public class SubstepsContentTypeDefinitionFactoryTest {
 
     @Test
     public void canGetAllSubstepsContentTypeDefinitionsByName() {
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__substeps_define"),
-                is(DefineContentTypeDefinition.class));
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_tag"),
-                is(TagContentTypeDefinition.class));
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_comment"),
-                is(CommentContentTypeDefinition.class));
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_given"),
-                is(GivenContentTypeDefinition.class));
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_when"),
-                is(WhenContentTypeDefinition.class));
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_then"),
-                is(ThenContentTypeDefinition.class));
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_and"),
-                is(AndContentTypeDefinition.class));
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__substeps_define") instanceof DefineContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_tag") instanceof TagContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_comment") instanceof CommentContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_given") instanceof GivenContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_when") instanceof WhenContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_then") instanceof ThenContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_and") instanceof AndContentTypeDefinition);
     }
 
 
     @Test
     public void returnsNullDefinitionWhenInvalidTypeRequested() {
 
-        assertThat(contentTypeDefinitionFactory.contentTypeDefintionByName("invalid_type"),
-                is(NullContentTypeDefinition.class));
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("invalid_type") instanceof NullContentTypeDefinition);
     }
 }
