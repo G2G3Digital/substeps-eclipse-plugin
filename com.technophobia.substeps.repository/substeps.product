@@ -10,7 +10,6 @@
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
-
    <launcher>
       <solaris/>
       <win useIco="false">
@@ -26,46 +25,14 @@
 
    <features>
       <feature id="com.technophobia.substeps.feature" version="0.0.1.qualifier"/>
-      <feature id="org.eclipse.sdk" version="4.2.0.v20120528-1648-7T7oDFDPz-3FepgRqG6kkFFY0UF4_otgmt0XcoU3Zh27X"/>
-      <feature id="org.eclipse.platform" version="4.2.0.v20120608-135145-9JF7BHV8FyMteji0Oi_ePMz0xuZ8TVo7lV0z0ecb"/>
-      <feature id="org.eclipse.equinox.p2.core.feature"/>
-      <feature id="org.eclipse.e4.rcp.source"/>
-      <feature id="org.eclipse.equinox.p2.extras.feature.source"/>
-      <feature id="org.eclipse.help.source"/>
-      <feature id="org.eclipse.help"/>
-      <feature id="org.eclipse.emf.ecore"/>
-      <feature id="org.eclipse.rcp.source"/>
-      <feature id="org.eclipse.equinox.p2.rcp.feature"/>
-      <feature id="org.eclipse.pde.source"/>
-      <feature id="org.eclipse.equinox.p2.user.ui"/>
-      <feature id="org.eclipse.cvs"/>
-      <feature id="org.eclipse.equinox.p2.rcp.feature.source"/>
-      <feature id="org.eclipse.jdt.source"/>
-      <feature id="org.eclipse.rcp"/>
-      <feature id="org.eclipse.jdt"/>
-      <feature id="org.eclipse.cvs.source"/>
-      <feature id="org.eclipse.e4.rcp"/>
-      <feature id="org.eclipse.equinox.p2.user.ui.source"/>
-      <feature id="org.eclipse.emf.common"/>
-      <feature id="org.eclipse.platform.source"/>
-      <feature id="org.eclipse.equinox.p2.core.feature.source"/>
-      <feature id="org.eclipse.pde"/>
-      <feature id="org.eclipse.equinox.p2.extras.feature"/>
    </features>
 
-   <!--<configurations>
+   <configurations>
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="3" />
+      <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="3" />
       <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1" />
-   </configurations>-->
-   
-   <configurations>
-     <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="2" />
-     <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="3" />
-     <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="3" />
-     <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
-      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
-      <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1" />
-  </configurations>
+   </configurations>
 
 </product>
