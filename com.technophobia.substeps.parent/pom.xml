@@ -76,7 +76,7 @@
 						<artifact>
 							<groupId>com.technophobia.substeps</groupId>
 							<artifactId>com.technophobia.substeps.target</artifactId>
-							<version>0.0.1-SNAPSHOT</version>
+							<version>${project.version}</version>
 							<classifier>substeps</classifier>
 						</artifact>
 					</target>
