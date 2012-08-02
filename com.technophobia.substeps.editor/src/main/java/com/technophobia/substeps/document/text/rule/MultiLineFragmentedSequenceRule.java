@@ -31,7 +31,7 @@ import org.eclipse.jface.text.rules.MultiLineRule;
  */
 public class MultiLineFragmentedSequenceRule extends MultiLineRule {
 
-    private static final char[] WHITESPACE_CHARS = new char[] { ' ', '\n', '\t' };
+    private static final char[] WHITESPACE_CHARS = new char[] { ' ', '\r', '\n', '\t' };
 
 
     public MultiLineFragmentedSequenceRule(final String startString, final String endSequence, final IToken token) {

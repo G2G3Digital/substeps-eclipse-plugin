@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.technophobia.substeps</groupId>
+		<artifactId>com.technophobia.substeps.parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../com.technophobia.substeps.parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>com.technophobia.substeps.updatesite</artifactId>
+
+	<packaging>war</packaging>
+
+	<organization>
+		<name>Technophobia Ltd</name>
+		<url>www.technophobia.com/</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>LGPL 3.0 license</name>
+			<url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+			<distribution>manual</distribution>
+		</license>
+	</licenses>
+
+	<properties>
+		<docbase.on.server>${project.build.directory}/repository</docbase.on.server>
+	</properties>
+
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<id>unpack-repository</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeGroupIds>com.technophobia.substeps</includeGroupIds>
+							<includeArtifactIds>com.technophobia.substeps.repository</includeArtifactIds>
+							<outputDirectory>${docbase.on.server}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<warSourceDirectory>${basedir}/target/repository/</warSourceDirectory>
+					<webXml>${basedir}/src/main/webapp/WEB-INF/web.xml</webXml>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>tomcat-maven-plugin</artifactId>
+				<version>1.1</version>
+
+				<configuration>
+					<path>/substeps-update-site</path>
+					<port>9999</port>
+					<uriEncoding>utf-8</uriEncoding>
+				</configuration>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-dependency-plugin
+										</artifactId>
+										<versionRange>
+											[2.2,)
+										</versionRange>
+										<goals>
+											<goal>
+												unpack-dependencies
+											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.technophobia.substeps</groupId>
+			<artifactId>com.technophobia.substeps.repository</artifactId>
+			<version>${project.version}</version>
+			<type>zip</type>
+		</dependency>
+	</dependencies>
+
+</project>

@@ -50,14 +50,14 @@ public class MultiLineFixedIndentFormattingStrategy extends DefaultFormattingStr
     public String format(final String content, final boolean isLineStart, final String indentation,
             final int[] positions) {
 
-        final String[] lines = content.split("\n");
+        final String[] lines = content.split(NEWLINE);
 
         if (lines.length > 0) {
             final StringBuffer sb = new StringBuffer();
 
             sb.append(initialLineIndent + lines[0].trim());
             if (lines.length > 1) {
-                sb.append("\n");
+                sb.append(NEWLINE);
             }
 
             for (int i = 1; i < lines.length; i++) {
@@ -69,7 +69,7 @@ public class MultiLineFixedIndentFormattingStrategy extends DefaultFormattingStr
                     // don't add new line to last line as its taken care of by
                     // tailingNewLines()
                     if (i < lines.length - 1) {
-                        sb.append("\n");
+                        sb.append(NEWLINE);
                     }
                 }
             }
@@ -82,9 +82,14 @@ public class MultiLineFixedIndentFormattingStrategy extends DefaultFormattingStr
 
 
     private void tailingNewLines(final String content, final StringBuffer sb) {
-        for (int i = content.length() - 1; i >= 0 && content.charAt(i) == '\n'; i--) {
-            sb.append("\n");
+        for (int i = content.length() - 1; i >= 0 && isNewline(content, i); i -= NEWLINE.length()) {
+            sb.append(NEWLINE);
         }
+    }
+
+
+    private boolean isNewline(final String content, final int endPos) {
+        return content.substring(endPos - NEWLINE.length(), endPos).equals(NEWLINE);
     }
 
 }

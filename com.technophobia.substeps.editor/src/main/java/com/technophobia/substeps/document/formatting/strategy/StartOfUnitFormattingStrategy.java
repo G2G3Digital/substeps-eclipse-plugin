@@ -65,7 +65,7 @@ public class StartOfUnitFormattingStrategy extends DefaultFormattingStrategy {
 
         final StringBuffer sb = new StringBuffer();
         if (prefixNewLine) {
-            sb.append("\n");
+            sb.append(NEWLINE);
         }
         sb.append(formattedContent);
         return sb.toString();

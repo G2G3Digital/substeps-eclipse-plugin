@@ -2,7 +2,7 @@
 <!-- Copyright Technophobia.Ltd 2012 -->
 <feature
       id="com.technophobia.substeps.feature"
-      label="Substeps Feature"
+      label="Substeps"
       version="0.0.1.qualifier"
       provider-name="Technophobia Ltd">
 

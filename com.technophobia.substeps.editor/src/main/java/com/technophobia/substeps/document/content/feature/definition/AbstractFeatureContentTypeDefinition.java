@@ -16,6 +16,8 @@ import com.technophobia.substeps.document.text.rule.MultiLineFragmentedSequenceR
 
 public abstract class AbstractFeatureContentTypeDefinition implements ContentTypeDefinition {
 
+    private static final String NEWLINE = System.getProperty("line.separator");
+
     private final String id;
     private final boolean optional;
 
@@ -62,7 +64,7 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
 
     protected IPredicateRule paragraphRule(final String startString, final String tokenId) {
         final IToken token = new Token(tokenId);
-        return new MultiLineFragmentedSequenceRule(startString, "\n\n", token);
+        return new MultiLineFragmentedSequenceRule(startString, NEWLINE + NEWLINE, token);
     }
 
 
