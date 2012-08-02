@@ -3,12 +3,15 @@ package com.technophobia.substeps.step;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.jar.JarFile;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -65,16 +68,40 @@ public class ProjectStepImplementationLoader implements Transformer<IProject, Li
     private String[] findDependenciesFor(final IJavaProject javaProject) {
         try {
             final IPackageFragmentRoot[] fragmentRoots = javaProject.getPackageFragmentRoots();
-            final String[] rootPaths = new String[fragmentRoots.length];
+            final Collection<String> rootPaths = new ArrayList<String>(fragmentRoots.length);
             for (int i = 0; i < fragmentRoots.length; i++) {
-                rootPaths[i] = fragmentRoots[i].getPath().makeAbsolute().toOSString();
+                final String path = getPathFor(fragmentRoots[i]);
+                if (path != null) {
+                    rootPaths.add(path);
+                }
             }
-            return rootPaths;
+            return rootPaths.toArray(new String[rootPaths.size()]);
         } catch (final JavaModelException ex) {
             FeatureEditorPlugin.log(IStatus.WARNING, "Could not get package fragment roots for project "
                     + javaProject.getProject().getName());
             return new String[0];
         }
+    }
+
+
+    /**
+     * Returns the path for this fragment in a OS friendly string. Note that in
+     * windows, the method for getting the absolute path varies for source
+     * folders and jars
+     * 
+     * @param fragmentRoot
+     *            The fragment containing classes
+     * @return The path of this fragment root, os-friendly
+     */
+    private String getPathFor(final IPackageFragmentRoot fragmentRoot) {
+        final IResource resource = fragmentRoot.getResource();
+        final IPath path;
+        if (resource != null) {
+            path = resource.getRawLocation();
+        } else {
+            path = fragmentRoot.getPath().makeAbsolute();
+        }
+        return path.toOSString();
     }
 
 

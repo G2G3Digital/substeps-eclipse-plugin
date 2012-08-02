@@ -89,7 +89,7 @@ public class MultiLineFixedIndentFormattingStrategy extends DefaultFormattingStr
 
 
     private boolean isNewline(final String content, final int endPos) {
-        return content.substring(endPos - NEWLINE.length(), endPos).equals(NEWLINE);
+        return content.substring(endPos - (NEWLINE.length() - 1), endPos + 1).equals(NEWLINE);
     }
 
 }
