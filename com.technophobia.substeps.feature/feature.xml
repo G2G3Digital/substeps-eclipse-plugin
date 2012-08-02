@@ -2,11 +2,12 @@
 <!-- Copyright Technophobia.Ltd 2012 -->
 <feature
       id="com.technophobia.substeps.feature"
-      label="Feature"
-      version="0.0.1.qualifier">
+      label="Substeps"
+      version="0.0.1.qualifier"
+      provider-name="Technophobia Ltd">
 
    <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+      A Collection of plugins to assist in editing and running substeps feature files
    </description>
 
    <copyright url="http://www.example.com/copyright">

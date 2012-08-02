@@ -3,7 +3,7 @@
    <feature url="features/com.technophobia.substeps.feature_0.0.1.qualifier.jar" id="com.technophobia.substeps.feature" version="0.0.1.qualifier">
       <category name="com.technophobia.substeps.category"/>
    </feature>
-   <category-def name="com.technophobia.category" label="ATclipse Category">
+   <category-def name="com.technophobia.substeps.category" label="Substeps">
       <description>
          Substeps Category
       </description>

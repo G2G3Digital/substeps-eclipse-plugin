@@ -29,7 +29,7 @@ import org.eclipse.jface.text.formatter.IFormattingStrategy;
  */
 public class DefaultFormattingStrategy implements IFormattingStrategy {
 
-    protected static final String lineSeparator = System.getProperty("line.separator");
+    protected static final String NEWLINE = System.getProperty("line.separator");
 
 
     public DefaultFormattingStrategy() {

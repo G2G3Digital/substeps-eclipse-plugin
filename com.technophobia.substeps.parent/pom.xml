@@ -26,16 +26,6 @@
 	</properties>
 	
 	<repositories> 
- 	  <!--repository> 
-	    <id>indigo</id> 
- 	    <layout>p2</layout> 
-	    <url>http://download.eclipse.org/releases/indigo</url> 
-	  </repository--> 
-	  <!--repository>
-            <id>indigo-local</id> 
-            <layout>p2</layout> 
-            <url>file:/home/sforbes/Desktop/repo/repo</url>
-          </repository-->
       <repository> 
 	    <id>juno</id> 
  	    <layout>p2</layout> 
@@ -76,7 +66,7 @@
 						<artifact>
 							<groupId>com.technophobia.substeps</groupId>
 							<artifactId>com.technophobia.substeps.target</artifactId>
-							<version>0.0.1-SNAPSHOT</version>
+							<version>${project.version}</version>
 							<classifier>substeps</classifier>
 						</artifact>
 					</target>
@@ -117,6 +107,7 @@
 		<module>../com.technophobia.substeps.testlauncher</module>
 		<module>../com.technophobia.substeps.feature</module>
 		<module>../com.technophobia.substeps.repository</module>
+		<module>../com.technophobia.substeps.updatesite</module>
 	</modules>
 	
 </project>

@@ -35,11 +35,11 @@ public abstract class IndentationFormattingStrategy extends DefaultFormattingStr
     @Override
     public String format(final String content, final boolean isLineStart, final String indentation,
             final int[] positions) {
-        final boolean hasLineBreak = content.endsWith(lineSeparator);
+        final boolean hasLineBreak = content.endsWith(NEWLINE);
 
         String indentedContent = isLineStart ? indent() + content.trim() : content.trim();
         if (hasLineBreak) {
-            indentedContent = indentedContent + lineSeparator;
+            indentedContent = indentedContent + NEWLINE;
         }
         return indentedContent;
     }

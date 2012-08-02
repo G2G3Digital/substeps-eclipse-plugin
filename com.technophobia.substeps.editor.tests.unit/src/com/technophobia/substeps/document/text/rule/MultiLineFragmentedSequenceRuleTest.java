@@ -33,61 +33,65 @@ import org.junit.runner.RunWith;
 @RunWith(JMock.class)
 public class MultiLineFragmentedSequenceRuleTest {
 
-	private Mockery context;
+    private static final String NEWLINE = System.getProperty("line.separator");
 
-	private IToken token;
-	private ICharacterScanner characterScanner;
+    private Mockery context;
 
-	private MultiLineFragmentedSequenceRule rule;
+    private IToken token;
+    private ICharacterScanner characterScanner;
 
-	@Before
-	public void initialise() {
-		this.context = new Mockery();
+    private MultiLineFragmentedSequenceRule rule;
 
-		this.token = context.mock(IToken.class);
-		this.characterScanner = context.mock(ICharacterScanner.class);
 
-		this.rule = new MultiLineFragmentedSequenceRule("Start", "End", token);
-	}
+    @Before
+    public void initialise() {
+        this.context = new Mockery();
 
-	@Test
-	public void findsSequenceWhenSequenceIsNonFragmented() {
-		prepareCharacterScanner("End");
+        this.token = context.mock(IToken.class);
+        this.characterScanner = context.mock(ICharacterScanner.class);
 
-		assertTrue(rule.sequenceDetected(characterScanner,
-				" End".toCharArray(), false));
-	}
+        this.rule = new MultiLineFragmentedSequenceRule("Start", "End", token);
+    }
 
-	@Test
-	public void findsSequenceWhenSequenceIsFragmented() {
-		prepareCharacterScanner("E  n\t\nd");
 
-		assertTrue(rule.sequenceDetected(characterScanner,
-				" End".toCharArray(), false));
-	}
+    @Test
+    public void findsSequenceWhenSequenceIsNonFragmented() {
+        prepareCharacterScanner("End");
 
-	@Test
-	public void failsWhenSequenceNotDetected() {
-		prepareCharacterScanner("S");
+        assertTrue(rule.sequenceDetected(characterScanner, " End".toCharArray(), false));
+    }
 
-		context.checking(new Expectations() {
-			{
-				oneOf(characterScanner).unread();
-			}
-		});
 
-		assertFalse(rule.sequenceDetected(characterScanner,
-				" End".toCharArray(), false));
-	}
+    @Test
+    public void findsSequenceWhenSequenceIsFragmented() {
+        prepareCharacterScanner("E  n\t" + NEWLINE + "d");
 
-	private void prepareCharacterScanner(final String text) {
-		context.checking(new Expectations() {
-			{
-				for (final char c : text.toCharArray()) {
-					oneOf(characterScanner).read();
-					will(returnValue((int) c));
-				}
-			}
-		});
-	}
+        assertTrue(rule.sequenceDetected(characterScanner, " End".toCharArray(), false));
+    }
+
+
+    @Test
+    public void failsWhenSequenceNotDetected() {
+        prepareCharacterScanner("S");
+
+        context.checking(new Expectations() {
+            {
+                oneOf(characterScanner).unread();
+            }
+        });
+
+        assertFalse(rule.sequenceDetected(characterScanner, " End".toCharArray(), false));
+    }
+
+
+    private void prepareCharacterScanner(final String text) {
+        context.checking(new Expectations() {
+            {
+                for (final char c : text.toCharArray()) {
+                    oneOf(characterScanner).read();
+                    will(returnValue((int) c));
+                }
+            }
+        });
+    }
 }
