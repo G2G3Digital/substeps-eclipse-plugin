@@ -35,6 +35,12 @@ public class ContentFormattingSteps extends AbstractEditorSteps {
     }
 
 
+    @Step("And dummy")
+    public void andSomething() {
+        // no-op
+    }
+
+
     @Step("Given there is a general project named \"([^\"]*)\"")
     public void ensureProjectExistsNamed(final String projectName) {
         // TODO - add logging

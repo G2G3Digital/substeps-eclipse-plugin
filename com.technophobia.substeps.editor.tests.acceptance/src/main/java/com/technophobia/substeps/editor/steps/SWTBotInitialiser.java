@@ -9,7 +9,8 @@ import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.ui.PlatformUI;
 
 import com.technophobia.substeps.editor.SWTTestUtil;
-import com.technophobia.substeps.runner.setupteardown.Annotations.BeforeEveryScenario;
+import com.technophobia.substeps.runner.setupteardown.Annotations.BeforeAllFeatures;
+import com.technophobia.substeps.runner.setupteardown.Annotations.BeforeEveryFeature;
 
 public class SWTBotInitialiser {
 
@@ -17,7 +18,7 @@ public class SWTBotInitialiser {
     private static SWTWorkbenchBot workbenchBot;
 
 
-    @BeforeEveryScenario
+    @BeforeAllFeatures
     public void initialise() {
         bot = new SWTBot();
         workbenchBot = new SWTWorkbenchBot();
@@ -26,8 +27,8 @@ public class SWTBotInitialiser {
     }
 
 
-    @BeforeEveryScenario
-    public void setUp() throws Exception {
+    @BeforeEveryFeature
+    public void setUp() {
         UIThreadRunnable.syncExec(new VoidResult() {
 
             @Override
