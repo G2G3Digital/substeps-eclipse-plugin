@@ -2,11 +2,13 @@ package com.technophobia.substeps.document.content.assist.feature;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ui.IWorkbenchSite;
@@ -27,24 +29,40 @@ public class SiteToSyntaxTransformer implements Transformer<IWorkbenchSite, Synt
     public Syntax to(final IWorkbenchSite site) {
         final IJavaProject project = new SiteToJavaProjectTransformer().to(site);
         final ClassLoader classLoader = new JavaProjectClassLoader(project);
-        final String outputFolder = outputFolderForProject(project);
-        final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
+        final String[] outputFolders = outputFoldersForProject(project);
 
-        final List<Class<?>> stepClasses = stepClasses(outputFolder, classLocator);
+        final List<Class<?>> stepClasses = new ArrayList<Class<?>>();
+        for (final String outputFolder : outputFolders) {
+            final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
+            stepClasses.addAll(stepClasses(outputFolder, classLocator));
+        }
         return SyntaxBuilder.buildSyntax(stepClasses, new File(projectLocationPath(project).toOSString()), true, null,
-                new ClassLoadedClassAnalyser(classLoader));
+                new ClassLoadedClassAnalyser(classLoader), false);
     }
 
 
-    private String outputFolderForProject(final IJavaProject project) {
+    private String[] outputFoldersForProject(final IJavaProject project) {
+        final Collection<String> outputFolders = new ArrayList<String>();
+        final IPath projectLocation = projectLocationPath(project);
+
         try {
-            final IPath projectLocation = projectLocationPath(project);
-            final IPath outputLocation = project.getOutputLocation();
-            return projectLocation.append(outputLocation.removeFirstSegments(1)).toOSString();
-        } catch (final JavaModelException e) {
-            FeatureEditorPlugin.instance().log(IStatus.ERROR, "Could not get output folder for project " + project);
+            outputFolders.add(appendPathTo(projectLocation, project.getOutputLocation()));
+            for (final IClasspathEntry entry : project.getRawClasspath()) {
+                if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+                    outputFolders.add(appendPathTo(projectLocation, entry.getOutputLocation()));
+                }
+            }
+        } catch (final JavaModelException ex) {
+            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+                    "Could not get output folder location for project " + project.getElementName());
         }
-        return null;
+
+        return outputFolders.toArray(new String[outputFolders.size()]);
+    }
+
+
+    private String appendPathTo(final IPath projectLocation, final IPath outputLocation) {
+        return projectLocation.append(outputLocation.removeFirstSegments(1)).toOSString();
     }
 
 
