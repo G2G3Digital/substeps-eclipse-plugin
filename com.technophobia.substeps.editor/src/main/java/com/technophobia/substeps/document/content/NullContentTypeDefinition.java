@@ -22,6 +22,10 @@ public class NullContentTypeDefinition implements ContentTypeDefinition {
         return "";
     }
 
+    @Override
+    public String prefixText() {
+    	return "";
+    }
 
     @Override
     public boolean isOptional() {

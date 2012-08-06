@@ -71,8 +71,10 @@ public class JavaProjectClassLoader extends ClassLoader {
         try {
             return JavaRuntime.computeDefaultRuntimeClassPath(project);
         } catch (final CoreException e) {
-            FeatureEditorPlugin.log(IStatus.ERROR, "Could not get classpath entries for project "
-                    + project.getProject().getName() + ", returning empty array");
+            FeatureEditorPlugin.instance().log(
+                    IStatus.ERROR,
+                    "Could not get classpath entries for project " + project.getProject().getName()
+                            + ", returning empty array");
             return new String[0];
         }
     }
@@ -91,7 +93,8 @@ public class JavaProjectClassLoader extends ClassLoader {
             final URL url = path.toFile().toURI().toURL();
             return url;
         } catch (final MalformedURLException ex) {
-            FeatureEditorPlugin.log(IStatus.ERROR, "classpath entry " + entry + " could not be mapped to a url");
+            FeatureEditorPlugin.instance().log(IStatus.ERROR,
+                    "classpath entry " + entry + " could not be mapped to a url");
             return null;
         }
     }

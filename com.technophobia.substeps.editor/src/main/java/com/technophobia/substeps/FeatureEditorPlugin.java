@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import com.technophobia.eclipse.log.Logger;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
 import com.technophobia.substeps.step.MappedStepImplementationsManager;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
@@ -42,7 +43,7 @@ import com.technophobia.substeps.step.StepImplementationManager;
  * @author sforbes
  * 
  */
-public class FeatureEditorPlugin implements BundleActivator {
+public class FeatureEditorPlugin implements BundleActivator, Logger {
 
     private static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
@@ -99,7 +100,8 @@ public class FeatureEditorPlugin implements BundleActivator {
     }
 
 
-    public static void log(final int status, final String message) {
+    @Override
+    public void log(final int status, final String message) {
         instance().log.log(new Status(status, PLUGIN_ID, message));
     }
 

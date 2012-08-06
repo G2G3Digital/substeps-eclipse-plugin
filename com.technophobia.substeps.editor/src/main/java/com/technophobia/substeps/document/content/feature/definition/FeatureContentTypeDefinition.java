@@ -13,22 +13,22 @@ import com.technophobia.substeps.supplier.Supplier;
 public class FeatureContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
 
     public static final String CONTENT_TYPE_ID = "__feature_feature";
-
+    public static final String PREFIX_TEXT = "Feature:";
 
     public FeatureContentTypeDefinition() {
-        super(CONTENT_TYPE_ID, false);
+        super(CONTENT_TYPE_ID, PREFIX_TEXT, false);
     }
 
 
     @Override
     public IPredicateRule partitionRule() {
-        return paragraphRule("Feature:", id());
+        return paragraphRule(PREFIX_TEXT, id(), false, TagContentTypeDefinition.PREFIX_TEXT, CommentContentTypeDefinition.PREFIX_TEXT, BackgroundContentTypeDefinition.PREFIX_TEXT, ScenarioContentTypeDefinition.PREFIX_TEXT, ScenarioOutlineContentTypeDefinition.PREFIX_TEXT);
     }
 
 
     @Override
     public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedWordRule("Feature:", colourToken(FeatureColour.BLUE, colourManager));
+        return fixedWordRule(PREFIX_TEXT, colourToken(FeatureColour.BLUE, colourManager));
     }
 
 

@@ -87,7 +87,8 @@ public class ClassLoadedClassAnalyser extends ClassAnalyser {
         try {
             return (T) ob.getClass().getMethod(methodName).invoke(ob);
         } catch (final Exception e) {
-            FeatureEditorPlugin.log(IStatus.ERROR, "Could not invoke method " + methodName + " on object " + ob);
+            FeatureEditorPlugin.instance().log(IStatus.ERROR,
+                    "Could not invoke method " + methodName + " on object " + ob);
             return null;
         }
     }

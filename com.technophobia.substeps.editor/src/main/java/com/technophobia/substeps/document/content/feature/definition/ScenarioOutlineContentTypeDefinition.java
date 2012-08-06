@@ -14,22 +14,23 @@ import com.technophobia.substeps.supplier.Supplier;
 public class ScenarioOutlineContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
 
     public static final String CONTENT_TYPE_ID = "__feature_scenario_outline";
+    public static final String PREFIX_TEXT = "Scenario Outline:";
 
 
     public ScenarioOutlineContentTypeDefinition() {
-        super(CONTENT_TYPE_ID, false);
+        super(CONTENT_TYPE_ID, PREFIX_TEXT, false);
     }
 
 
     @Override
     public IPredicateRule partitionRule() {
-        return singleLineRule("Scenario Outline:", id());
+        return singleLineRule(PREFIX_TEXT, id());
     }
 
 
     @Override
     public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedWordRule("Scenario Outline:", colourToken(FeatureColour.BLUE, colourManager));
+        return fixedWordRule(PREFIX_TEXT, colourToken(FeatureColour.BLUE, colourManager));
     }
 
 

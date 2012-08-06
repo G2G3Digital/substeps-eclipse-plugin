@@ -13,22 +13,23 @@ import com.technophobia.substeps.supplier.Supplier;
 public class ScenarioExampleRowContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
 
     public static final String CONTENT_TYPE_ID = "__feature_example_row";
+    public static final String PREFIX_TEXT = "|";
 
 
     public ScenarioExampleRowContentTypeDefinition() {
-        super(CONTENT_TYPE_ID, false);
+        super(CONTENT_TYPE_ID, PREFIX_TEXT, false);
     }
 
 
     @Override
     public IPredicateRule partitionRule() {
-        return singleLineRule("|", id());
+        return singleLineRule(PREFIX_TEXT, id());
     }
 
 
     @Override
     public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedWordRule("|", colourToken(FeatureColour.BLACK, colourManager));
+        return fixedWordRule(PREFIX_TEXT, colourToken(FeatureColour.BLACK, colourManager));
     }
 
 

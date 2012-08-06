@@ -53,7 +53,7 @@ public class ContentTypeRuleBasedPartitionScanner extends RuleBasedPartitionScan
             partitionRules[i + 2] = contentTypeDefinition.partitionRule();
             i++;
         }
-
+        
         this.contentTypes = contentTypeDefinitionIds;
         setPredicateRules(partitionRules);
     }

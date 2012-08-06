@@ -35,7 +35,7 @@ public abstract class IndentationFormattingStrategy extends DefaultFormattingStr
     @Override
     public String format(final String content, final boolean isLineStart, final String indentation,
             final int[] positions) {
-        final boolean hasLineBreak = content.endsWith(NEWLINE);
+        final boolean hasLineBreak = endsInNewline(content);
 
         String indentedContent = isLineStart ? indent() + content.trim() : content.trim();
         if (hasLineBreak) {
@@ -43,6 +43,18 @@ public abstract class IndentationFormattingStrategy extends DefaultFormattingStr
         }
         return indentedContent;
     }
+
+
+    /**
+     * Checks whether content ends in a newline, ignoring any tabs or spaces
+     * @param content The content to check
+     * @return true if content ends in newline, otherwise false
+     */
+	private boolean endsInNewline(final String content) {
+		String stripped = content.replaceAll(" ", "").replaceAll("\t", "");
+		
+		return stripped.endsWith(NEWLINE);
+	}
 
 
     /**

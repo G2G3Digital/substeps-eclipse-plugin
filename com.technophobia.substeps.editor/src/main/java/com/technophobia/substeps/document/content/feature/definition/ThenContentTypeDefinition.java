@@ -13,22 +13,23 @@ import com.technophobia.substeps.supplier.Supplier;
 public class ThenContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
 
     public static final String CONTENT_TYPE_ID = "__feature_then";
+    public static final String PREFIX_TEXT = "Then";
 
 
     public ThenContentTypeDefinition() {
-        super(CONTENT_TYPE_ID, false);
+        super(CONTENT_TYPE_ID, PREFIX_TEXT, false);
     }
 
 
     @Override
     public IPredicateRule partitionRule() {
-        return singleLineRule("Then", id());
+        return singleLineRule(PREFIX_TEXT, id());
     }
 
 
     @Override
     public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedWordRule("Then", colourToken(FeatureColour.PINK, colourManager));
+        return fixedWordRule(PREFIX_TEXT, colourToken(FeatureColour.PINK, colourManager));
     }
 
 
