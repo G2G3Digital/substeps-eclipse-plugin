@@ -14,22 +14,22 @@ import com.technophobia.substeps.supplier.Supplier;
 public class BackgroundContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
 
     public static final String CONTENT_TYPE_ID = "__feature_background";
-
+    public static final String PREFIX_TEXT = "Background:";
 
     public BackgroundContentTypeDefinition() {
-        super(CONTENT_TYPE_ID, false);
+        super(CONTENT_TYPE_ID, PREFIX_TEXT, false);
     }
 
 
     @Override
     public IPredicateRule partitionRule() {
-        return singleLineRule("Background:", id());
+        return singleLineRule(PREFIX_TEXT, id());
     }
 
 
     @Override
     public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedWordRule("Background:", colourToken(FeatureColour.BLUE, colourManager));
+        return fixedWordRule(PREFIX_TEXT, colourToken(FeatureColour.BLUE, colourManager));
     }
 
 

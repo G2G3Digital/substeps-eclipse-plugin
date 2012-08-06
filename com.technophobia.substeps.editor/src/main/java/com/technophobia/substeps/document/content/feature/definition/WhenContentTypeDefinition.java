@@ -13,22 +13,23 @@ import com.technophobia.substeps.supplier.Supplier;
 public class WhenContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
 
     public static final String CONTENT_TYPE_ID = "__feature_when";
+    public static final String PREFIX_TEXT = "When";
 
 
     public WhenContentTypeDefinition() {
-        super(CONTENT_TYPE_ID, false);
+        super(CONTENT_TYPE_ID, PREFIX_TEXT, false);
     }
 
 
     @Override
     public IPredicateRule partitionRule() {
-        return singleLineRule("When", id());
+        return singleLineRule(PREFIX_TEXT, id());
     }
 
 
     @Override
     public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedWordRule("When", colourToken(FeatureColour.PINK, colourManager));
+        return fixedWordRule(PREFIX_TEXT, colourToken(FeatureColour.PINK, colourManager));
     }
 
 

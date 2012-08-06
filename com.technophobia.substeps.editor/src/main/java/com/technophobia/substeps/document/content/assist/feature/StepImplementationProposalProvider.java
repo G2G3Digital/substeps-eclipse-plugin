@@ -208,7 +208,7 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
             return line.trim();
 
         } catch (final BadLocationException e) {
-            FeatureEditorPlugin.log(IStatus.ERROR, "Could not get last word");
+            FeatureEditorPlugin.instance().log(IStatus.ERROR, "Could not get last word");
             // ... log the exception ...
         }
         return null;

@@ -12,19 +12,19 @@ import org.eclipse.jface.text.rules.WordRule;
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.FeatureColour;
-import com.technophobia.substeps.document.text.rule.MultiLineFragmentedSequenceRule;
+import com.technophobia.substeps.document.text.rule.UntilOtherContentTypeSequenceRule;
 
 public abstract class AbstractFeatureContentTypeDefinition implements ContentTypeDefinition {
 
-    private static final String NEWLINE = System.getProperty("line.separator");
-
     private final String id;
+    private final String prefixText;
     private final boolean optional;
 
 
-    public AbstractFeatureContentTypeDefinition(final String id, final boolean optional) {
+    public AbstractFeatureContentTypeDefinition(final String id, final String prefixText, final boolean optional) {
         super();
         this.id = id;
+		this.prefixText = prefixText;
         this.optional = optional;
     }
 
@@ -32,6 +32,11 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
     @Override
     public String id() {
         return id;
+    }
+    
+    @Override
+    public String prefixText(){
+    	return prefixText;
     }
 
 
@@ -46,27 +51,27 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
     }
 
 
-    protected IPredicateRule singleLineRule(final String startSequence, final IToken token) {
-        return new EndOfLineRule(startSequence, token);
-    }
-
-
     protected IRule fixedWordRule(final String word, final IToken token) {
         return new WordRule(word(word), token);
     }
 
 
     protected IPredicateRule singleLineRule(final String startString, final String tokenId) {
-        final IToken token = new Token(tokenId);
-        return new EndOfLineRule(startString, token);
+        return singleLineRule(startString, new Token(tokenId));
+    }
+    
+    protected IPredicateRule singleLineRule(final String startSequence, final IToken token) {
+        return new EndOfLineRule(startSequence, token);
     }
 
 
-    protected IPredicateRule paragraphRule(final String startString, final String tokenId) {
-        final IToken token = new Token(tokenId);
-        return new MultiLineFragmentedSequenceRule(startString, NEWLINE + NEWLINE, token);
+    protected IPredicateRule paragraphRule(final String startString, final String tokenId, final boolean breaksOnEOF, final String... validProceedingContentTypes) {
+        return paragraphRule(startString, new Token(tokenId), breaksOnEOF, validProceedingContentTypes);
     }
 
+    protected IPredicateRule paragraphRule(final String startString, final IToken token, boolean breaksOnEOF, final String... validProceedingContentTypes) {
+        return new UntilOtherContentTypeSequenceRule(startString, token, breaksOnEOF, validProceedingContentTypes);
+    }
 
     protected IWordDetector word(final String word) {
         return new IWordDetector() {

@@ -42,7 +42,7 @@ public class SiteToSyntaxTransformer implements Transformer<IWorkbenchSite, Synt
             final IPath outputLocation = project.getOutputLocation();
             return projectLocation.append(outputLocation.removeFirstSegments(1)).toOSString();
         } catch (final JavaModelException e) {
-            FeatureEditorPlugin.log(IStatus.ERROR, "Could not get output folder for project " + project);
+            FeatureEditorPlugin.instance().log(IStatus.ERROR, "Could not get output folder for project " + project);
         }
         return null;
     }

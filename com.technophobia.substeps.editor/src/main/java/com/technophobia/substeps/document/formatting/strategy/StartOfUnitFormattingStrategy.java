@@ -49,8 +49,8 @@ public class StartOfUnitFormattingStrategy extends DefaultFormattingStrategy {
     @Override
     public String format(final String content, final boolean isLineStart, final String indentation,
             final int[] positions) {
-        FeatureEditorPlugin.log(IStatus.INFO, "Formatting line: " + content + ", isLineStart: " + isLineStart
-                + ", indentation: " + indentation);
+        FeatureEditorPlugin.instance().log(IStatus.INFO,
+                "Formatting line: " + content + ", isLineStart: " + isLineStart + ", indentation: " + indentation);
         boolean prefixNewLine = false;
         if (isLineStart) {
             final FormattingContext formattingContext = formattingContextSupplier.get();

@@ -40,7 +40,13 @@ public interface ContentTypeDefinition {
      * @return id
      */
     String id();
-
+    
+    /**
+     * Text that will be visible in the editor for this content type
+     * 
+     * @return prefixText
+     */
+    String prefixText();
 
     /**
      * Is this item optional in the editor
