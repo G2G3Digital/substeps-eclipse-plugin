@@ -6,7 +6,7 @@ import com.technophobia.substeps.model.structure.SubstepsTestElement;
 
 public class OpenFeatureAction extends Action {
 
-    public OpenFeatureAction(final SubstepsTestElement testElements) {
+    public OpenFeatureAction(@SuppressWarnings("unused") final SubstepsTestElement testElements) {
         // TODO Auto-generated constructor stub
     }
 

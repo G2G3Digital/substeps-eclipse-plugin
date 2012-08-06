@@ -4,7 +4,7 @@ import org.eclipse.jface.action.Action;
 
 public class OpenEditorAtLineAction extends Action {
 
-    public OpenEditorAtLineAction(final int line) {
+    public OpenEditorAtLineAction(@SuppressWarnings("unused") final int line) {
         // TODO Auto-generated constructor stub
     }
 

@@ -18,82 +18,57 @@
  */
 package com.technophobia.substeps.document.content.feature;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.NullContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.AndContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.BackgroundContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.CommentContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.FeatureContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.GivenContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleRowContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioOutlineContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.TagContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ThenContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.WhenContentTypeDefinition;
 
 public class FeatureContentTypeDefinitionFactoryTest {
 
-	private ContentTypeDefinitionFactory contentTypeDefinitionFactory;
+    private ContentTypeDefinitionFactory contentTypeDefinitionFactory;
 
-	@Before
-	public void initialiseFactory() {
-		this.contentTypeDefinitionFactory = new FeatureContentTypeDefinitionFactory();
-	}
 
-	@Test
-	public void canGetAllFeatureContentTypeDefinitionsByName() {
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_feature"),
-				is(FeatureContentTypeDefinition.FEATURE));
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_tag"),
-				is(FeatureContentTypeDefinition.TAG));
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_comment"),
-				is(FeatureContentTypeDefinition.COMMENT));
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_background"),
-				is(FeatureContentTypeDefinition.BACKGROUND));
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_scenario"),
-				is(FeatureContentTypeDefinition.SCENARIO));
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_scenario_outline"),
-				is(FeatureContentTypeDefinition.SCENARIO_OUTLINE));
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_example"),
-				is(FeatureContentTypeDefinition.EXAMPLE));
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_example_row"),
-				is(FeatureContentTypeDefinition.EXAMPLE_ROW));
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_given"),
-				is(FeatureContentTypeDefinition.GIVEN));
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_when"),
-				is(FeatureContentTypeDefinition.WHEN));
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_then"),
-				is(FeatureContentTypeDefinition.THEN));
-		assertThat(
-				(FeatureContentTypeDefinition) contentTypeDefinitionFactory
-						.contentTypeDefintionByName("__feature_and"),
-				is(FeatureContentTypeDefinition.AND));
-	}
+    @Before
+    public void initialiseFactory() {
+        this.contentTypeDefinitionFactory = new FeatureContentTypeDefinitionFactory();
+    }
 
-	@Test
-	public void returnsNullDefinitionWhenInvalidTypeRequested() {
 
-		assertThat(
-				contentTypeDefinitionFactory
-						.contentTypeDefintionByName("invalid_type"),
-				is(NullContentTypeDefinition.class));
-	}
+    @Test
+    public void canGetAllFeatureContentTypeDefinitionsByName() {
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_feature") instanceof FeatureContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_tag") instanceof TagContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_comment") instanceof CommentContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_background") instanceof BackgroundContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_scenario") instanceof ScenarioContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_scenario_outline") instanceof ScenarioOutlineContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_example") instanceof ScenarioExampleContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_example_row") instanceof ScenarioExampleRowContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_given") instanceof GivenContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_when") instanceof WhenContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_then") instanceof ThenContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_and") instanceof AndContentTypeDefinition);
+    }
+
+
+    @Test
+    public void returnsNullDefinitionWhenInvalidTypeRequested() {
+
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("invalid_type") instanceof NullContentTypeDefinition);
+    }
 }

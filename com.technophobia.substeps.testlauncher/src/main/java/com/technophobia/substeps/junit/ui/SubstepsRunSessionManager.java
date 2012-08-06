@@ -76,7 +76,7 @@ public class SubstepsRunSessionManager implements Supplier<SubstepsRunSession> {
 
         testViewer.registerActiveSession(substepsRunSession);
 
-        if (disposedSashFormChecker.get()) {
+        if (disposedSashFormChecker.get().booleanValue()) {
             updateJobManager.stopUpdateJobs();
             return deactivatedSession;
         }

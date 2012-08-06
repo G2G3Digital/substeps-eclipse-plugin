@@ -77,8 +77,8 @@ public class FeatureViewer {
             final Status status = testElement.getStatus();
             if (status.isErrorOrFailure())
                 return true;
-            else
-                return !testRunSession.isRunning() && (status.equals(Status.RUNNING)); // rerunning
+
+            return !testRunSession.isRunning() && (status.equals(Status.RUNNING)); // rerunning
         }
     }
 
@@ -265,7 +265,7 @@ public class FeatureViewer {
     }
 
 
-    private boolean testClassExists(final String className) {
+    private boolean testClassExists(@SuppressWarnings("unused") final String className) {
         throw new UnsupportedOperationException("This is not implemented - needs to be features, not classes");
         // final IJavaProject project = testRunnerPart.getLaunchedProject();
         // if (project == null)
@@ -285,8 +285,8 @@ public class FeatureViewer {
     }
 
 
-    public synchronized void registerActiveSession(final SubstepsRunSession testRunSession) {
-        this.testRunSession = testRunSession;
+    public synchronized void registerActiveSession(final SubstepsRunSession session) {
+        this.testRunSession = session;
         registerAutoScrollTarget(null);
         registerViewersRefresh();
     }
@@ -401,8 +401,7 @@ public class FeatureViewer {
     private boolean getActiveViewerHasFilter() {
         if (layoutMode.equals(ViewLayout.HIERARCHICAL))
             return treeHasFilter;
-        else
-            return tableHasFilter;
+        return tableHasFilter;
     }
 
 
@@ -417,16 +416,14 @@ public class FeatureViewer {
     private StructuredViewer getActiveViewer() {
         if (layoutMode.equals(ViewLayout.HIERARCHICAL))
             return treeViewer;
-        else
-            return tableViewer;
+        return tableViewer;
     }
 
 
     private boolean getActiveViewerNeedsRefresh() {
         if (layoutMode.equals(ViewLayout.HIERARCHICAL))
             return treeNeedsRefresh;
-        else
-            return tableNeedsRefresh;
+        return tableNeedsRefresh;
     }
 
 
@@ -658,9 +655,8 @@ public class FeatureViewer {
             if (sibling.getStatus().isErrorOrFailure()) {
                 if (sibling instanceof SubstepsTestLeafElement) {
                     return (SubstepsTestLeafElement) sibling;
-                } else {
-                    return getNextChildFailure((SubstepsTestParentElement) sibling, showNext);
                 }
+                return getNextChildFailure((SubstepsTestParentElement) sibling, showNext);
             }
         }
         return getNextFailureSibling(parent, showNext);
@@ -676,9 +672,8 @@ public class FeatureViewer {
             if (child.getStatus().isErrorOrFailure()) {
                 if (child instanceof SubstepsTestLeafElement) {
                     return (SubstepsTestLeafElement) child;
-                } else {
-                    return getNextChildFailure((SubstepsTestParentElement) child, showNext);
                 }
+                return getNextChildFailure((SubstepsTestParentElement) child, showNext);
             }
         }
         return null;

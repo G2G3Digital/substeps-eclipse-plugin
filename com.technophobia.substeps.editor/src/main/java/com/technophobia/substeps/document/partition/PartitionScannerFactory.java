@@ -20,9 +20,26 @@ package com.technophobia.substeps.document.partition;
 
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
+/**
+ * Factory interface for {@link IPartitionTokenScanner}
+ * 
+ * @author sforbes
+ * 
+ */
 public interface PartitionScannerFactory {
 
-	IPartitionTokenScanner createScanner();
+    /**
+     * Create a new {@link IPartitionTokenScanner}
+     * 
+     * @return the newly created scanner
+     */
+    IPartitionTokenScanner createScanner();
 
-	String[] legalContentTypes();
+
+    /**
+     * All legal content types
+     * 
+     * @return
+     */
+    String[] legalContentTypes();
 }

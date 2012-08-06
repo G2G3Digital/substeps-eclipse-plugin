@@ -20,7 +20,7 @@ public class SubstepsLaunchConfigurationConstants {
     public static final String ATTR_TEST_METHOD_NAME = FeatureRunnerPlugin.PLUGIN_ID + ".TESTNAME";
 
     public static final String JUNIT4_TEST_KIND_ID = "org.eclipse.jdt.junit.loader.junit4";
-    public static final String MODE_RUN_QUIETLY_MODE = "runQuietly";;
+    public static final String MODE_RUN_QUIETLY_MODE = "runQuietly";
 
     public static final String ATTR_NO_DISPLAY = FeatureRunnerPlugin.PLUGIN_ID + ".NO_DISPLAY";
 
@@ -33,6 +33,7 @@ public class SubstepsLaunchConfigurationConstants {
                 return JavaCore.create(ResourcesPlugin.getWorkspace().getRoot().getProject(projectName));
             }
         } catch (final CoreException e) {
+            // No-op
         }
         return null;
     }

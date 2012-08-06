@@ -18,23 +18,37 @@
  */
 package com.technophobia.substeps.document.formatting.strategy;
 
+/**
+ * Formatting Strategy that indents the content value
+ * 
+ * @author sforbes
+ * 
+ */
 public abstract class IndentationFormattingStrategy extends DefaultFormattingStrategy {
 
-	@Override
-	public void formatterStarts(final String initialIndentation) {
-		super.formatterStarts(initialIndentation);
-	}
+    @Override
+    public void formatterStarts(final String initialIndentation) {
+        super.formatterStarts(initialIndentation);
+    }
 
-	@Override
-	public String format(final String content, final boolean isLineStart, final String indentation, final int[] positions) {
-		final boolean hasLineBreak = content.endsWith(lineSeparator);
 
-		String indentedContent = isLineStart ? indent() + content.trim() : content.trim();	
-		if (hasLineBreak) {
-			indentedContent = indentedContent + lineSeparator;
-		}
-		return indentedContent;
-	}
+    @Override
+    public String format(final String content, final boolean isLineStart, final String indentation,
+            final int[] positions) {
+        final boolean hasLineBreak = content.endsWith(NEWLINE);
 
-	protected abstract String indent();
+        String indentedContent = isLineStart ? indent() + content.trim() : content.trim();
+        if (hasLineBreak) {
+            indentedContent = indentedContent + NEWLINE;
+        }
+        return indentedContent;
+    }
+
+
+    /**
+     * What indent should the content have
+     * 
+     * @return The indent in string format
+     */
+    protected abstract String indent();
 }

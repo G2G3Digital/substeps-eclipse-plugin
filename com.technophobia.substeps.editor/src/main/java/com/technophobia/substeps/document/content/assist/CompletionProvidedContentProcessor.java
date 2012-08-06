@@ -6,8 +6,13 @@ import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 
-import com.technophobia.substeps.document.content.assist.CompletionProposalProvider;
-
+/**
+ * Implementation of {@link IContentAssistProcessor} that uses a
+ * {@link CompletionProposalProvider} to get the details
+ * 
+ * @author sforbes
+ * 
+ */
 public class CompletionProvidedContentProcessor implements IContentAssistProcessor {
 
     private final CompletionProposalProvider completionProposalProvider;
@@ -20,7 +25,7 @@ public class CompletionProvidedContentProcessor implements IContentAssistProcess
 
     @Override
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
-        return completionProposalProvider.get();
+        return completionProposalProvider.get(viewer.getDocument(), offset);
     }
 
 

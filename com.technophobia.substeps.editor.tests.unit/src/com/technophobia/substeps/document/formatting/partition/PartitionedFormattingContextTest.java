@@ -23,7 +23,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TypedPosition;
 import org.jmock.Expectations;
@@ -41,228 +40,195 @@ import com.technophobia.substeps.document.formatting.InvalidFormatPositionExcept
 @RunWith(JMock.class)
 public class PartitionedFormattingContextTest {
 
-	private Mockery context;
+    private Mockery context;
 
-	private ContentTypeDefinitionFactory contentTypeDefinitionFactory;
+    private ContentTypeDefinitionFactory contentTypeDefinitionFactory;
 
-	@Before
-	public void initialise() {
-		this.context = new Mockery();
 
-		this.contentTypeDefinitionFactory = context
-				.mock(ContentTypeDefinitionFactory.class);
-	}
+    @Before
+    public void initialise() {
+        this.context = new Mockery();
 
-	@Test
-	public void hasPreviousContentTypeReturnsFalseForFirstLine()
-			throws Exception {
+        this.contentTypeDefinitionFactory = context.mock(ContentTypeDefinitionFactory.class);
+    }
 
-		final TypedPosition[] positions = positions(position(0, 10,
-				"position-1"));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 0);
 
-		assertFalse(formattingContext.hasPreviousContentType());
-	}
+    @Test
+    public void hasPreviousContentTypeReturnsFalseForFirstLine() {
 
-	@Test
-	public void hasPreviousContentTypeReturnsFalseIfOnlyPreviousTypeIsWhitespace()
-			throws Exception {
-		final TypedPosition[] positions = positions(
-				position(0, 10, IDocument.DEFAULT_CONTENT_TYPE),
-				position(11, 10, "position-1"));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 1);
+        final TypedPosition[] positions = positions(position(0, 10, "position-1"));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-		assertFalse(formattingContext.hasPreviousContentType());
-	}
+        assertFalse(formattingContext.hasPreviousContent());
+    }
 
-	@Test
-	public void hasPreviousContentTypeReturnsTrueForSecondType()
-			throws Exception {
-		final TypedPosition[] positions = positions(
-				position(0, 10, "position-1"), position(11, 10, "position-2"));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 1);
 
-		context.checking(new Expectations() {
-			{
-				oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName(
-						"position-1");
+    @Test
+    public void hasPreviousContentTypeReturnsFalseIfOnlyPreviousTypeIsWhitespace() {
+        final TypedPosition[] positions = positions(position(0, 10, IDocument.DEFAULT_CONTENT_TYPE),
+                position(11, 10, "position-1"));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 1);
 
-			}
-		});
+        assertFalse(formattingContext.hasPreviousContent());
+    }
 
-		assertTrue(formattingContext.hasPreviousContentType());
-	}
 
-	@Test(expected = InvalidFormatPositionException.class)
-	public void previousContentTypeThrowsExceptionForFirstContentType()
-			throws BadLocationException {
+    @Test
+    public void hasPreviousContentTypeReturnsTrueForSecondType() {
+        final TypedPosition[] positions = positions(position(0, 10, "position-1"), position(11, 10, "position-2"));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 1);
 
-		final TypedPosition[] positions = positions(position(0, 10,
-				"position-1"));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 0);
+        context.checking(new Expectations() {
+            {
+                oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-1");
 
-		formattingContext.previousContentType();
-	}
+            }
+        });
 
-	@Test
-	public void previousContentTypeReturnsCorrectContentType() throws Exception {
-		final ContentTypeDefinition previousContentType = context
-				.mock(ContentTypeDefinition.class);
+        assertTrue(formattingContext.hasPreviousContent());
+    }
 
-		final TypedPosition[] positions = positions(
-				position(0, 10, "position-1"), position(11, 10, "position-2"));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 1);
 
-		context.checking(new Expectations() {
-			{
-				oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName(
-						"position-1");
-				will(returnValue(previousContentType));
-			}
-		});
+    @Test(expected = InvalidFormatPositionException.class)
+    public void previousContentTypeThrowsExceptionForFirstContentType() {
 
-		assertThat(formattingContext.previousContentType(),
-				is(previousContentType));
-	}
+        final TypedPosition[] positions = positions(position(0, 10, "position-1"));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-	@Test
-	public void previousContentTypeReturnsCorrectNonWhitespace()
-			throws Exception {
-		final ContentTypeDefinition previousContentType = context.mock(
-				ContentTypeDefinition.class, "previousContentType");
+        formattingContext.previousContentContext().currentContentType();
+    }
 
-		final TypedPosition[] positions = positions(
-				position(0, 10, "position-1"),
-				position(11, 10, IDocument.DEFAULT_CONTENT_TYPE),
-				position(21, 10, "position-3"));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 2);
 
-		context.checking(new Expectations() {
-			{
-				oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName(
-						"position-1");
-				will(returnValue(previousContentType));
-			}
-		});
+    @Test
+    public void previousContentTypeReturnsCorrectContentType() throws Exception {
+        final ContentTypeDefinition previousContentType = context.mock(ContentTypeDefinition.class);
 
-		assertThat(formattingContext.previousContentType(),
-				is(previousContentType));
-	}
+        final TypedPosition[] positions = positions(position(0, 10, "position-1"), position(11, 10, "position-2"));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 1);
 
-	@Test
-	public void hasNextContentTypeReturnsFalseForLastLine() throws Exception {
-		final TypedPosition[] positions = positions(position(0, 10,
-				"position-1"));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 0);
+        context.checking(new Expectations() {
+            {
+                exactly(2).of(contentTypeDefinitionFactory).contentTypeDefintionByName("position-1");
+                will(returnValue(previousContentType));
+            }
+        });
 
-		assertFalse(formattingContext.hasNextContentType());
-	}
+        assertThat(formattingContext.previousContentContext().currentContentType(), is(previousContentType));
+    }
 
-	@Test
-	public void hasNextContentTypeReturnsFalseIfOnlyNextTypeIsWhitespace()
-			throws Exception {
-		final TypedPosition[] positions = positions(
-				position(0, 10, "position-1"),
-				position(11, 10, IDocument.DEFAULT_CONTENT_TYPE));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 0);
 
-		assertFalse(formattingContext.hasNextContentType());
-	}
+    @Test
+    public void previousContentTypeReturnsCorrectNonWhitespace() throws Exception {
+        final ContentTypeDefinition previousContentType = context.mock(ContentTypeDefinition.class,
+                "previousContentType");
 
-	@Test
-	public void hasNextContentTypeReturnsTrueForSecondLastType()
-			throws Exception {
-		final TypedPosition[] positions = positions(
-				position(0, 10, "position-1"), position(11, 10, "position-2"));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 0);
+        final TypedPosition[] positions = positions(position(0, 10, "position-1"),
+                position(11, 10, IDocument.DEFAULT_CONTENT_TYPE), position(21, 10, "position-3"));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 2);
 
-		context.checking(new Expectations() {
-			{
-				oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName(
-						"position-2");
+        context.checking(new Expectations() {
+            {
+                exactly(2).of(contentTypeDefinitionFactory).contentTypeDefintionByName("position-1");
+                will(returnValue(previousContentType));
+            }
+        });
 
-			}
-		});
+        assertThat(formattingContext.previousContentContext().currentContentType(), is(previousContentType));
+    }
 
-		assertTrue(formattingContext.hasNextContentType());
-	}
 
-	@Test(expected = InvalidFormatPositionException.class)
-	public void nextContentTypeThrowsExceptionForLastContentType()
-			throws BadLocationException {
-		final TypedPosition[] positions = positions(position(0, 10,
-				"position-1"));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 0);
+    @Test
+    public void hasNextContentTypeReturnsFalseForLastLine() {
+        final TypedPosition[] positions = positions(position(0, 10, "position-1"));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-		formattingContext.nextContentType();
-	}
+        assertFalse(formattingContext.hasNextContent());
+    }
 
-	@Test
-	public void nextContentTypeReturnsCorrectContentType() throws Exception {
-		final ContentTypeDefinition nextContentType = context
-				.mock(ContentTypeDefinition.class);
 
-		final TypedPosition[] positions = positions(
-				position(0, 10, "position-1"), position(11, 10, "position-2"));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 0);
+    @Test
+    public void hasNextContentTypeReturnsFalseIfOnlyNextTypeIsWhitespace() {
+        final TypedPosition[] positions = positions(position(0, 10, "position-1"),
+                position(11, 10, IDocument.DEFAULT_CONTENT_TYPE));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-		context.checking(new Expectations() {
-			{
-				oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName(
-						"position-2");
-				will(returnValue(nextContentType));
-			}
-		});
+        assertFalse(formattingContext.hasNextContent());
+    }
 
-		assertThat(formattingContext.nextContentType(), is(nextContentType));
-	}
 
-	@Test
-	public void nextContentTypeReturnsCorrectNonWhitespace() throws Exception {
-		final ContentTypeDefinition nextContentType = context.mock(
-				ContentTypeDefinition.class, "nextContentType");
+    @Test
+    public void hasNextContentTypeReturnsTrueForSecondLastType() {
+        final TypedPosition[] positions = positions(position(0, 10, "position-1"), position(11, 10, "position-2"));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-		final TypedPosition[] positions = positions(
-				position(0, 10, "position-1"),
-				position(11, 10, IDocument.DEFAULT_CONTENT_TYPE),
-				position(21, 10, "position-2"));
-		final FormattingContext formattingContext = formattingContextForPosition(
-				positions, 0);
+        context.checking(new Expectations() {
+            {
+                oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-2");
 
-		context.checking(new Expectations() {
-			{
-				oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName(
-						"position-2");
-				will(returnValue(nextContentType));
-			}
-		});
+            }
+        });
 
-		assertThat(formattingContext.nextContentType(), is(nextContentType));
-	}
+        assertTrue(formattingContext.hasNextContent());
+    }
 
-	private FormattingContext formattingContextForPosition(
-			final TypedPosition[] positions, final int currentPosition) {
-		return new PartitionedFormattingContext(positions, currentPosition,
-				contentTypeDefinitionFactory);
-	}
 
-	private TypedPosition[] positions(final TypedPosition... positions) {
-		return positions;
-	}
+    @Test(expected = InvalidFormatPositionException.class)
+    public void nextContentTypeThrowsExceptionForLastContentType() {
+        final TypedPosition[] positions = positions(position(0, 10, "position-1"));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-	private TypedPosition position(final int offset, final int length,
-			final String type) {
-		return new TypedPosition(offset, length, type);
-	}
+        formattingContext.nextContentContext();
+    }
+
+
+    @Test
+    public void nextContentTypeReturnsCorrectContentType() throws Exception {
+        final ContentTypeDefinition nextContentType = context.mock(ContentTypeDefinition.class);
+
+        final TypedPosition[] positions = positions(position(0, 10, "position-1"), position(11, 10, "position-2"));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
+
+        context.checking(new Expectations() {
+            {
+                exactly(2).of(contentTypeDefinitionFactory).contentTypeDefintionByName("position-2");
+                will(returnValue(nextContentType));
+            }
+        });
+
+        assertThat(formattingContext.nextContentContext().currentContentType(), is(nextContentType));
+    }
+
+
+    @Test
+    public void nextContentTypeReturnsCorrectNonWhitespace() throws Exception {
+        final ContentTypeDefinition nextContentType = context.mock(ContentTypeDefinition.class, "nextContentType");
+
+        final TypedPosition[] positions = positions(position(0, 10, "position-1"),
+                position(11, 10, IDocument.DEFAULT_CONTENT_TYPE), position(21, 10, "position-2"));
+        final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
+
+        context.checking(new Expectations() {
+            {
+                exactly(2).of(contentTypeDefinitionFactory).contentTypeDefintionByName("position-2");
+                will(returnValue(nextContentType));
+            }
+        });
+
+        assertThat(formattingContext.nextContentContext().currentContentType(), is(nextContentType));
+    }
+
+
+    private FormattingContext formattingContextForPosition(final TypedPosition[] positions, final int currentPosition) {
+        return new PartitionedFormattingContext(positions, currentPosition, contentTypeDefinitionFactory);
+    }
+
+
+    private TypedPosition[] positions(final TypedPosition... positions) {
+        return positions;
+    }
+
+
+    private TypedPosition position(final int offset, final int length, final String type) {
+        return new TypedPosition(offset, length, type);
+    }
 }

@@ -15,10 +15,8 @@ public abstract class JUnit4TestReference implements ITestReference {
     protected Runner runner;
 
 
-    public JUnit4TestReference(Request request, final String[] failureNames) {
-        if (failureNames != null) {
-            request = request.sortWith(new FailuresFirstSorter(failureNames));
-        }
+    public JUnit4TestReference(final Request req, final String[] failureNames) {
+        final Request request = failureNames != null ? req.sortWith(new FailuresFirstSorter(failureNames)) : req;
         runner = request.getRunner();
     }
 

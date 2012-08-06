@@ -1,6 +1,6 @@
 package com.technophobia.substeps.junit.ui.testsession;
 
-import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -37,7 +37,7 @@ public class JunitTestResultsView implements TestResultsView {
                     page.bringToTop(testRunner);
                 }
             } catch (final PartInitException pie) {
-                FeatureRunnerPlugin.log(Status.ERROR, pie.getMessage());
+                FeatureRunnerPlugin.log(IStatus.ERROR, pie.getMessage());
             }
         }
     }

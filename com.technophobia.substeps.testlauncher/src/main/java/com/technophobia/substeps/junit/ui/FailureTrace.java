@@ -127,7 +127,9 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
             final int line = Integer.valueOf(lineNumber).intValue();
             return new OpenEditorAtLineAction(line);
         } catch (final NumberFormatException e) {
+            // No-op
         } catch (final IndexOutOfBoundsException e) {
+            // No-op
         }
         return null;
     }
@@ -186,15 +188,14 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
     }
 
 
-    private void updateTable(String trace) {
+    private void updateTable(final String trace) {
         if (trace == null || trace.trim().equals("")) { //$NON-NLS-1$
             clear();
             return;
         }
-        trace = trace.trim();
         table.setRedraw(false);
         table.removeAll();
-        new TextualTrace(trace, getFilterPatterns()).display(failureTableDisplay, MAX_LABEL_LENGTH);
+        new TextualTrace(trace.trim(), getFilterPatterns()).display(failureTableDisplay, MAX_LABEL_LENGTH);
         table.setRedraw(true);
     }
 

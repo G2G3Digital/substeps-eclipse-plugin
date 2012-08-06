@@ -30,7 +30,7 @@ public class SubstepsFeatureUiUpdater extends NonDisposedUiUpdater {
 
     @Override
     public void reset() {
-
+        // No-op
     }
 
 

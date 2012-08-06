@@ -3,7 +3,15 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Unit Tests
 Bundle-SymbolicName: com.technophobia.substeps.editor.tests.unit
 Bundle-Version: 0.0.1.qualifier
-Fragment-Host: com.technophobia.substeps.editor;bundle-version="0.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit;bundle-version="4.8.2",
- com.technophobia.substeps.testingtools;bundle-version="0.0.1"
+Bundle-ActivationPolicy: lazy
+Fragment-Host: com.technophobia.substeps.editor
+Require-Bundle: org.eclipse.swt;bundle-version="3.100.0",
+ com.technophobia.substeps.core.bundle;bundle-version="0.0.1",
+ com.technophobia.substeps.testingtools;bundle-version="0.0.1",
+ org.eclipse.core.runtime;bundle-version="3.8.0",
+ org.eclipse.jdt.core;bundle-version="3.8.1",
+ org.eclipse.core.resources;bundle-version="3.8.0",
+ org.eclipse.jface.text;bundle-version="3.8.0",
+ org.junit;bundle-version="4.10.0",
+ org.eclipse.jface;bundle-version="3.8.0"

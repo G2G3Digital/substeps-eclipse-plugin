@@ -38,30 +38,36 @@ public class DefaultVisibilityPartMonitor implements PartMonitor {
 
     @Override
     public void partActivated(final IWorkbenchPartReference partRef) {
+        // No-op
     }
 
 
     @Override
     public void partBroughtToTop(final IWorkbenchPartReference partRef) {
+        // No-op
     }
 
 
     @Override
     public void partClosed(final IWorkbenchPartReference partRef) {
+        // No-op
     }
 
 
     @Override
     public void partDeactivated(final IWorkbenchPartReference partRef) {
+        // No-op
     }
 
 
     @Override
     public void partOpened(final IWorkbenchPartReference partRef) {
+        // No-op
     }
 
 
     @Override
     public void partInputChanged(final IWorkbenchPartReference partRef) {
+        // No-op
     }
 }

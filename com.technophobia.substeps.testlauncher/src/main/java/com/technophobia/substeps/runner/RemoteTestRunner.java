@@ -149,9 +149,9 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
                             final String s = arg.substring(0, c0);
                             final int testId = Integer.parseInt(s);
                             final String className = arg.substring(c0 + 1, c1);
-                            final String testName = arg.substring(c1 + 1, arg.length());
+                            final String name = arg.substring(c1 + 1, arg.length());
                             synchronized (RemoteTestRunner.this) {
-                                rerunRequests.add(new RerunRequest(testId, className, testName));
+                                rerunRequests.add(new RerunRequest(testId, className, name));
                                 RemoteTestRunner.this.notifyAll();
                             }
                         }
@@ -244,12 +244,12 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
                 }
                 testClassNames = list.toArray(new String[list.size()]);
             } else if (args[i].toLowerCase().equals("-test")) { //$NON-NLS-1$
-                String testName = args[i + 1];
+                String name = args[i + 1];
                 final int p = testName.indexOf(':');
                 if (p == -1)
                     throw new IllegalArgumentException("Testname not separated by \'%\'"); //$NON-NLS-1$
-                testName = testName.substring(p + 1);
-                testClassNames = new String[] { testName.substring(0, p) };
+                name = name.substring(p + 1);
+                testClassNames = new String[] { name.substring(0, p) };
                 i++;
             } else if (args[i].toLowerCase().equals("-testnamefile")) { //$NON-NLS-1$
                 final String testNameFile = args[i + 1];
@@ -423,6 +423,7 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
                     rerunTest(r);
                 }
             } catch (final InterruptedException e) {
+                // No-op
             }
         }
     }
@@ -436,10 +437,10 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
     }
 
 
-    protected Class<?>[] loadClasses(final String[] testClassNames) {
+    protected Class<?>[] loadClasses(final String[] classNames) {
         final Vector<Class<?>> classes = new Vector<Class<?>>();
-        for (int i = 0; i < testClassNames.length; i++) {
-            final String name = testClassNames[i];
+        for (int i = 0; i < classNames.length; i++) {
+            final String name = classNames[i];
             final Class<?> clazz = loadClass(name, this);
             if (clazz != null) {
                 classes.add(clazz);
@@ -449,8 +450,8 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
     }
 
 
-    protected void notifyListenersOfTestEnd(final TestExecution execution, final long testStartTime) {
-        if (execution == null || execution.shouldStop())
+    protected void notifyListenersOfTestEnd(final TestExecution testExecution, final long testStartTime) {
+        if (testExecution == null || testExecution.shouldStop())
             notifyTestRunStopped(System.currentTimeMillis() - testStartTime);
         else
             notifyTestRunEnded(System.currentTimeMillis() - testStartTime);
@@ -467,8 +468,8 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
      * @param execution
      *            executor
      */
-    public void runTests(final String[] testClassNames, final String testName, final TestExecution execution) {
-        final ITestReference[] suites = loader.loadTests(loadClasses(testClassNames), testName, failureNames, this);
+    public void runTests(final String[] classNames, final String name, final TestExecution testExecution) {
+        final ITestReference[] suites = loader.loadTests(loadClasses(classNames), name, failureNames, this);
 
         // count all testMethods and inform ITestRunListeners
         final int count = countTests(suites);
@@ -483,8 +484,8 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
         sendTrees(suites);
 
         final long testStartTime = System.currentTimeMillis();
-        execution.run(suites);
-        notifyListenersOfTestEnd(execution, testStartTime);
+        testExecution.run(suites);
+        notifyListenersOfTestEnd(testExecution, testStartTime);
     }
 
 
@@ -523,9 +524,9 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
         final ITestReference rerunTest1 = loader.loadTests(classes, r.rerunTestName, null, this)[0];
         final RerunExecutionListener service = rerunExecutionListener();
 
-        final TestExecution execution = new TestExecution(service, getClassifier());
+        final TestExecution testExecution = new TestExecution(service, getClassifier());
         final ITestReference[] suites = new ITestReference[] { rerunTest1 };
-        execution.run(suites);
+        testExecution.run(suites);
 
         notifyRerunComplete(r, service.getStatus());
     }
@@ -622,6 +623,7 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
             try {
                 Thread.sleep(2000);
             } catch (final InterruptedException e) {
+                // No-op
             }
         }
 
@@ -734,8 +736,8 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
      * org.eclipse.jdt.internal.junit.runner.TestRunner#runTests(org.eclipse
      * .jdt.internal.junit.runner.RemoteTestRunner.TestExecution)
      */
-    public void runTests(final TestExecution execution) {
-        runTests(testClassNames, testName, execution);
+    public void runTests(final TestExecution testExecution) {
+        runTests(testClassNames, testName, testExecution);
     }
 
 

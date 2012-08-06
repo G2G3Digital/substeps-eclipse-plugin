@@ -206,11 +206,13 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
 
             @Override
             public void launchesChanged(final ILaunch[] launches) {
+                // No-op
             }
 
 
             @Override
             public void launchesAdded(final ILaunch[] launches) {
+                // No-op
             }
         });
 
@@ -252,9 +254,8 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
     public Result getTestResult(final boolean includeChildren) {
         if (testRoot != null) {
             return testRoot.getTestResult(true);
-        } else {
-            return testResult;
         }
+        return testResult;
     }
 
 
@@ -494,9 +495,8 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
                 return false;
             }
 
-        } else {
-            return false;
         }
+        return false;
     }
 
 
@@ -691,9 +691,9 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
 
 
         private SubstepsTestElement createUnrootedTestElement(final String testId, final String testName) {
-            final SubstepsTestParentElement unrootedSuite = getUnrootedSuite();
-            final SubstepsTestElement testElement = testElementFactory.createTestElement(unrootedSuite, testId,
-                    testName, false, 1);
+            final SubstepsTestParentElement unrooted = getUnrootedSuite();
+            final SubstepsTestElement testElement = testElementFactory.createTestElement(unrooted, testId, testName,
+                    false, 1);
 
             final Object[] listeners = sessionListeners.getListeners();
             for (int i = 0; i < listeners.length; ++i) {
@@ -822,8 +822,8 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
 
 
         private void logUnexpectedTest(final String testId, final SubstepsTestElement testElement) {
-            FeatureRunnerPlugin.log(org.eclipse.core.runtime.Status.WARNING, "Unexpected TestElement type for testId '"
-                    + testId + "': " + testElement);
+            FeatureRunnerPlugin.log(org.eclipse.core.runtime.IStatus.WARNING,
+                    "Unexpected TestElement type for testId '" + testId + "': " + testElement);
         }
 
 
@@ -906,8 +906,8 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
 
 
     private void addFailures(final ArrayList<SubstepsTestElement> failures, final SubstepsTestElement testElement) {
-        final Result testResult = testElement.getTestResult(true);
-        if (testResult == Result.ERROR || testResult == Result.FAILURE) {
+        final Result result = testElement.getTestResult(true);
+        if (result == Result.ERROR || result == Result.FAILURE) {
             failures.add(testElement);
         }
         if (testElement instanceof SubstepsTestParentElement) {
@@ -924,7 +924,7 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
         return new Transformer<IncompleteParentItem, Boolean>() {
             @Override
             public Boolean to(final IncompleteParentItem from) {
-                return !from.hasOutstandingChildren();
+                return Boolean.valueOf(!from.hasOutstandingChildren());
             }
         };
     }

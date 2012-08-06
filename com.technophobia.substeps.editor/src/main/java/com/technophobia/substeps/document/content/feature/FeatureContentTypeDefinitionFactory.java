@@ -18,26 +18,39 @@
  */
 package com.technophobia.substeps.document.content.feature;
 
-import com.technophobia.substeps.document.content.ContentTypeDefinition;
+import com.technophobia.substeps.document.content.AbstractContentDefinitionFactory;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
-import com.technophobia.substeps.document.content.NullContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.AndContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.BackgroundContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.CommentContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.FeatureContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.GivenContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleRowContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ScenarioOutlineContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.TagContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.ThenContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.WhenContentTypeDefinition;
 
-public class FeatureContentTypeDefinitionFactory implements ContentTypeDefinitionFactory {
+/**
+ * Implementation of {@link ContentTypeDefinitionFactory} returning
+ * {@link FeatureContentTypeDefinition} items
+ */
+public class FeatureContentTypeDefinitionFactory extends AbstractContentDefinitionFactory {
 
-	private static final ContentTypeDefinition DEFAULT_CONTENT_TYPEDEFINITION = new NullContentTypeDefinition();
-
-	@Override
-	public ContentTypeDefinition contentTypeDefintionByName(final String contentTypeName) {
-		for (final ContentTypeDefinition contentTypeDefinition : FeatureContentTypeDefinition.values()) {
-			if (contentTypeName.equals(contentTypeDefinition.id())) {
-				return contentTypeDefinition;
-			}
-		}
-		return DEFAULT_CONTENT_TYPEDEFINITION;
-	}
-
-	@Override
-	public ContentTypeDefinition[] contentTypeDefinitions() {
-		return FeatureContentTypeDefinition.values();
-	}
+    public FeatureContentTypeDefinitionFactory() {
+        super(new FeatureContentTypeDefinition(), //
+                new BackgroundContentTypeDefinition(), //
+                new CommentContentTypeDefinition(), //
+                new TagContentTypeDefinition(), //
+                new ScenarioContentTypeDefinition(), //
+                new ScenarioOutlineContentTypeDefinition(), //
+                new ScenarioExampleContentTypeDefinition(), //
+                new ScenarioExampleRowContentTypeDefinition(), //
+                new GivenContentTypeDefinition(), //
+                new WhenContentTypeDefinition(), //
+                new ThenContentTypeDefinition(), //
+                new AndContentTypeDefinition());
+    }
 }

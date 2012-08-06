@@ -3,13 +3,13 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Testingtools
 Bundle-SymbolicName: com.technophobia.substeps.testingtools
 Bundle-Version: 0.0.1.qualifier
-Bundle-ClassPath: jmock-2.5.1.jar,
- jmock-junit4-2.5.1.jar,
+Bundle-ClassPath: guava-12.0.jar,
  hamcrest-all-1.2.jar,
+ jmock-2.5.1.jar,
+ jmock-junit4-2.5.1.jar,
+ log4j-1.2.16.jar,
  slf4j-api-1.6.4.jar,
  slf4j-log4j12-1.6.4.jar,
- log4j-1.2.16.jar,
- guava-12.0.jar,
  velocity-1.5.jar
 Export-Package: com.google.common.base,
  com.google.common.collect,
@@ -54,4 +54,4 @@ Export-Package: com.google.common.base,
  org.jmock.syntax,
  org.slf4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit;bundle-version="4.8.2"
+Require-Bundle: org.junit;bundle-version="4.10.0"

@@ -30,7 +30,7 @@ public class ActivateOnErrorAction extends Action {
     @Override
     public void run() {
         final boolean checked = isChecked();
-        showOnErrorOnlyNotifier.notify(checked);
+        showOnErrorOnlyNotifier.notify(Boolean.valueOf(checked));
         InstanceScope.INSTANCE.getNode(FeatureRunnerPlugin.PLUGIN_ID).putBoolean(
                 PreferencesConstants.SHOW_ON_ERROR_ONLY, checked);
     }

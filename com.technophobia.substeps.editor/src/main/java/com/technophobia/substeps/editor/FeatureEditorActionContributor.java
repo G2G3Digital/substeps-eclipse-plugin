@@ -28,39 +28,45 @@ import org.eclipse.ui.texteditor.RetargetTextEditorAction;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 
+/**
+ * All actions required for the feature editor
+ * 
+ * @author sforbes
+ * 
+ */
 public class FeatureEditorActionContributor extends TextEditorActionContributor {
 
-	private final RetargetTextEditorAction contentFormatProposal;
+    private final RetargetTextEditorAction contentFormatProposal;
 
-	public FeatureEditorActionContributor() {
-		this.contentFormatProposal = new RetargetTextEditorAction(
-				FeatureEditorPlugin.instance().getResourceBundle(),
-				"ContentFormatProposal.");
-	}
 
-	@Override
-	public void contributeToMenu(final IMenuManager menuManager) {
-		super.contributeToMenu(menuManager);
+    public FeatureEditorActionContributor() {
+        this.contentFormatProposal = new RetargetTextEditorAction(FeatureEditorPlugin.instance().getResourceBundle(),
+                "ContentFormatProposal.");
+    }
 
-		final IMenuManager editMenu = menuManager
-				.findMenuUsingPath(IWorkbenchActionConstants.M_EDIT);
-		if (editMenu != null) {
-			editMenu.add(new Separator());
-			editMenu.add(contentFormatProposal);
-		}
-	}
 
-	@Override
-	public void setActiveEditor(final IEditorPart part) {
-		super.setActiveEditor(part);
+    @Override
+    public void contributeToMenu(final IMenuManager menuManager) {
+        super.contributeToMenu(menuManager);
 
-		ITextEditor editor = null;
-		if (part instanceof FeatureEditor) {
-			editor = (ITextEditor) part;
-		}
+        final IMenuManager editMenu = menuManager.findMenuUsingPath(IWorkbenchActionConstants.M_EDIT);
+        if (editMenu != null) {
+            editMenu.add(new Separator());
+            editMenu.add(contentFormatProposal);
+        }
+    }
 
-		contentFormatProposal.setAction(getAction(editor,
-				"ContentFormatProposal"));
-	}
+
+    @Override
+    public void setActiveEditor(final IEditorPart part) {
+        super.setActiveEditor(part);
+
+        ITextEditor editor = null;
+        if (part instanceof FeatureEditor) {
+            editor = (ITextEditor) part;
+        }
+
+        contentFormatProposal.setAction(getAction(editor, "ContentFormatProposal"));
+    }
 
 }

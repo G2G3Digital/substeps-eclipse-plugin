@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- Copyright Technophobia.Ltd 2012 -->
 <plugin>
-	<extension
+	<!--extension
         point="org.eclipse.ui.actionSets">
      <actionSet
            id="com.technophobia.substeps.actionSet1"
@@ -30,7 +30,7 @@
               retarget="true">
         </action>
      </actionSet>
-  </extension>
+  </extension-->
   <extension
         id="substeps_product"
         point="org.eclipse.core.runtime.products">
@@ -81,6 +81,15 @@
            icon="src/main/resources/feature_file.gif"
            id="com.technophobia.substeps.editor.featureEditor"
            name="FeatureFileEditor">
+     </editor>
+     <editor
+           class="com.technophobia.substeps.editor.SubstepsEditor"
+           contributorClass="com.technophobia.substeps.editor.FeatureEditorActionContributor"
+           default="true"
+           filenames="*.substeps"
+           icon="src/main/resources/feature_file.gif"
+           id="com.technophobia.substeps.editor.substepsEditor"
+           name="SubstepsFileEditor">
      </editor>
   </extension>
   <extension

@@ -21,59 +21,99 @@ package com.technophobia.substeps;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
+import com.technophobia.substeps.step.MappedStepImplementationsManager;
+import com.technophobia.substeps.step.ProjectStepImplementationLoader;
+import com.technophobia.substeps.step.StepImplementationManager;
+
+/**
+ * BundleActivator/general bundle aware class for managing things such as
+ * logging, requesting the bundle context etc
+ * 
+ * @author sforbes
+ * 
+ */
 public class FeatureEditorPlugin implements BundleActivator {
 
-	private static final String PLUGIN_ID = "com.technophobia.substeps.editor";
+    private static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
-	private static FeatureEditorPlugin pluginInstance;
+    private static FeatureEditorPlugin pluginInstance;
 
-	private BundleContext context;
-	private ResourceBundle resourceBundle;
-	private ILog log;
+    private BundleContext context;
+    private ResourceBundle resourceBundle;
+    private ILog log;
 
-	public FeatureEditorPlugin() {
-		super();
-		FeatureEditorPlugin.pluginInstance = this;
-	}
+    private final MappedStepImplementationsManager<IProject> stepImplementationManager;
 
-	@Override
-	public void start(final BundleContext bundleContext) throws Exception {
-		context = bundleContext;
-		log = Platform.getLog(bundleContext.getBundle());
-		try {
-			resourceBundle = ResourceBundle
-					.getBundle("com.technophobia.substeps.FeatureEditorResources");
-		} catch (final MissingResourceException x) {
-			resourceBundle = null;
-		}
-	}
 
-	@Override
-	public void stop(final BundleContext bundleContext) throws Exception {
-		resourceBundle = null;
-		log = null;
-		resourceBundle = null;
-	}
+    public FeatureEditorPlugin() {
+        super();
+        FeatureEditorPlugin.pluginInstance = this;
+        this.stepImplementationManager = new MappedStepImplementationsManager<IProject>(
+                new ResourceToProjectTransformer(), new ProjectStepImplementationLoader());
+    }
 
-	public BundleContext getBundleContext() {
-		return context;
-	}
 
-	public ResourceBundle getResourceBundle() {
-		return resourceBundle;
-	}
+    @Override
+    public void start(final BundleContext bundleContext) throws Exception {
+        context = bundleContext;
+        log = Platform.getLog(bundleContext.getBundle());
+        try {
+            resourceBundle = ResourceBundle.getBundle("com.technophobia.substeps.FeatureEditorResources");
+        } catch (final MissingResourceException x) {
+            resourceBundle = null;
+        }
 
-	public static void log(final int status, final String message) {
-		instance().log.log(new Status(status, PLUGIN_ID, message));
-	}
+        addStepImplementationsFromDependencies();
+    }
 
-	public static FeatureEditorPlugin instance() {
-		return pluginInstance;
-	}
+
+    @Override
+    public void stop(final BundleContext bundleContext) throws Exception {
+        resourceBundle = null;
+        log = null;
+    }
+
+
+    public BundleContext getBundleContext() {
+        return context;
+    }
+
+
+    public ResourceBundle getResourceBundle() {
+        return resourceBundle;
+    }
+
+
+    public StepImplementationManager getStepImplementationManager() {
+        return stepImplementationManager;
+    }
+
+
+    public static void log(final int status, final String message) {
+        instance().log.log(new Status(status, PLUGIN_ID, message));
+    }
+
+
+    public static FeatureEditorPlugin instance() {
+        return pluginInstance;
+    }
+
+
+    private void addStepImplementationsFromDependencies() {
+        final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        final IProject[] projects = workspace.getRoot().getProjects();
+        for (final IProject project : projects) {
+            stepImplementationManager.load(project);
+        }
+    }
 }

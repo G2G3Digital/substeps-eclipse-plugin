@@ -18,56 +18,78 @@
  */
 package com.technophobia.substeps.document.formatting.strategy;
 
-public class MultiLineFixedIndentFormattingStrategy extends
-		DefaultFormattingStrategy {
+import org.eclipse.jface.text.formatter.IFormattingStrategy;
 
-	private final String initialLineIndent;
-	private final String subsequentLineIndent;
+/**
+ * Implementation of {@link IFormattingStrategy} that formats multiple lines,
+ * each with a specific indent
+ * 
+ * @author sforbes
+ * 
+ */
+public class MultiLineFixedIndentFormattingStrategy extends DefaultFormattingStrategy {
 
-	public MultiLineFixedIndentFormattingStrategy(
-			final String initialLineIndent, final String subsequentLineIndent) {
-		this.initialLineIndent = initialLineIndent;
-		this.subsequentLineIndent = subsequentLineIndent;
-	}
+    /**
+     * Amount the 1st line should be indented
+     */
+    private final String initialLineIndent;
 
-	@Override
-	public String format(final String content, final boolean isLineStart,
-			final String indentation, final int[] positions) {
+    /**
+     * Amount subsequent lines should be indented
+     */
+    private final String subsequentLineIndent;
 
-		final String[] lines = content.split("\n");
 
-		if (lines.length > 0) {
-			final StringBuffer sb = new StringBuffer();
+    public MultiLineFixedIndentFormattingStrategy(final String initialLineIndent, final String subsequentLineIndent) {
+        this.initialLineIndent = initialLineIndent;
+        this.subsequentLineIndent = subsequentLineIndent;
+    }
 
-			sb.append(initialLineIndent + lines[0].trim());
-			if (lines.length > 1) {
-				sb.append("\n");
-			}
 
-			for (int i = 1; i < lines.length; i++) {
-				final String trimmed = lines[i].trim();
-				if (trimmed.length() == 0) {
-					sb.append("");
-				} else {
-					sb.append(subsequentLineIndent + trimmed);
-					// don't add new line to last line as its taken care of by
-					// tailingNewLines()
-					if (i < lines.length - 1) {
-						sb.append("\n");
-					}
-				}
-			}
+    @Override
+    public String format(final String content, final boolean isLineStart, final String indentation,
+            final int[] positions) {
 
-			tailingNewLines(content, sb);
-			return sb.toString();
-		}
-		return "";
-	}
+        final String[] lines = content.split(NEWLINE);
 
-	private void tailingNewLines(final String content, final StringBuffer sb) {
-		for (int i = content.length() - 1; i >= 0 && content.charAt(i) == '\n'; i--) {
-			sb.append("\n");
-		}
-	}
+        if (lines.length > 0) {
+            final StringBuffer sb = new StringBuffer();
+
+            sb.append(initialLineIndent + lines[0].trim());
+            if (lines.length > 1) {
+                sb.append(NEWLINE);
+            }
+
+            for (int i = 1; i < lines.length; i++) {
+                final String trimmed = lines[i].trim();
+                if (trimmed.length() == 0) {
+                    sb.append("");
+                } else {
+                    sb.append(subsequentLineIndent + trimmed);
+                    // don't add new line to last line as its taken care of by
+                    // tailingNewLines()
+                    if (i < lines.length - 1) {
+                        sb.append(NEWLINE);
+                    }
+                }
+            }
+
+            tailingNewLines(content, sb);
+            return sb.toString();
+        }
+        return "";
+    }
+
+
+    private void tailingNewLines(final String content, final StringBuffer sb) {
+        for (int i = content.length() - 1; i >= 0 && isNewline(content, i); i -= NEWLINE.length()) {
+            sb.append(NEWLINE);
+        }
+    }
+
+
+    private boolean isNewline(final String content, final int endPos) {
+        return content.substring(endPos - (NEWLINE.length() - 1), endPos + 1).equals(NEWLINE);
+    }
 
 }
