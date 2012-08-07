@@ -14,17 +14,15 @@ import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchSite;
-import org.eclipse.ui.internal.texteditor.spelling.NoCompletionsProposal;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.document.content.assist.CompletionProposalProvider;
-import com.technophobia.substeps.glossary.StepDescriptor;
-import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
 import com.technophobia.substeps.model.ParentStep;
 import com.technophobia.substeps.model.StepImplementation;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.render.StepImplementationRenderer;
-import com.technophobia.substeps.step.StepImplementationManager;
+import com.technophobia.substeps.step.ContextualSuggestionManager;
+import com.technophobia.substeps.step.SuggestionType;
 import com.technophobia.substeps.supplier.Transformer;
 
 /**
@@ -41,30 +39,36 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
     private final IWorkbenchPartSite site;
     private final StepImplementationRenderer stepRenderer;
     private final Transformer<IWorkbenchSite, Syntax> siteToSyntaxTransformer;
-    private final StepImplementationManager stepImplementationManager;
+    private final ContextualSuggestionManager suggestionManager;
 
 
     public StepImplementationProposalProvider(final IWorkbenchPartSite site,
             final StepImplementationRenderer stepRenderer,
             final Transformer<IWorkbenchSite, Syntax> siteToSyntaxTransformer,
-            final StepImplementationManager stepImplementationManager) {
+            final ContextualSuggestionManager suggestionManager) {
         this.site = site;
         this.stepRenderer = stepRenderer;
         this.siteToSyntaxTransformer = siteToSyntaxTransformer;
-        this.stepImplementationManager = stepImplementationManager;
+        this.suggestionManager = suggestionManager;
     }
 
 
     @Override
     public ICompletionProposal[] get(final IDocument document, final int offset) {
         final Syntax syntax = siteToSyntaxTransformer.to(site);
-        final List<String> suggestions = new ArrayList<String>();
-        suggestions.addAll(getSuggestionsForStepImplementations(syntax.getStepImplementations()));
-        suggestions.addAll(getSuggestionsForSubsteps(syntax.getSortedRootSubSteps()));
-        suggestions.addAll(getSuggestionsInDependencies());
+        final IResource resource = activeEditorResource();
 
-        Collections.sort(suggestions);
-        return createCompletionsForSuggestions(document, offset, suggestions);
+        final SuggestionType suggestionType = suggestionTypeForResource(resource);
+        if (suggestionType != null) {
+            final List<String> suggestions = suggestionManager.suggestionsFor(suggestionType, resource);
+            // suggestions.addAll(getSuggestionsForStepImplementations(syntax.getStepImplementations()));
+            // suggestions.addAll(getSuggestionsForSubsteps(syntax.getSortedRootSubSteps()));
+            // suggestions.addAll(getSuggestionsInDependencies());
+
+            Collections.sort(suggestions);
+            return createCompletionsForSuggestions(document, offset, suggestions);
+        }
+        return new ICompletionProposal[] { new NoCompletionsProposal() };
     }
 
 
@@ -103,25 +107,6 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
 
 
     /**
-     * Find step implementations in this projects dependencies
-     * 
-     * @return
-     */
-    private List<String> getSuggestionsInDependencies() {
-        final List<String> suggestions = new ArrayList<String>();
-        final List<StepImplementationsDescriptor> stepImplementations = stepImplementationManager
-                .stepImplementationsFor(activeEditorResource());
-        for (final StepImplementationsDescriptor stepImplementation : stepImplementations) {
-            final List<StepDescriptor> stepDescriptors = stepImplementation.getExpressions();
-            for (final StepDescriptor stepDescriptor : stepDescriptors) {
-                suggestions.add(stepDescriptor.getExpression());
-            }
-        }
-        return suggestions;
-    }
-
-
-    /**
      * Find the current resource for the active editor
      * 
      * @return
@@ -129,6 +114,26 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
     private IResource activeEditorResource() {
         return (IResource) site.getWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()
                 .getAdapter(IResource.class);
+    }
+
+
+    /**
+     * Find the {@link SuggestionType} of the resource, based on the file
+     * extension
+     * 
+     * @param resource
+     *            The resource to be inspected
+     * @return suggestion type of the resource
+     */
+    private SuggestionType suggestionTypeForResource(final IResource resource) {
+        final String fileExtension = resource.getFileExtension();
+        if ("substeps".equalsIgnoreCase(fileExtension)) {
+            return SuggestionType.SUBSTEP;
+        }
+        if ("feature".equalsIgnoreCase(fileExtension)) {
+            return SuggestionType.FEATURE;
+        }
+        return null;
     }
 
 

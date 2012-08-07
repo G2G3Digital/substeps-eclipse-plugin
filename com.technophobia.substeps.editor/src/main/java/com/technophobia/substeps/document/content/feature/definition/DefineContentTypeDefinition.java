@@ -23,7 +23,8 @@ public class DefineContentTypeDefinition extends AbstractFeatureContentTypeDefin
 
     @Override
     public IPredicateRule partitionRule() {
-        return paragraphRule(PREFIX_TEXT, id(), false, CommentContentTypeDefinition.PREFIX_TEXT, DefineContentTypeDefinition.PREFIX_TEXT);
+        return paragraphRule(PREFIX_TEXT, id(), true, CommentContentTypeDefinition.PREFIX_TEXT,
+                DefineContentTypeDefinition.PREFIX_TEXT);
     }
 
 

@@ -49,7 +49,10 @@ public class SiteToSyntaxTransformer implements Transformer<IWorkbenchSite, Synt
             outputFolders.add(appendPathTo(projectLocation, project.getOutputLocation()));
             for (final IClasspathEntry entry : project.getRawClasspath()) {
                 if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-                    outputFolders.add(appendPathTo(projectLocation, entry.getOutputLocation()));
+                    final IPath outputLocation = entry.getOutputLocation();
+                    if (outputLocation != null) {
+                        outputFolders.add(appendPathTo(projectLocation, outputLocation));
+                    }
                 }
             }
         } catch (final JavaModelException ex) {
