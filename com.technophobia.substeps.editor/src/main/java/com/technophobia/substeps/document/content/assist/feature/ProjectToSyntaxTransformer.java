@@ -6,14 +6,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.ui.IWorkbenchSite;
 
-import com.technophobia.eclipse.transformer.SiteToJavaProjectTransformer;
+import com.technophobia.eclipse.transformer.ProjectToJavaProjectTransformer;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.classloader.ClassLoadedClassAnalyser;
 import com.technophobia.substeps.classloader.JavaProjectClassLoader;
@@ -23,21 +23,21 @@ import com.technophobia.substeps.runner.runtime.StepClassLocator;
 import com.technophobia.substeps.runner.syntax.SyntaxBuilder;
 import com.technophobia.substeps.supplier.Transformer;
 
-public class SiteToSyntaxTransformer implements Transformer<IWorkbenchSite, Syntax> {
+public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax> {
 
     @Override
-    public Syntax to(final IWorkbenchSite site) {
-        final IJavaProject project = new SiteToJavaProjectTransformer().to(site);
-        final ClassLoader classLoader = new JavaProjectClassLoader(project);
-        final String[] outputFolders = outputFoldersForProject(project);
+    public Syntax to(final IProject project) {
+        final IJavaProject javaProject = new ProjectToJavaProjectTransformer().to(project);
+        final ClassLoader classLoader = new JavaProjectClassLoader(javaProject);
+        final String[] outputFolders = outputFoldersForProject(javaProject);
 
         final List<Class<?>> stepClasses = new ArrayList<Class<?>>();
         for (final String outputFolder : outputFolders) {
             final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
             stepClasses.addAll(stepClasses(outputFolder, classLocator));
         }
-        return SyntaxBuilder.buildSyntax(stepClasses, new File(projectLocationPath(project).toOSString()), true, null,
-                new ClassLoadedClassAnalyser(classLoader), false);
+        return SyntaxBuilder.buildSyntax(stepClasses, new File(projectLocationPath(javaProject).toOSString()), true,
+                null, new ClassLoadedClassAnalyser(classLoader), false);
     }
 
 
@@ -49,7 +49,10 @@ public class SiteToSyntaxTransformer implements Transformer<IWorkbenchSite, Synt
             outputFolders.add(appendPathTo(projectLocation, project.getOutputLocation()));
             for (final IClasspathEntry entry : project.getRawClasspath()) {
                 if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-                    outputFolders.add(appendPathTo(projectLocation, entry.getOutputLocation()));
+                    final IPath outputLocation = entry.getOutputLocation();
+                    if (outputLocation != null) {
+                        outputFolders.add(appendPathTo(projectLocation, outputLocation));
+                    }
                 }
             }
         } catch (final JavaModelException ex) {

@@ -78,13 +78,6 @@ public class PartitionedFormattingContextTest {
         final TypedPosition[] positions = positions(position(0, 10, "position-1"), position(11, 10, "position-2"));
         final FormattingContext formattingContext = formattingContextForPosition(positions, 1);
 
-        context.checking(new Expectations() {
-            {
-                oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-1");
-
-            }
-        });
-
         assertTrue(formattingContext.hasPreviousContent());
     }
 
@@ -108,7 +101,7 @@ public class PartitionedFormattingContextTest {
 
         context.checking(new Expectations() {
             {
-                exactly(2).of(contentTypeDefinitionFactory).contentTypeDefintionByName("position-1");
+                oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-1");
                 will(returnValue(previousContentType));
             }
         });
@@ -128,7 +121,7 @@ public class PartitionedFormattingContextTest {
 
         context.checking(new Expectations() {
             {
-                exactly(2).of(contentTypeDefinitionFactory).contentTypeDefintionByName("position-1");
+                oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-1");
                 will(returnValue(previousContentType));
             }
         });
@@ -161,13 +154,6 @@ public class PartitionedFormattingContextTest {
         final TypedPosition[] positions = positions(position(0, 10, "position-1"), position(11, 10, "position-2"));
         final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-        context.checking(new Expectations() {
-            {
-                oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-2");
-
-            }
-        });
-
         assertTrue(formattingContext.hasNextContent());
     }
 
@@ -190,7 +176,7 @@ public class PartitionedFormattingContextTest {
 
         context.checking(new Expectations() {
             {
-                exactly(2).of(contentTypeDefinitionFactory).contentTypeDefintionByName("position-2");
+                oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-2");
                 will(returnValue(nextContentType));
             }
         });
@@ -209,7 +195,7 @@ public class PartitionedFormattingContextTest {
 
         context.checking(new Expectations() {
             {
-                exactly(2).of(contentTypeDefinitionFactory).contentTypeDefintionByName("position-2");
+                oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-2");
                 will(returnValue(nextContentType));
             }
         });

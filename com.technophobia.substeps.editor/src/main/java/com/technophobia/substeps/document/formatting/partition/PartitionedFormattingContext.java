@@ -86,17 +86,12 @@ public class PartitionedFormattingContext implements FormattingContext {
     }
 
 
-    private ContentTypeDefinition contentTypeFor(final String contentType) {
-        return contentTypeDefinitionFactory.contentTypeDefintionByName(contentType);
-    }
-
-
     private PositionalContentTypeDefinitionHolder locatePreviousContentTypeOrNull() {
         int pos = currentPosition - 1;
         while (pos >= 0) {
             final String type = positions[pos].getType();
             if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
-                return new PositionalContentTypeDefinitionHolder(pos, contentTypeFor(type));
+                return new PositionalContentTypeDefinitionHolder(pos);
             }
             pos--;
         }
@@ -109,7 +104,7 @@ public class PartitionedFormattingContext implements FormattingContext {
         while (pos < positions.length) {
             final String type = positions[pos].getType();
             if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
-                return new PositionalContentTypeDefinitionHolder(pos, contentTypeFor(type));
+                return new PositionalContentTypeDefinitionHolder(pos);
             }
             pos++;
         }
@@ -118,24 +113,15 @@ public class PartitionedFormattingContext implements FormattingContext {
 
     private static final class PositionalContentTypeDefinitionHolder {
         private final int position;
-        private final ContentTypeDefinition contentTypeDefinition;
 
 
-        public PositionalContentTypeDefinitionHolder(final int position,
-                final ContentTypeDefinition contentTypeDefinition) {
-            super();
+        public PositionalContentTypeDefinitionHolder(final int position) {
             this.position = position;
-            this.contentTypeDefinition = contentTypeDefinition;
         }
 
 
         public int getPosition() {
             return position;
-        }
-
-
-        public ContentTypeDefinition getContentTypeDefinition() {
-            return contentTypeDefinition;
         }
     }
 }

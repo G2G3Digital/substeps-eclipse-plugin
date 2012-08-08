@@ -21,8 +21,6 @@ package com.technophobia.substeps;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
@@ -32,9 +30,15 @@ import org.osgi.framework.BundleContext;
 
 import com.technophobia.eclipse.log.Logger;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
-import com.technophobia.substeps.step.MappedStepImplementationsManager;
+import com.technophobia.substeps.document.content.assist.feature.ProjectToSyntaxTransformer;
+import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
+import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
-import com.technophobia.substeps.step.StepImplementationManager;
+import com.technophobia.substeps.step.ProvidedSuggestionManager;
+import com.technophobia.substeps.step.SuggestionSource;
+import com.technophobia.substeps.step.provider.ExternalStepImplementationProvider;
+import com.technophobia.substeps.step.provider.ProjectSpecificSuggestionProvider;
+import com.technophobia.substeps.step.provider.SubstepSuggestionProvider;
 
 /**
  * BundleActivator/general bundle aware class for managing things such as
@@ -53,14 +57,13 @@ public class FeatureEditorPlugin implements BundleActivator, Logger {
     private ResourceBundle resourceBundle;
     private ILog log;
 
-    private final MappedStepImplementationsManager<IProject> stepImplementationManager;
+    private final ProvidedSuggestionManager suggestionManager;
 
 
     public FeatureEditorPlugin() {
         super();
         FeatureEditorPlugin.pluginInstance = this;
-        this.stepImplementationManager = new MappedStepImplementationsManager<IProject>(
-                new ResourceToProjectTransformer(), new ProjectStepImplementationLoader());
+        this.suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
     }
 
 
@@ -74,7 +77,7 @@ public class FeatureEditorPlugin implements BundleActivator, Logger {
             resourceBundle = null;
         }
 
-        addStepImplementationsFromDependencies();
+        addSuggestionProviders();
     }
 
 
@@ -95,8 +98,8 @@ public class FeatureEditorPlugin implements BundleActivator, Logger {
     }
 
 
-    public StepImplementationManager getStepImplementationManager() {
-        return stepImplementationManager;
+    public ContextualSuggestionManager getStepImplementationManager() {
+        return suggestionManager;
     }
 
 
@@ -111,11 +114,19 @@ public class FeatureEditorPlugin implements BundleActivator, Logger {
     }
 
 
-    private void addStepImplementationsFromDependencies() {
-        final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        final IProject[] projects = workspace.getRoot().getProjects();
-        for (final IProject project : projects) {
-            stepImplementationManager.load(project);
-        }
+    private void addSuggestionProviders() {
+        final ProjectToSyntaxTransformer projectToSyntaxTransformer = new ProjectToSyntaxTransformer();
+
+        suggestionManager.addProvider(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION,
+                new ExternalStepImplementationProvider(new ProjectStepImplementationLoader()));
+
+        suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION,
+                new ProjectSpecificSuggestionProvider(projectToSyntaxTransformer,
+                        new ParameterisedStepImplementationRenderer()));
+
+        suggestionManager.addProvider(SuggestionSource.SUBSTEP_DEFINITION, new SubstepSuggestionProvider(
+                projectToSyntaxTransformer));
+
+        suggestionManager.load(ResourcesPlugin.getWorkspace());
     }
 }
