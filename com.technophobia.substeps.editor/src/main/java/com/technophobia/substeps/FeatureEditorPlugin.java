@@ -30,11 +30,14 @@ import org.osgi.framework.BundleContext;
 
 import com.technophobia.eclipse.log.Logger;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
+import com.technophobia.substeps.document.content.assist.feature.ProjectToSyntaxTransformer;
+import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
 import com.technophobia.substeps.step.ProvidedSuggestionManager;
 import com.technophobia.substeps.step.SuggestionSource;
 import com.technophobia.substeps.step.provider.ExternalStepImplementationProvider;
+import com.technophobia.substeps.step.provider.ProjectSpecificSuggestionProvider;
 
 /**
  * BundleActivator/general bundle aware class for managing things such as
@@ -113,6 +116,10 @@ public class FeatureEditorPlugin implements BundleActivator, Logger {
     private void addSuggestionProviders() {
         suggestionManager.addProvider(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION,
                 new ExternalStepImplementationProvider(new ProjectStepImplementationLoader()));
+
+        suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION,
+                new ProjectSpecificSuggestionProvider(new ProjectToSyntaxTransformer(),
+                        new ParameterisedStepImplementationRenderer()));
 
         suggestionManager.load(ResourcesPlugin.getWorkspace());
     }

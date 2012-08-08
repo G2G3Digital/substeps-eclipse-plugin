@@ -32,7 +32,7 @@ public class StepImplementationProcessorSupplier implements Supplier<IContentAss
     @Override
     public IContentAssistProcessor get() {
         return new CompletionProvidedContentProcessor(new StepImplementationProposalProvider(site,
-                new ParameterisedStepImplementationRenderer(), new SiteToSyntaxTransformer(), suggestionManager));
+                new ParameterisedStepImplementationRenderer(), new ProjectToSyntaxTransformer(), suggestionManager));
     }
 
 }

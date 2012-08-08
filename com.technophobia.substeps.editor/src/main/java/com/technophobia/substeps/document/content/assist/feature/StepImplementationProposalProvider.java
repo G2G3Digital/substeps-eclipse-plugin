@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaProject;
@@ -13,7 +14,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.IWorkbenchSite;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.document.content.assist.CompletionProposalProvider;
@@ -38,24 +38,24 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
 
     private final IWorkbenchPartSite site;
     private final StepImplementationRenderer stepRenderer;
-    private final Transformer<IWorkbenchSite, Syntax> siteToSyntaxTransformer;
+    private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
     private final ContextualSuggestionManager suggestionManager;
 
 
     public StepImplementationProposalProvider(final IWorkbenchPartSite site,
             final StepImplementationRenderer stepRenderer,
-            final Transformer<IWorkbenchSite, Syntax> siteToSyntaxTransformer,
+            final Transformer<IProject, Syntax> projectToSyntaxTransformer,
             final ContextualSuggestionManager suggestionManager) {
         this.site = site;
         this.stepRenderer = stepRenderer;
-        this.siteToSyntaxTransformer = siteToSyntaxTransformer;
+        this.projectToSyntaxTransformer = projectToSyntaxTransformer;
         this.suggestionManager = suggestionManager;
     }
 
 
     @Override
     public ICompletionProposal[] get(final IDocument document, final int offset) {
-        final Syntax syntax = siteToSyntaxTransformer.to(site);
+        // final Syntax syntax = siteToSyntaxTransformer.to(site);
         final IResource resource = activeEditorResource();
 
         final SuggestionType suggestionType = suggestionTypeForResource(resource);
