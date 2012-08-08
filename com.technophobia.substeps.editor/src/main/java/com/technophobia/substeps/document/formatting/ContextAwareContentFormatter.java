@@ -662,6 +662,7 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
      * @return <code>true</code> if the position can be added,
      *         <code>false</code> if it should be ignored
      */
+    @SuppressWarnings("unused")
     protected boolean positionAboutToBeAdded(final IDocument doc, final String category, final Position position) {
         return true;
     }

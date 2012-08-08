@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaProject;
@@ -17,13 +16,8 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.document.content.assist.CompletionProposalProvider;
-import com.technophobia.substeps.model.ParentStep;
-import com.technophobia.substeps.model.StepImplementation;
-import com.technophobia.substeps.model.Syntax;
-import com.technophobia.substeps.render.StepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.step.SuggestionType;
-import com.technophobia.substeps.supplier.Transformer;
 
 /**
  * Implementation of {@link CompletionProposalProvider} that looks up all class
@@ -37,18 +31,12 @@ import com.technophobia.substeps.supplier.Transformer;
 public class StepImplementationProposalProvider implements CompletionProposalProvider {
 
     private final IWorkbenchPartSite site;
-    private final StepImplementationRenderer stepRenderer;
-    private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
     private final ContextualSuggestionManager suggestionManager;
 
 
     public StepImplementationProposalProvider(final IWorkbenchPartSite site,
-            final StepImplementationRenderer stepRenderer,
-            final Transformer<IProject, Syntax> projectToSyntaxTransformer,
             final ContextualSuggestionManager suggestionManager) {
         this.site = site;
-        this.stepRenderer = stepRenderer;
-        this.projectToSyntaxTransformer = projectToSyntaxTransformer;
         this.suggestionManager = suggestionManager;
     }
 
@@ -61,48 +49,11 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
         final SuggestionType suggestionType = suggestionTypeForResource(resource);
         if (suggestionType != null) {
             final List<String> suggestions = suggestionManager.suggestionsFor(suggestionType, resource);
-            // suggestions.addAll(getSuggestionsForStepImplementations(syntax.getStepImplementations()));
-            // suggestions.addAll(getSuggestionsForSubsteps(syntax.getSortedRootSubSteps()));
-            // suggestions.addAll(getSuggestionsInDependencies());
 
             Collections.sort(suggestions);
             return createCompletionsForSuggestions(document, offset, suggestions);
         }
         return new ICompletionProposal[] { new NoCompletionsProposal() };
-    }
-
-
-    /**
-     * Convert {@link StepImplementation} into suggestions
-     * 
-     * @param syntax
-     *            The step implementations
-     * @return list of suggestions
-     */
-    private List<String> getSuggestionsForStepImplementations(final List<StepImplementation> stepImplementations) {
-
-        final List<String> suggestions = new ArrayList<String>();
-        for (final StepImplementation step : stepImplementations) {
-            suggestions.add(stepRenderer.render(step));
-        }
-        return suggestions;
-    }
-
-
-    /**
-     * Convert {@link ParentStep} substeps into suggestions
-     * 
-     * @param substeps
-     *            The substeps
-     * @return list of suggestions
-     */
-    private List<String> getSuggestionsForSubsteps(final List<ParentStep> substeps) {
-        final List<String> suggestions = new ArrayList<String>();
-        for (final ParentStep substep : substeps) {
-            suggestions.add(substep.getParent().getLine());
-        }
-
-        return suggestions;
     }
 
 

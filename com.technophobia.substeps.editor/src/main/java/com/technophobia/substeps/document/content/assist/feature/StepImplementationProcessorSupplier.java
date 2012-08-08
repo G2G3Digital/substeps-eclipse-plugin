@@ -5,7 +5,6 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 import com.technophobia.substeps.document.content.assist.CompletionProvidedContentProcessor;
 import com.technophobia.substeps.model.StepImplementation;
-import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.supplier.Supplier;
 
@@ -31,8 +30,7 @@ public class StepImplementationProcessorSupplier implements Supplier<IContentAss
 
     @Override
     public IContentAssistProcessor get() {
-        return new CompletionProvidedContentProcessor(new StepImplementationProposalProvider(site,
-                new ParameterisedStepImplementationRenderer(), new ProjectToSyntaxTransformer(), suggestionManager));
+        return new CompletionProvidedContentProcessor(new StepImplementationProposalProvider(site, suggestionManager));
     }
 
 }

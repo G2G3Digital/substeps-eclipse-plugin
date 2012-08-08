@@ -1,22 +1,31 @@
 package com.technophobia.substeps.step.provider;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.core.runtime.IStatus;
 
-public class StepImplementationClassChangeListenerOld implements IResourceChangeListener {
+import com.technophobia.substeps.FeatureEditorPlugin;
+import com.technophobia.substeps.supplier.Callback1;
+
+public class FileChangedListener implements IResourceChangeListener {
 
     private static final int[] VALID_EVENT_KINDS = new int[] { IResourceDelta.CHANGED, IResourceDelta.ADDED,
             IResourceDelta.REMOVED };
+
+    private final String fileExtension;
+    private final Callback1<IFile> fileChangedCallback;
+
+
+    public FileChangedListener(final String fileExtension, final Callback1<IFile> fileChangedCallback) {
+        this.fileExtension = fileExtension;
+        this.fileChangedCallback = fileChangedCallback;
+    }
 
 
     @Override
@@ -28,13 +37,12 @@ public class StepImplementationClassChangeListenerOld implements IResourceChange
                 public boolean visit(final IResourceDelta delta) throws CoreException {
                     if (isValidKind(delta)) {
                         final IResource resource = delta.getResource();
-                        if (resource instanceof IFolder || resource instanceof IWorkspaceRoot
-                                || resource instanceof IProject) {
+                        if (resource instanceof IContainer) {
                             return true;
                         }
 
                         if (resource instanceof IFile) {
-                            handleFile((IFile) resource, delta.getKind());
+                            handleFile((IFile) resource);
                             return true;
                         }
                     }
@@ -42,7 +50,7 @@ public class StepImplementationClassChangeListenerOld implements IResourceChange
                 }
             });
         } catch (final CoreException ex) {
-            ex.printStackTrace();
+            FeatureEditorPlugin.instance().log(IStatus.WARNING, "Could not handle file change for event " + event);
         }
         System.out.println(event);
     }
@@ -59,11 +67,9 @@ public class StepImplementationClassChangeListenerOld implements IResourceChange
     }
 
 
-    private void handleFile(final IFile file, final int kind) {
-        if ("java".equals(file.getFileExtension())) {
-            System.out.println("Found java file" + file);
-            final IJavaElement javaFile = JavaCore.create(file);
-            javaFile.getPrimaryElement();
+    private void handleFile(final IFile file) {
+        if (fileExtension.equals(file.getFileExtension())) {
+            fileChangedCallback.doCallback(file);
         }
     }
 }

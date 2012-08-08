@@ -38,6 +38,7 @@ import com.technophobia.substeps.step.ProvidedSuggestionManager;
 import com.technophobia.substeps.step.SuggestionSource;
 import com.technophobia.substeps.step.provider.ExternalStepImplementationProvider;
 import com.technophobia.substeps.step.provider.ProjectSpecificSuggestionProvider;
+import com.technophobia.substeps.step.provider.SubstepSuggestionProvider;
 
 /**
  * BundleActivator/general bundle aware class for managing things such as
@@ -114,12 +115,17 @@ public class FeatureEditorPlugin implements BundleActivator, Logger {
 
 
     private void addSuggestionProviders() {
+        final ProjectToSyntaxTransformer projectToSyntaxTransformer = new ProjectToSyntaxTransformer();
+
         suggestionManager.addProvider(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION,
                 new ExternalStepImplementationProvider(new ProjectStepImplementationLoader()));
 
         suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION,
-                new ProjectSpecificSuggestionProvider(new ProjectToSyntaxTransformer(),
+                new ProjectSpecificSuggestionProvider(projectToSyntaxTransformer,
                         new ParameterisedStepImplementationRenderer()));
+
+        suggestionManager.addProvider(SuggestionSource.SUBSTEP_DEFINITION, new SubstepSuggestionProvider(
+                projectToSyntaxTransformer));
 
         suggestionManager.load(ResourcesPlugin.getWorkspace());
     }

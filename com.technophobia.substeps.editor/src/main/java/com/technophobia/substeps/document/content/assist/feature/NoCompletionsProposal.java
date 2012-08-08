@@ -10,6 +10,7 @@ public class NoCompletionsProposal implements ICompletionProposal {
 
     @Override
     public void apply(final IDocument document) {
+        // no-op
     }
 
 
