@@ -1,7 +1,7 @@
 package com.technophobia.eclipse.ui.render;
 
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.UiUpdater;
+import com.technophobia.substeps.supplier.Supplier;
 
 public abstract class NonDisposedUiUpdater implements UiUpdater {
 

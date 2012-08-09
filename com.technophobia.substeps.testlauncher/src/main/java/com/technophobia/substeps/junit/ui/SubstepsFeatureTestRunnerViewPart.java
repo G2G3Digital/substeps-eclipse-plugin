@@ -65,7 +65,6 @@ import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 import com.technophobia.eclipse.transformer.Callback;
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.eclipse.ui.NotifyingUiUpdater;
 import com.technophobia.eclipse.ui.Renderer;
@@ -108,6 +107,7 @@ import com.technophobia.substeps.model.structure.Status;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
 import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
 import com.technophobia.substeps.preferences.PreferencesConstants;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements UpdateJobManager, Notifier<Runnable>,
         Callback, IPropertyListener {

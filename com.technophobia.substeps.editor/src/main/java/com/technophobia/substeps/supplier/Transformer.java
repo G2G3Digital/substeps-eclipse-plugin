@@ -17,5 +17,5 @@ public interface Transformer<From, To> {
      *            The item to transform from
      * @return the transformed item
      */
-    To to(From from);
+    To from(From from);
 }

@@ -8,7 +8,7 @@ import com.technophobia.substeps.supplier.Transformer;
 public class ResourceToProjectTransformer implements Transformer<IResource, IProject> {
 
     @Override
-    public IProject to(final IResource from) {
+    public IProject from(final IResource from) {
         return from.getProject();
     }
 

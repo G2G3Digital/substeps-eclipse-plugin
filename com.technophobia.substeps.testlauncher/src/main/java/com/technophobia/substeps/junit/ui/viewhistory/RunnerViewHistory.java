@@ -16,8 +16,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
-import com.technophobia.eclipse.transformer.Supplier;
-import com.technophobia.eclipse.transformer.Transformer;
 import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.ui.SubstepsControlsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
@@ -28,6 +26,8 @@ import com.technophobia.substeps.junit.ui.SubstepsRunSessionManager;
 import com.technophobia.substeps.junit.ui.SubstepsTestIcon;
 import com.technophobia.substeps.model.structure.Result;
 import com.technophobia.substeps.preferences.PreferencesConstants;
+import com.technophobia.substeps.supplier.Supplier;
+import com.technophobia.substeps.supplier.Transformer;
 
 @SuppressWarnings("restriction")
 public class RunnerViewHistory extends ViewHistory<SubstepsRunSession> {
@@ -133,20 +133,20 @@ public class RunnerViewHistory extends ViewHistory<SubstepsRunSession> {
     public ImageDescriptor getImageDescriptor(final Object element) {
         final SubstepsRunSession session = (SubstepsRunSession) element;
         if (session.isStopped())
-            return imageDescriptorTransformer.to(SubstepsTestIcon.Suite);
+            return imageDescriptorTransformer.from(SubstepsTestIcon.Suite);
 
         if (session.isRunning())
-            return imageDescriptorTransformer.to(SubstepsTestIcon.SuiteRunning);
+            return imageDescriptorTransformer.from(SubstepsTestIcon.SuiteRunning);
 
         final Result result = session.getTestResult(true);
         if (result == Result.OK)
-            return imageDescriptorTransformer.to(SubstepsTestIcon.SuiteOk);
+            return imageDescriptorTransformer.from(SubstepsTestIcon.SuiteOk);
         else if (result == Result.ERROR)
-            return imageDescriptorTransformer.to(SubstepsTestIcon.SuiteError);
+            return imageDescriptorTransformer.from(SubstepsTestIcon.SuiteError);
         else if (result == Result.FAILURE)
-            return imageDescriptorTransformer.to(SubstepsTestIcon.SuiteFail);
+            return imageDescriptorTransformer.from(SubstepsTestIcon.SuiteFail);
         else
-            return imageDescriptorTransformer.to(SubstepsTestIcon.Suite);
+            return imageDescriptorTransformer.from(SubstepsTestIcon.Suite);
     }
 
 

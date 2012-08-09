@@ -2,12 +2,12 @@ package com.technophobia.substeps.junit.action;
 
 import org.eclipse.jface.action.Action;
 
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.substeps.junit.ui.SubstepsControlsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
 import com.technophobia.substeps.junit.ui.SubstepsRunSession;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class StopTestAction extends Action {
     private final Supplier<SubstepsRunSession> substepsRunSessionSupplier;

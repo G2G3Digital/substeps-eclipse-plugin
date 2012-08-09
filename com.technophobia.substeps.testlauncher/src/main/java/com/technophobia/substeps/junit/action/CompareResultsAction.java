@@ -5,12 +5,12 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Shell;
 
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.substeps.junit.ui.SubstepsControlsIcon;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
 import com.technophobia.substeps.junit.ui.dialog.CompareResultDialog;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class CompareResultsAction extends Action {
 

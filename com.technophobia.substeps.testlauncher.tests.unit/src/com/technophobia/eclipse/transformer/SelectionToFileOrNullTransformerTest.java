@@ -15,6 +15,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.technophobia.substeps.supplier.Transformer;
+
 @RunWith(JMock.class)
 public class SelectionToFileOrNullTransformerTest {
 
@@ -47,7 +49,7 @@ public class SelectionToFileOrNullTransformerTest {
             }
         });
 
-        assertThat(transformer.to(selection), is(file));
+        assertThat(transformer.from(selection), is(file));
     }
 
 
@@ -56,7 +58,7 @@ public class SelectionToFileOrNullTransformerTest {
 
         final ISelection selection = context.mock(ISelection.class);
 
-        assertThat(transformer.to(selection), is(nullValue()));
+        assertThat(transformer.from(selection), is(nullValue()));
     }
 
 
@@ -75,7 +77,7 @@ public class SelectionToFileOrNullTransformerTest {
             }
         });
 
-        assertThat(transformer.to(selection), is(nullValue()));
+        assertThat(transformer.from(selection), is(nullValue()));
     }
 
 
@@ -90,6 +92,6 @@ public class SelectionToFileOrNullTransformerTest {
             }
         });
 
-        assertThat(transformer.to(selection), is(nullValue()));
+        assertThat(transformer.from(selection), is(nullValue()));
     }
 }

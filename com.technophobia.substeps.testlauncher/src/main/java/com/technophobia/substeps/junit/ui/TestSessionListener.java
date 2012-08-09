@@ -4,7 +4,6 @@ import java.text.MessageFormat;
 import java.text.NumberFormat;
 
 import com.technophobia.eclipse.transformer.Callback;
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.eclipse.ui.Resettable;
 import com.technophobia.eclipse.ui.UiUpdater;
@@ -15,6 +14,7 @@ import com.technophobia.substeps.model.SubstepsSessionListener;
 import com.technophobia.substeps.model.structure.Status;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
 import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class TestSessionListener implements SubstepsSessionListener {
 

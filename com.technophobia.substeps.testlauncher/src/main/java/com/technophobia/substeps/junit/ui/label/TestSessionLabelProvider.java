@@ -10,7 +10,6 @@ import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.view.ViewLayout;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.junit.ui.SubstepsIconProvider;
@@ -20,6 +19,7 @@ import com.technophobia.substeps.model.structure.Status;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
 import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
 import com.technophobia.substeps.model.structure.SubstepsTestParentElement;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class TestSessionLabelProvider extends LabelProvider implements IStyledLabelProvider {
 

@@ -9,7 +9,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
-import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.supplier.Transformer;
 
 public class DialogConfigSelector implements Transformer<Collection<ILaunchConfiguration>, ILaunchConfiguration> {
 
@@ -28,7 +28,7 @@ public class DialogConfigSelector implements Transformer<Collection<ILaunchConfi
 
 
     @Override
-    public ILaunchConfiguration to(final Collection<ILaunchConfiguration> configList) {
+    public ILaunchConfiguration from(final Collection<ILaunchConfiguration> configList) {
         final IDebugModelPresentation labelProvider = DebugUITools.newDebugModelPresentation();
         final ElementListSelectionDialog dialog = new ElementListSelectionDialog(shell, labelProvider);
         dialog.setElements(configList.toArray());

@@ -110,7 +110,7 @@
       <launchConfigurationTabGroup
             type="com.technophobia.substeps.junit.launchconfig"
             helpContextId="com.technophobia.substeps.feature_tab_group"
-            class="org.eclipse.jdt.internal.junit.launcher.JUnitTabGroup"
+            class="com.technophobia.substeps.junit.launcher.SubstepsTabGroup"
             id="com.technophobia.substeps.launchConfigurationTabGroup">
          <launchMode
                perspective="org.eclipse.debug.ui.DebugPerspective"

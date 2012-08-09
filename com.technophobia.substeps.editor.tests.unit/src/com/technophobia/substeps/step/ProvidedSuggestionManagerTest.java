@@ -44,7 +44,7 @@ public class ProvidedSuggestionManagerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(resourceToProjectTransformer).to(resource);
+                oneOf(resourceToProjectTransformer).from(resource);
                 will(returnValue(project));
             }
         });
@@ -61,7 +61,7 @@ public class ProvidedSuggestionManagerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(resourceToProjectTransformer).to(resource);
+                oneOf(resourceToProjectTransformer).from(resource);
                 will(returnValue(project));
 
                 oneOf(provider).suggestionsFor(project);
@@ -87,7 +87,7 @@ public class ProvidedSuggestionManagerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(resourceToProjectTransformer).to(resource);
+                oneOf(resourceToProjectTransformer).from(resource);
                 will(returnValue(project));
 
                 oneOf(provider1).suggestionsFor(project);
@@ -118,7 +118,7 @@ public class ProvidedSuggestionManagerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(resourceToProjectTransformer).to(resource);
+                oneOf(resourceToProjectTransformer).from(resource);
                 will(returnValue(project));
 
                 oneOf(provider1).suggestionsFor(project);
@@ -148,7 +148,7 @@ public class ProvidedSuggestionManagerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(resourceToProjectTransformer).to(resource);
+                oneOf(resourceToProjectTransformer).from(resource);
                 will(returnValue(project));
 
                 oneOf(provider2).suggestionsFor(project);

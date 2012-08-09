@@ -87,6 +87,34 @@ public class SubstepsFeatureMessages {
     public static String SubstepsLaunchConfigurationDelegate_error_input_element_deosn_not_exist;
     public static String SubstepsLaunchConfigurationDelegate_input_type_does_not_exist;
 
+    public static String SubstepsLaunchConfigurationTab_tab_label;
+    public static String SubstepsLaunchConfigurationTab_label_feature_location;
+    public static String SubstepsLaunchConfigurationTab_browse_feature_location;
+    public static String SubstepsLaunchConfigurationTab_label_substeps_location;
+    public static String SubstepsLaunchConfigurationTab_browse_substeps_location;
+    public static String SubstepsLaunchConfigurationTab_label_project_location;
+    public static String SubstepsLaunchConfigurationTab_browse_project_location;
+    public static String SubstepsLaunchConfigurationTab_substepsdialog_title;
+    public static String SubstepsLaunchConfigurationTab_substepsdialog_message;
+    public static String SubstepsLaunchConfigurationTab_featurefiledialog_title;
+    public static String SubstepsLaunchConfigurationTab_featurefiledialog_message;
+    public static String SubstepsLaunchConfigurationTab_projectdialog_title;
+    public static String SubstepsLaunchConfigurationTab_projectdialog_message;
+    public static String SubstepsLaunchConfigurationTab_label_before_and_after_processors;
+    public static String SubstepsLaunchConfigurationTab_button_add_before_and_after_processors;
+    public static String SubstepsLaunchConfigurationTab_button_remove_before_and_after_processors;
+    public static String SubstepsLaunchConfigurationTab_error_projectnotdefined;
+    public static String SubstepsLaunchConfigurationTab_error_invalidProjectName;
+    public static String SubstepsLaunchConfigurationTab_error_projectnotexists;
+    public static String SubstepsLaunchConfigurationTab_error_notJavaProject;
+    public static String SubstepsLaunchConfigurationTab_error_substepsnotdefined;
+    public static String SubstepsLaunchConfigurationTab_error_substepsnotexists;
+    public static String SubstepsLaunchConfigurationTab_error_notSubstepsFile;
+    public static String SubstepsLaunchConfigurationTab_error_notFeatureFile;
+    public static String SubstepsLaunchConfigurationTab_error_featurefilenotdefined;
+    public static String SubstepsLaunchConfigurationTab_error_featurefilenotexists;
+    public static String SubstepsLaunchConfigurationTab_error_beforeafterprocessornotexists;
+
     public static String SubstepsRunSession_unrootedTests;
 
     public static String CompareResultsAction_label;

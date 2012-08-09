@@ -35,7 +35,6 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.PageBook;
 
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.eclipse.ui.view.ViewLayout;
 import com.technophobia.substeps.junit.action.OpenFeatureAction;
@@ -50,6 +49,7 @@ import com.technophobia.substeps.model.structure.SubstepsTestElement;
 import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
 import com.technophobia.substeps.model.structure.SubstepsTestParentElement;
 import com.technophobia.substeps.model.structure.SubstepsTestRootElement;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class FeatureViewer {
     private final class TestSelectionListener implements ISelectionChangedListener {

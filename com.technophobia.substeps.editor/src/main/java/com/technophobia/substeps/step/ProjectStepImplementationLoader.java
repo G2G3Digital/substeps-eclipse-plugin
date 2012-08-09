@@ -34,7 +34,7 @@ public class ProjectStepImplementationLoader implements Transformer<IProject, Li
 
 
     @Override
-    public List<StepImplementationsDescriptor> to(final IProject project) {
+    public List<StepImplementationsDescriptor> from(final IProject project) {
         final List<StepImplementationsDescriptor> stepImplementationsDescriptors = new ArrayList<StepImplementationsDescriptor>();
         if (isJavaProject(project)) {
             final IJavaProject javaProject = toJavaProject(project);

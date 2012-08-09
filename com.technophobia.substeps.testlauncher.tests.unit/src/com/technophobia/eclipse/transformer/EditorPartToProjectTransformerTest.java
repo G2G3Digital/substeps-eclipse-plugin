@@ -14,39 +14,43 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.technophobia.substeps.supplier.Transformer;
+
 @RunWith(JMock.class)
 public class EditorPartToProjectTransformerTest {
 
-	private Mockery context;
-	private Transformer<IEditorPart, IProject> transformer;
+    private Mockery context;
+    private Transformer<IEditorPart, IProject> transformer;
 
-	@Before
-	public void initialise() {
-		this.context = new Mockery();
 
-		this.transformer = new EditorPartToProjectTransformer();
-	}
+    @Before
+    public void initialise() {
+        this.context = new Mockery();
 
-	@Test
-	public void canTransform() {
-		final IEditorPart editor = context.mock(IEditorPart.class);
-		final IEditorInput editorInput = context.mock(IEditorInput.class);
-		final IResource resource = context.mock(IResource.class);
-		final IProject project = context.mock(IProject.class);
+        this.transformer = new EditorPartToProjectTransformer();
+    }
 
-		context.checking(new Expectations() {
-			{
-				oneOf(editor).getEditorInput();
-				will(returnValue(editorInput));
 
-				oneOf(editorInput).getAdapter(IResource.class);
-				will(returnValue(resource));
+    @Test
+    public void canTransform() {
+        final IEditorPart editor = context.mock(IEditorPart.class);
+        final IEditorInput editorInput = context.mock(IEditorInput.class);
+        final IResource resource = context.mock(IResource.class);
+        final IProject project = context.mock(IProject.class);
 
-				oneOf(resource).getProject();
-				will(returnValue(project));
-			}
-		});
+        context.checking(new Expectations() {
+            {
+                oneOf(editor).getEditorInput();
+                will(returnValue(editorInput));
 
-		assertThat(transformer.to(editor), is(project));
-	}
+                oneOf(editorInput).getAdapter(IResource.class);
+                will(returnValue(resource));
+
+                oneOf(resource).getProject();
+                will(returnValue(project));
+            }
+        });
+
+        assertThat(transformer.from(editor), is(project));
+    }
 }

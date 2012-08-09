@@ -26,8 +26,8 @@ import com.technophobia.substeps.supplier.Transformer;
 public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax> {
 
     @Override
-    public Syntax to(final IProject project) {
-        final IJavaProject javaProject = new ProjectToJavaProjectTransformer().to(project);
+    public Syntax from(final IProject project) {
+        final IJavaProject javaProject = new ProjectToJavaProjectTransformer().from(project);
         final ClassLoader classLoader = new JavaProjectClassLoader(javaProject);
         final String[] outputFolders = outputFoldersForProject(javaProject);
 

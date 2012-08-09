@@ -10,16 +10,16 @@ import org.eclipse.ui.IEditorPart;
 public class Transformers {
 
     public static IJavaProject projectToJavaProject(final IProject project) {
-        return new ProjectToJavaProjectTransformer().to(project);
+        return new ProjectToJavaProjectTransformer().from(project);
     }
 
 
     public static IFile selectionToFileOrNull(final ISelection selection) {
-        return new SelectionToFileOrNullTransformer().to(selection);
+        return new SelectionToFileOrNullTransformer().from(selection);
     }
 
 
     public static IResource editorToResource(final IEditorPart editor) {
-        return new EditorToResourceTransformer().to(editor);
+        return new EditorToResourceTransformer().from(editor);
     }
 }

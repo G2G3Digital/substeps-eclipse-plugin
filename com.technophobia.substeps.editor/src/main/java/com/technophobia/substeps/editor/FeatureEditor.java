@@ -98,7 +98,7 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart {
             @Override
             public IContentAssistProcessor get() {
                 return new StepImplementationProcessorSupplier(getSite(), FeatureEditorPlugin.instance()
-                        .getStepImplementationManager()).get();
+                        .getSuggestionManager()).get();
             }
 
         };
