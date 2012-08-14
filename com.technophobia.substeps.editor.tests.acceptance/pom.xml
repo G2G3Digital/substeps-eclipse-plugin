@@ -8,6 +8,7 @@
 		<groupId>com.technophobia.substeps</groupId>
 		<artifactId>com.technophobia.substeps.parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
+	 	<relativePath>../com.technophobia.substeps.parent</relativePath>
 	</parent>
 	
 	<artifactId>com.technophobia.substeps.editor.tests.acceptance</artifactId>
