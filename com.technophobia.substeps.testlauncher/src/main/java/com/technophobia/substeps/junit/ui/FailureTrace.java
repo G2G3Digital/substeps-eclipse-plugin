@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
 
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Refreshable;
 import com.technophobia.eclipse.ui.Resettable;
 import com.technophobia.substeps.junit.action.CompareResultsAction;
@@ -27,6 +26,7 @@ import com.technophobia.substeps.junit.action.OpenEditorAtLineAction;
 import com.technophobia.substeps.junit.action.SubstepsCopyAction;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
 import com.technophobia.substeps.preferences.PreferencesConstants;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class FailureTrace implements IMenuListener, Refreshable, Resettable {
     private static final int MAX_LABEL_LENGTH = 256;

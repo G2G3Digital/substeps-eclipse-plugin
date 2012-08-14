@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.technophobia.eclipse.transformer.Callback1;
-import com.technophobia.eclipse.transformer.Supplier;
-import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.supplier.Supplier;
+import com.technophobia.substeps.supplier.Transformer;
 
 @RunWith(JMock.class)
 public class PredicatedLinkedParentItemManagerTest {
@@ -85,7 +85,7 @@ public class PredicatedLinkedParentItemManagerTest {
 
                 oneOf(nodeProcessor).callback("item2");
 
-                oneOf(isCompletePredicate).to("item2");
+                oneOf(isCompletePredicate).from("item2");
                 will(returnValue(true));
             }
         });
@@ -105,7 +105,7 @@ public class PredicatedLinkedParentItemManagerTest {
 
                 oneOf(nodeProcessor).callback("item2");
 
-                oneOf(isCompletePredicate).to("item2");
+                oneOf(isCompletePredicate).from("item2");
                 will(returnValue(false));
             }
         });

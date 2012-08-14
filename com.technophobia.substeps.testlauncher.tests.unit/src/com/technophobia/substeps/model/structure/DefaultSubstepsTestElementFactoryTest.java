@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.technophobia.eclipse.transformer.Supplier;
+import com.technophobia.substeps.supplier.Supplier;
 
 @RunWith(JMock.class)
 public class DefaultSubstepsTestElementFactoryTest {

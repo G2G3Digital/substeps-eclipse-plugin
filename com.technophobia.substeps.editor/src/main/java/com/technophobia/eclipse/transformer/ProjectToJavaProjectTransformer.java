@@ -12,7 +12,7 @@ import com.technophobia.substeps.supplier.Transformer;
 public class ProjectToJavaProjectTransformer implements Transformer<IProject, IJavaProject> {
 
     @Override
-    public IJavaProject to(final IProject project) {
+    public IJavaProject from(final IProject project) {
         try {
             if (project.hasNature(JavaCore.NATURE_ID)) {
                 return JavaCore.create(project);

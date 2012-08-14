@@ -13,10 +13,12 @@ import org.eclipse.jdt.core.JavaCore;
 import com.technophobia.substeps.model.StepImplementation;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.render.StepImplementationRenderer;
+import com.technophobia.substeps.step.ProjectStepImplementationProvider;
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Transformer;
 
-public class ProjectSpecificSuggestionProvider extends AbstractMultiProjectSuggestionProvider {
+public class ProjectSpecificSuggestionProvider extends AbstractMultiProjectSuggestionProvider implements
+        ProjectStepImplementationProvider {
 
     private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
     private final StepImplementationRenderer stepRenderer;
@@ -58,8 +60,22 @@ public class ProjectSpecificSuggestionProvider extends AbstractMultiProjectSugge
 
 
     @Override
+    public Collection<String> stepImplementationClasses(final IProject project) {
+        final Syntax syntax = projectToSyntaxTransformer.from(project);
+
+        final List<StepImplementation> stepImplementations = syntax.getStepImplementations();
+
+        final Collection<String> classes = new HashSet<String>();
+        for (final StepImplementation stepImplementation : stepImplementations) {
+            classes.add(stepImplementation.getImplementedIn().getName());
+        }
+        return classes;
+    }
+
+
+    @Override
     protected Collection<String> findStepImplementationsFor(final IProject project) {
-        final Syntax syntax = projectToSyntaxTransformer.to(project);
+        final Syntax syntax = projectToSyntaxTransformer.from(project);
 
         final List<StepImplementation> stepImplementations = syntax.getStepImplementations();
         final Collection<String> suggestions = new ArrayList<String>(stepImplementations.size());

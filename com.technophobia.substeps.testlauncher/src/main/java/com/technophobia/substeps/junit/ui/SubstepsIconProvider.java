@@ -6,8 +6,8 @@ import java.util.Map;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
-import com.technophobia.eclipse.transformer.Transformer;
 import com.technophobia.eclipse.ui.Disposable;
+import com.technophobia.substeps.supplier.Transformer;
 
 public class SubstepsIconProvider implements Disposable {
 
@@ -33,7 +33,7 @@ public class SubstepsIconProvider implements Disposable {
 
 
     public ImageDescriptor imageDescriptorFor(final SubstepsIcon icon) {
-        return this.imageDescriptorLoader.to(icon);
+        return this.imageDescriptorLoader.from(icon);
     }
 
 
@@ -46,6 +46,6 @@ public class SubstepsIconProvider implements Disposable {
 
 
     private Image createImageFor(final SubstepsIcon iconToLoad) {
-        return imageLoader.to(iconToLoad);
+        return imageLoader.from(iconToLoad);
     }
 }

@@ -50,10 +50,10 @@ public class MappedStepImplementationsManagerTest {
         final IResource resource = context.mock(IResource.class);
         context.checking(new Expectations() {
             {
-                oneOf(resourceTransformer).to(resource);
+                oneOf(resourceTransformer).from(resource);
                 will(returnValue("a-key"));
 
-                oneOf(stepImplementationLoader).to("a-key");
+                oneOf(stepImplementationLoader).from("a-key");
                 will(returnValue(Arrays.asList(step1, step2)));
             }
         });
@@ -71,7 +71,7 @@ public class MappedStepImplementationsManagerTest {
         final IResource resource = context.mock(IResource.class);
         context.checking(new Expectations() {
             {
-                oneOf(resourceTransformer).to(resource);
+                oneOf(resourceTransformer).from(resource);
                 will(returnValue("a-key"));
             }
         });

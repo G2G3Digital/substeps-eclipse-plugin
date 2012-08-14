@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.technophobia.eclipse.transformer.Callback1;
-import com.technophobia.eclipse.transformer.Supplier;
-import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.supplier.Supplier;
+import com.technophobia.substeps.supplier.Transformer;
 
 public class PredicatedLinkedParentItemManager<T> implements LinkedParentItemManager<T> {
 
@@ -53,7 +53,7 @@ public class PredicatedLinkedParentItemManager<T> implements LinkedParentItemMan
         final T lastItem = linkItems.get(linkItems.size() - 1);
         nodeProcessor.callback(lastItem);
 
-        if (hasCompletedPredicate.to(lastItem).booleanValue()) {
+        if (hasCompletedPredicate.from(lastItem).booleanValue()) {
             linkItems.remove(lastItem);
         }
     }

@@ -1,10 +1,10 @@
 package com.technophobia.substeps.junit.ui;
 
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.UiUpdater;
 import com.technophobia.substeps.junit.ui.TestRunStats.TestRunState;
 import com.technophobia.substeps.junit.ui.component.CounterPanel;
 import com.technophobia.substeps.junit.ui.component.ProgressBar;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class TestCounterUiUpdater implements UiUpdater {
 

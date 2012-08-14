@@ -48,7 +48,7 @@ public class FeatureFormatterHandlerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(editorSupplier).to(event);
+                oneOf(editorSupplier).from(event);
                 will(returnValue(formattable));
 
                 oneOf(formattable).doFormat();
@@ -65,7 +65,7 @@ public class FeatureFormatterHandlerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(editorSupplier).to(event);
+                oneOf(editorSupplier).from(event);
                 will(returnValue(editor));
 
                 allowing(logger).log(with(any(int.class)), with(any(String.class)));
@@ -81,7 +81,7 @@ public class FeatureFormatterHandlerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(editorSupplier).to(event);
+                oneOf(editorSupplier).from(event);
                 will(returnValue(null));
 
                 allowing(logger).log(with(any(int.class)), with(any(String.class)));

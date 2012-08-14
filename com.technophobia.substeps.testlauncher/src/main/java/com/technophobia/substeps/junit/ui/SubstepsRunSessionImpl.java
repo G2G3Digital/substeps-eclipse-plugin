@@ -23,8 +23,6 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
 import com.technophobia.eclipse.launcher.config.SubstepsLaunchConfigurationConstants;
 import com.technophobia.eclipse.transformer.Callback1;
-import com.technophobia.eclipse.transformer.Supplier;
-import com.technophobia.eclipse.transformer.Transformer;
 import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.model.RemoteTestRunnerClient;
 import com.technophobia.substeps.model.SubstepsRunListener;
@@ -41,6 +39,8 @@ import com.technophobia.substeps.model.structure.SubstepsTestElementFactory;
 import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
 import com.technophobia.substeps.model.structure.SubstepsTestParentElement;
 import com.technophobia.substeps.model.structure.SubstepsTestRootElement;
+import com.technophobia.substeps.supplier.Supplier;
+import com.technophobia.substeps.supplier.Transformer;
 
 public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats {
 
@@ -923,7 +923,7 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
     private Transformer<IncompleteParentItem, Boolean> checkRemainingChildItemsPredicate() {
         return new Transformer<IncompleteParentItem, Boolean>() {
             @Override
-            public Boolean to(final IncompleteParentItem from) {
+            public Boolean from(final IncompleteParentItem from) {
                 return Boolean.valueOf(!from.hasOutstandingChildren());
             }
         };

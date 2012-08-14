@@ -1,6 +1,6 @@
 package com.technophobia.substeps.model.structure;
 
-import com.technophobia.eclipse.transformer.Supplier;
+import com.technophobia.substeps.supplier.Supplier;
 
 public interface SubstepsTestElementFactory {
 

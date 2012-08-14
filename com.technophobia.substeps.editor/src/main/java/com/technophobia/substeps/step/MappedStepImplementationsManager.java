@@ -31,13 +31,13 @@ public class MappedStepImplementationsManager<T> implements StepImplementationMa
             stepImplementationMap.put(t, new ArrayList<StepImplementationsDescriptor>());
         }
 
-        stepImplementationMap.get(t).addAll(stepImplementationLoader.to(t));
+        stepImplementationMap.get(t).addAll(stepImplementationLoader.from(t));
     }
 
 
     @Override
     public List<StepImplementationsDescriptor> stepImplementationsFor(final IResource resource) {
-        final T key = resourceTransformer.to(resource);
+        final T key = resourceTransformer.from(resource);
         return stepImplementationMap.containsKey(key) ? stepImplementationMap.get(key) : Collections
                 .<StepImplementationsDescriptor> emptyList();
     }

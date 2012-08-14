@@ -34,6 +34,7 @@ import com.technophobia.substeps.document.content.assist.feature.ProjectToSyntax
 import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
+import com.technophobia.substeps.step.ProjectStepImplementationProvider;
 import com.technophobia.substeps.step.ProvidedSuggestionManager;
 import com.technophobia.substeps.step.SuggestionSource;
 import com.technophobia.substeps.step.provider.ExternalStepImplementationProvider;
@@ -98,7 +99,12 @@ public class FeatureEditorPlugin implements BundleActivator, Logger {
     }
 
 
-    public ContextualSuggestionManager getStepImplementationManager() {
+    public ContextualSuggestionManager getSuggestionManager() {
+        return suggestionManager;
+    }
+
+
+    public ProjectStepImplementationProvider getStepImplementationProvider() {
         return suggestionManager;
     }
 

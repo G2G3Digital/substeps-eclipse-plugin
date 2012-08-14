@@ -34,7 +34,7 @@ public class FeatureFormatterHandler extends AbstractHandler {
     @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-        final IEditorPart editor = editorForEventSupplier.to(event);
+        final IEditorPart editor = editorForEventSupplier.from(event);
         if (editor != null) {
             if (editor instanceof FormattableEditorPart) {
                 ((FormattableEditorPart) editor).doFormat();
@@ -52,7 +52,7 @@ public class FeatureFormatterHandler extends AbstractHandler {
     private static final class ActiveEditorSupplier implements Transformer<ExecutionEvent, IEditorPart> {
 
         @Override
-        public IEditorPart to(final ExecutionEvent event) {
+        public IEditorPart from(final ExecutionEvent event) {
             final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
             return window.getActivePage().getActiveEditor();
 

@@ -1,7 +1,7 @@
 package com.technophobia.substeps.model.structure;
 
-import com.technophobia.eclipse.transformer.Supplier;
-import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.supplier.Supplier;
+import com.technophobia.substeps.supplier.Transformer;
 
 public class DefaultSubstepsTestElementFactory implements SubstepsTestElementFactory {
 
@@ -35,7 +35,7 @@ public class DefaultSubstepsTestElementFactory implements SubstepsTestElementFac
     private String transform(final String originalString) {
         String currentString = originalString;
         for (final Transformer<String, String> transformer : testNameTransformers) {
-            currentString = transformer.to(currentString);
+            currentString = transformer.from(currentString);
         }
         return currentString;
     }

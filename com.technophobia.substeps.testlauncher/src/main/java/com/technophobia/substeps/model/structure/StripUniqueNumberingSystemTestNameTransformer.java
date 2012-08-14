@@ -1,11 +1,11 @@
 package com.technophobia.substeps.model.structure;
 
-import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.supplier.Transformer;
 
 public class StripUniqueNumberingSystemTestNameTransformer implements Transformer<String, String> {
 
     @Override
-    public String to(final String from) {
+    public String from(final String from) {
         final String[] split = from.split(":");
         if (split.length > 0 && isUniqueNumber(split[0])) {
             return from.substring(split[0].length() + 1).trim();

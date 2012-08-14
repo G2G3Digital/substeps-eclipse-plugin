@@ -56,7 +56,7 @@ public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionPro
 
     @Override
     protected Collection<String> findStepImplementationsFor(final IProject project) {
-        final Syntax syntax = projectToSyntaxTransformer.to(project);
+        final Syntax syntax = projectToSyntaxTransformer.from(project);
 
         final List<ParentStep> substeps = syntax.getSortedRootSubSteps();
         final List<String> suggestions = new ArrayList<String>();

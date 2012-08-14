@@ -24,12 +24,12 @@ import com.technophobia.eclipse.launcher.exception.DialogExceptionReporter;
 import com.technophobia.eclipse.launcher.exception.ExceptionReporter;
 import com.technophobia.eclipse.transformer.Decorator;
 import com.technophobia.eclipse.transformer.Locator;
-import com.technophobia.eclipse.transformer.ProjectToJavaProjectTransformer;
 import com.technophobia.eclipse.transformer.Transformers;
 import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.launcher.config.ResourceMappingDecorator;
 import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorkingCopyDecorator;
 import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorkingCopyFactory;
+import com.technophobia.substeps.junit.launcher.model.SubstepsLaunchModelFactory;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 public class SubstepsFeatureLaunchShortcut implements ILaunchShortcut2 {
@@ -133,8 +133,8 @@ public class SubstepsFeatureLaunchShortcut implements ILaunchShortcut2 {
     @SuppressWarnings("unchecked")
     private Collection<Decorator<ILaunchConfigurationWorkingCopy, IResource>> workingCopyDecorators(
             final ExceptionReporter exceptionReporter) {
-        return Arrays.asList(new SubstepsLaunchConfigWorkingCopyDecorator(new ProjectToJavaProjectTransformer(),
-                exceptionReporter), new ResourceMappingDecorator(exceptionReporter));
+        return Arrays.asList(new SubstepsLaunchConfigWorkingCopyDecorator(new SubstepsLaunchModelFactory(
+                new DefaultSubstepsLocationFinder())), new ResourceMappingDecorator(exceptionReporter));
     }
 
 
