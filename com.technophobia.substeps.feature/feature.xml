@@ -3,7 +3,7 @@
 <feature
       id="com.technophobia.substeps.feature"
       label="Substeps"
-      version="0.0.8.qualifier"
+      version="0.0.9.qualifier"
       provider-name="Technophobia Ltd">
 
    <description url="http://www.example.com/description">
