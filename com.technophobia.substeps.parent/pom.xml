@@ -110,6 +110,7 @@
 		<module>../com.technophobia.substeps.updatesite</module>
 	</modules>
 
+	<profiles>
 	<profile>
             <id>internalDev</id>
              
@@ -128,5 +129,5 @@
             </distributionManagement>
             
         </profile>
-	
+	</profiles>
 </project>
