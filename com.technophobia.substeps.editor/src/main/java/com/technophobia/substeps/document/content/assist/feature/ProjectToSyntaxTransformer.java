@@ -27,6 +27,7 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
 
     @Override
     public Syntax from(final IProject project) {
+
         final IJavaProject javaProject = new ProjectToJavaProjectTransformer().from(project);
         final ClassLoader classLoader = new JavaProjectClassLoader(javaProject);
         final String[] outputFolders = outputFoldersForProject(javaProject);
@@ -46,12 +47,21 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
         final IPath projectLocation = projectLocationPath(project);
 
         try {
-            outputFolders.add(appendPathTo(projectLocation, project.getOutputLocation()));
+            final IPath defaultOutputLocation = project.getOutputLocation();
+            if (defaultOutputLocation != null) {
+                final IPath fullPath = appendPathTo(projectLocation, defaultOutputLocation);
+                if (fullPath.toFile().exists()) {
+                    outputFolders.add(fullPath.toOSString());
+                }
+            }
             for (final IClasspathEntry entry : project.getRawClasspath()) {
                 if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
                     final IPath outputLocation = entry.getOutputLocation();
                     if (outputLocation != null) {
-                        outputFolders.add(appendPathTo(projectLocation, outputLocation));
+                        final IPath fullPath = appendPathTo(projectLocation, outputLocation);
+                        if (fullPath.toFile().exists()) {
+                            outputFolders.add(fullPath.toOSString());
+                        }
                     }
                 }
             }
@@ -64,8 +74,8 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
     }
 
 
-    private String appendPathTo(final IPath projectLocation, final IPath outputLocation) {
-        return projectLocation.append(outputLocation.removeFirstSegments(1)).toOSString();
+    private IPath appendPathTo(final IPath projectLocation, final IPath outputLocation) {
+        return projectLocation.append(outputLocation.removeFirstSegments(1));
     }
 
 
@@ -75,6 +85,7 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
 
 
     private List<Class<?>> stepClasses(final String outputFolder, final ClassLocator classLocator) {
+        FeatureEditorPlugin.instance().log(IStatus.INFO, "output folder " + outputFolder);
         return toList(classLocator.fromPath(outputFolder));
     }
 

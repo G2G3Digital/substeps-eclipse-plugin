@@ -9,7 +9,11 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.core.JavaCore;
 
+import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.step.ProjectSuggestionProvider;
 
 public abstract class AbstractMultiProjectSuggestionProvider implements ProjectSuggestionProvider {
@@ -25,7 +29,20 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
     @Override
     public void load(final IWorkspace workspace) {
         for (final IProject project : workspace.getRoot().getProjects()) {
-            loadProject(project);
+            if (project.isAccessible() && isJavaProject(project)) {
+                loadProject(project);
+            }
+        }
+    }
+
+
+    private boolean isJavaProject(final IProject project) {
+        try {
+            return project.hasNature(JavaCore.NATURE_ID);
+        } catch (final CoreException e) {
+            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+                    "Could not determine if project " + project.getName() + " is a java project, returning false");
+            return false;
         }
     }
 
