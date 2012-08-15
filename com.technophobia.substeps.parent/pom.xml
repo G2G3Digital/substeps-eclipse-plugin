@@ -109,5 +109,24 @@
 		<module>../com.technophobia.substeps.repository</module>
 		<module>../com.technophobia.substeps.updatesite</module>
 	</modules>
+
+	<profile>
+            <id>internalDev</id>
+             
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>${nexus.snapshot.artifacts}</id>
+                    <name>${nexus.snapshot.artifacts}</name>
+                    <url>${nexus.snapshot.url}</url>
+                    <uniqueVersion>false</uniqueVersion>
+                </snapshotRepository>
+                <repository>
+                    <id>${nexus.release.artifacts}</id>
+                    <name>${nexus.release.artifacts}</name>
+                    <url>${nexus.releases.url}</url>
+                </repository>
+            </distributionManagement>
+            
+        </profile>
 	
 </project>
