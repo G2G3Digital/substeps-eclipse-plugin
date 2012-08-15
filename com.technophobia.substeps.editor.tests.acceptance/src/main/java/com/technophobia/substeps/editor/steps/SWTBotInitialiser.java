@@ -13,52 +13,44 @@ import com.technophobia.substeps.runner.setupteardown.Annotations.BeforeEverySce
 
 public class SWTBotInitialiser {
 
-    private static SWTBot bot;
-    private static SWTWorkbenchBot workbenchBot;
+	private static SWTWorkbenchBot bot;
 
+	@BeforeEveryScenario
+	public void initialise() {
+		new Display(null);
+		bot = new SWTWorkbenchBot();
 
-    @BeforeEveryScenario
-    public void initialise() {
-        bot = new SWTBot();
-        workbenchBot = new SWTWorkbenchBot();
+		prepareActiveShell();
+	}
 
-        prepareActiveShell();
-    }
+	@BeforeEveryScenario
+	public void setUp() throws Exception {
+		UIThreadRunnable.syncExec(new VoidResult() {
 
+			@Override
+			public void run() {
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell()
+						.forceFocus();
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell()
+						.forceActive();
+				PlatformUI.getWorkbench().getDisplay().getActiveShell();
+			}
+		});
+	}
 
-    @BeforeEveryScenario
-    public void setUp() throws Exception {
-        UIThreadRunnable.syncExec(new VoidResult() {
+	public static SWTWorkbenchBot bot() {
+		return bot;
+	}
 
-            @Override
-            public void run() {
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().forceFocus();
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().forceActive();
-                PlatformUI.getWorkbench().getDisplay().getActiveShell();
-            }
-        });
-    }
-
-
-    public static SWTBot bot() {
-        return bot;
-    }
-
-
-    public static SWTWorkbenchBot workbenchBot() {
-        return workbenchBot;
-    }
-
-
-    private void prepareActiveShell() {
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                final Shell shell = bot().getDisplay().getShells()[0];
-
-                SWTTestUtil.setActiveShellHack(shell);
-
-            }
-        });
-    }
+	private void prepareActiveShell() {
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				Shell[] shells = bot().getDisplay().getShells();
+				if (shells.length > 0) {
+					SWTTestUtil.setActiveShellHack(shells[0]);
+				}
+			}
+		});
+	}
 }

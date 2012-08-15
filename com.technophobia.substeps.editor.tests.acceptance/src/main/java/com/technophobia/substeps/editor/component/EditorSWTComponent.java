@@ -29,6 +29,6 @@ public class EditorSWTComponent extends AbstractSWTLocatable<SWTBotEditor>
 
 	@Override
 	public SWTBotEditor doLocate() {
-		return SWTBotInitialiser.workbenchBot().activeEditor();
+		return SWTBotInitialiser.bot().activeEditor();
 	}
 }

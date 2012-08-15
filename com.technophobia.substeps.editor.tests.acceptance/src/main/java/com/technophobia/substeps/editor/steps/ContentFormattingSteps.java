@@ -12,7 +12,9 @@ import com.technophobia.substeps.editor.SWTTestUtil;
 import com.technophobia.substeps.editor.controller.FeatureFileEditorController;
 import com.technophobia.substeps.editor.controller.ProjectSWTController;
 import com.technophobia.substeps.model.SubSteps.Step;
+import com.technophobia.substeps.model.SubSteps.StepImplementations;
 
+@StepImplementations(requiredInitialisationClasses={EditorBeforeAndAfterExecutor.class, SWTBotInitialiser.class})
 public class ContentFormattingSteps extends AbstractEditorSteps {
 
     private static final Logger LOG = LoggerFactory.getLogger(ContentFormattingSteps.class);

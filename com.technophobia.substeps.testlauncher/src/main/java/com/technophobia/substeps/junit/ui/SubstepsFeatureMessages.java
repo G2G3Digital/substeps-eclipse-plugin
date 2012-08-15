@@ -171,6 +171,13 @@ public class SubstepsFeatureMessages {
     public static String RemoteTestRunner_error_connect;
     public static String RemoteTestRunner_error_classnotfound;
 
+    public static String OpenEditorAction_action_label;
+    public static String OpenEditorAction_error_cannotopen_title;
+    public static String OpenEditorAction_error_cannotopen_message;
+    public static String OpenEditorAction_error_dialog_title;
+    public static String OpenEditorAction_error_dialog_message;
+    public static String OpenEditorAction_message_cannotopen;
+
     static {
         NLS.initializeMessages(BUNDLE_NAME, SubstepsFeatureMessages.class);
     }
