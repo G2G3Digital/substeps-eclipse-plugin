@@ -70,7 +70,7 @@
 							<classifier>substeps</classifier>
 						</artifact>
 					</target>
-					<environments>
+					<!--environments>
 						<environment>
 							<os>linux</os>
 							<ws>gtk</ws>
@@ -91,7 +91,7 @@
 							<ws>win32</ws>
 							<arch>x86_64</arch>
 						</environment>
-					</environments>
+					</environments-->
 				</configuration>
 			</plugin>
 		</plugins>
