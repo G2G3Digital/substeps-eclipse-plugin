@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Testingtools
 Bundle-SymbolicName: com.technophobia.substeps.core.bundle
-Bundle-Version: 0.0.6.qualifier
+Bundle-Version: 0.0.6
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: commons-io-2.1.jar,
  guava-10.0.jar,
