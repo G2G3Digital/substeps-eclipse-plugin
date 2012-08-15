@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.jdt.core.JavaCore;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
@@ -46,7 +47,7 @@ public class ExternalStepImplementationProviderTest {
 
 
     @Test
-    public void noStepImplementationsForProjectYieldsNoSuggestions() {
+    public void noStepImplementationsForProjectYieldsNoSuggestions() throws Exception {
         final IProject project = aProjectWith("project");
         suggestionProvider.load(aWorkspaceWith(project));
 
@@ -56,7 +57,7 @@ public class ExternalStepImplementationProviderTest {
 
 
     @Test
-    public void stepImplementationsForProjectYieldsCorrespondingSuggestions() {
+    public void stepImplementationsForProjectYieldsCorrespondingSuggestions() throws Exception {
         final IProject project1 = aProjectWith("project-1",
                 aStepImplementation("stepClass1Project1", "step1", "step2"),
                 aStepImplementation("stepClass2Project1", "step4", "step4"));
@@ -73,7 +74,7 @@ public class ExternalStepImplementationProviderTest {
 
 
     @Test
-    public void clearingProjectRemovesCorrespondingSuggestions() {
+    public void clearingProjectRemovesCorrespondingSuggestions() throws Exception {
         final IProject project1 = aProjectWith("project-1",
                 aStepImplementation("stepClass1Project1", "step1", "step2"),
                 aStepImplementation("stepClass2Project1", "step4", "step4"));
@@ -93,7 +94,7 @@ public class ExternalStepImplementationProviderTest {
 
 
     @Test
-    public void addingDependencyAddsCorrespondingSuggestions() {
+    public void addingDependencyAddsCorrespondingSuggestions() throws Exception {
         final IProject project1 = aProjectWith("project-1",
                 aStepImplementation("stepClass1Project1", "step1", "step2"),
                 aStepImplementation("stepClass2Project1", "step4", "step4"));
@@ -119,7 +120,42 @@ public class ExternalStepImplementationProviderTest {
 
 
     @Test
-    public void noStepImplementationsForProjectYieldsNoStepImplementationClasses() {
+    public void closedProjectDoesntLoadSuggestions() {
+        final IProject project = context.mock(IProject.class);
+        context.checking(new Expectations() {
+            {
+                oneOf(project).isAccessible();
+                will(returnValue(Boolean.FALSE));
+            }
+        });
+
+        suggestionProvider.load(aWorkspaceWith(project));
+        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project);
+        assertTrue(suggestions.isEmpty());
+    }
+
+
+    @Test
+    public void ProjectDoesntLoadSuggestions() throws Exception {
+        final IProject project = context.mock(IProject.class);
+        context.checking(new Expectations() {
+            {
+                oneOf(project).isAccessible();
+                will(returnValue(Boolean.TRUE));
+
+                oneOf(project).hasNature(JavaCore.NATURE_ID);
+                will(returnValue(Boolean.FALSE));
+            }
+        });
+
+        suggestionProvider.load(aWorkspaceWith(project));
+        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project);
+        assertTrue(suggestions.isEmpty());
+    }
+
+
+    @Test
+    public void noStepImplementationsForProjectYieldsNoStepImplementationClasses() throws Exception {
         final IProject project = aProjectWith("project");
         suggestionProvider.load(aWorkspaceWith(project));
 
@@ -129,7 +165,7 @@ public class ExternalStepImplementationProviderTest {
 
 
     @Test
-    public void stepImplementationsForProjectYieldsCorrespondingStepImplementationClasses() {
+    public void stepImplementationsForProjectYieldsCorrespondingStepImplementationClasses() throws Exception {
         final IProject project1 = aProjectWith("project-1",
                 aStepImplementation("stepClass1Project1", "step1", "step2"),
                 aStepImplementation("stepClass2Project1", "step4", "step4"));
@@ -146,7 +182,7 @@ public class ExternalStepImplementationProviderTest {
 
 
     @Test
-    public void clearingProjectRemovesCorrespondingStepImplementationClasses() {
+    public void clearingProjectRemovesCorrespondingStepImplementationClasses() throws Exception {
         final IProject project1 = aProjectWith("project-1",
                 aStepImplementation("stepClass1Project1", "step1", "step2"),
                 aStepImplementation("stepClass2Project1", "step4", "step4"));
@@ -166,7 +202,7 @@ public class ExternalStepImplementationProviderTest {
 
 
     @Test
-    public void addingDependencyAddsCorrespondingStepImplementationClasses() {
+    public void addingDependencyAddsCorrespondingStepImplementationClasses() throws Exception {
         final IProject project1 = aProjectWith("project-1",
                 aStepImplementation("stepClass1Project1", "step1", "step2"),
                 aStepImplementation("stepClass2Project1", "step4", "step4"));
@@ -211,13 +247,20 @@ public class ExternalStepImplementationProviderTest {
     }
 
 
-    private IProject aProjectWith(final String name, final StepImplementationsDescriptor... stepImplementations) {
+    private IProject aProjectWith(final String name, final StepImplementationsDescriptor... stepImplementations)
+            throws Exception {
         final IProject project = context.mock(IProject.class, name);
 
         context.checking(new Expectations() {
             {
                 oneOf(stepImplementationLoader).from(project);
                 will(returnValue(Arrays.asList(stepImplementations)));
+
+                oneOf(project).isAccessible();
+                will(returnValue(Boolean.TRUE));
+
+                oneOf(project).hasNature(JavaCore.NATURE_ID);
+                will(returnValue(Boolean.TRUE));
             }
         });
 
