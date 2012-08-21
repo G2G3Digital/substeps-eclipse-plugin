@@ -31,7 +31,7 @@ public class GeneralDialogSWTComponent extends AbstractSWTLocatable<SWTBot>
 			e.printStackTrace();
 		}
 		final SWTBotShell shell = SWTTestUtil.dialogAtDepth(bot, 1);
-		SWTTestUtil.setActiveShellHack(shell.widget);
+//		SWTTestUtil.setActiveShellHack(shell.widget);
 		shell.setFocus();
 	}
 

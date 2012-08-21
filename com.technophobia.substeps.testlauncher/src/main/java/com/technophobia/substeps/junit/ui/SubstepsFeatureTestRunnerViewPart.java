@@ -475,7 +475,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
         final Integer l = m.getInteger(TAG_LAYOUT);
         ViewLayout layoutValue = ViewLayout.HIERARCHICAL;
-        if (layout != null)
+        if (layout != null && l != null)
             layoutValue = ViewLayout.forValue(l.intValue());
 
         final String failuresOnly = m.getString(TAG_FAILURES_ONLY);

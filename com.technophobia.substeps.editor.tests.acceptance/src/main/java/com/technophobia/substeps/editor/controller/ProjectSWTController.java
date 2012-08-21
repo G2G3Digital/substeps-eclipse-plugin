@@ -19,21 +19,32 @@ public class ProjectSWTController extends AbstractSWTController {
 	//
 
 	public void navigateToPerspective(final String perspectiveName) {
-		SWTTestUtil.setMainFrameToActiveShellHack();
+		System.out.println("About to navigate to perspective");
 		new MenuManagerSWTComponent().menuFor("Window")
 				.menuFor("Open Perspective").menuFor("Other...").click();
+		
+		System.out.println("Clicked menu link");
 
 		final GeneralDialogSWTComponent dialog = new GeneralDialogSWTComponent();
 		dialog.setFocus("Open Perspective");
+		
+		System.out.println("Set focus");
 
 		final TableSWTComponent table = dialog.table();
+		
+		System.out.println("got table");
 		if (table.hasItem(perspectiveName)) {
+			System.out.println("table has item");
 			table.select(perspectiveName);
+			System.out.println("selected item");
 		} else {
+			System.out.println("table doesn't have item");
 			table.select(perspectiveName + " (default)");
+			System.out.println("selected default");
 		}
 
 		new ButtonManagerComponent().buttonFor("OK").click();
+		System.out.println("pressed button");
 	}
 
 	public void createGeneralProject(final String projectName) {
@@ -90,11 +101,11 @@ public class ProjectSWTController extends AbstractSWTController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		SWTTestUtil.setActiveShellHack("New");
+//		SWTTestUtil.setActiveShellHack("New");
 		dialogComponent.tree().select("General").expandNode("General")
 				.select("Project");
 
-		SWTTestUtil.setActiveShellHack("New");
+//		SWTTestUtil.setActiveShellHack("New");
 		buttonManagerComponent.buttonFor("Next >").click();
 		dialogComponent.setFocus("New Project");
 
