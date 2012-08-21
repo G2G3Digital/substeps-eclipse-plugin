@@ -18,6 +18,7 @@ public class SubstepsHelpContextIds {
 
     public static final String RERUN_ACTION = PREFIX + "rerun_test_action_context";
 
-    public static final String RESULTS_VIEW_TOGGLE_ORIENTATION_ACTION = PREFIX
-            + "results_view_toggle_call_mode_action_context";
+    public static final String RESULTS_VIEW_TOGGLE_ORIENTATION_ACTION = PREFIX + "open_editor_atline_action_context";
+
+    public static final String OPENEDITORATLINE_ACTION = PREFIX + "open_editor_atline_action_context";
 }

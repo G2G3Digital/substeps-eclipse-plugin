@@ -12,7 +12,9 @@ import com.technophobia.substeps.editor.SWTTestUtil;
 import com.technophobia.substeps.editor.controller.FeatureFileEditorController;
 import com.technophobia.substeps.editor.controller.ProjectSWTController;
 import com.technophobia.substeps.model.SubSteps.Step;
+import com.technophobia.substeps.model.SubSteps.StepImplementations;
 
+@StepImplementations(requiredInitialisationClasses={EditorBeforeAndAfterExecutor.class, SWTBotInitialiser.class})
 public class ContentFormattingSteps extends AbstractEditorSteps {
 
     private static final Logger LOG = LoggerFactory.getLogger(ContentFormattingSteps.class);
@@ -35,6 +37,12 @@ public class ContentFormattingSteps extends AbstractEditorSteps {
     }
 
 
+    @Step("And dummy")
+    public void andSomething() {
+        // no-op
+    }
+
+
     @Step("Given there is a general project named \"([^\"]*)\"")
     public void ensureProjectExistsNamed(final String projectName) {
         // TODO - add logging
@@ -42,7 +50,6 @@ public class ContentFormattingSteps extends AbstractEditorSteps {
         final ProjectSWTController controller = createController(ProjectSWTController.class);
 
         if (!controller.isProjectExist(projectName)) {
-            SWTTestUtil.setMainFrameToActiveShellHack();
             controller.createGeneralProject(projectName);
         }
     }

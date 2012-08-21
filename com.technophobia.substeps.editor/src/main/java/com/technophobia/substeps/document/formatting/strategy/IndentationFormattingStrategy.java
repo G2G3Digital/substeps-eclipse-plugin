@@ -47,14 +47,16 @@ public abstract class IndentationFormattingStrategy extends DefaultFormattingStr
 
     /**
      * Checks whether content ends in a newline, ignoring any tabs or spaces
-     * @param content The content to check
+     * 
+     * @param content
+     *            The content to check
      * @return true if content ends in newline, otherwise false
      */
-	private boolean endsInNewline(final String content) {
-		String stripped = content.replaceAll(" ", "").replaceAll("\t", "");
-		
-		return stripped.endsWith(NEWLINE);
-	}
+    private boolean endsInNewline(final String content) {
+        final String stripped = content.replaceAll(" ", "").replaceAll("\t", "");
+
+        return stripped.endsWith(NEWLINE);
+    }
 
 
     /**

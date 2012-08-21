@@ -14,7 +14,7 @@ public class ViewManagerSWTComponent extends
 
 	@Override
 	public SWTWorkbenchBot doLocate() {
-		return SWTBotInitialiser.workbenchBot();
+		return SWTBotInitialiser.bot();
 	}
 
 }

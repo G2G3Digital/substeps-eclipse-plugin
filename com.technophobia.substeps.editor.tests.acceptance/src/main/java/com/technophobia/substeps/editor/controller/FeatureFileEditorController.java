@@ -62,7 +62,7 @@ public class FeatureFileEditorController extends AbstractSWTController {
 	}
 
 	public void formatContent() {
-		SWTTestUtil.setMainFrameToActiveShellHack();
+//		SWTTestUtil.setMainFrameToActiveShellHack();
 		new MenuManagerSWTComponent().menuFor("Edit").menuFor("Content Format")
 				.click();
 
