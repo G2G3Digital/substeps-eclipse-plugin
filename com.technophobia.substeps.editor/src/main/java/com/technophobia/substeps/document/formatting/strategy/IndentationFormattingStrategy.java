@@ -37,7 +37,7 @@ public abstract class IndentationFormattingStrategy extends DefaultFormattingStr
             final int[] positions) {
         final boolean hasLineBreak = endsInNewline(content);
 
-        String indentedContent = isLineStart ? indent() + content.trim() : content.trim();
+        String indentedContent = indent() + content.trim();
         if (hasLineBreak) {
             indentedContent = indentedContent + NEWLINE;
         }

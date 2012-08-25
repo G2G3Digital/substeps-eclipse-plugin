@@ -61,28 +61,30 @@ public class PartitionedFormattingContext implements FormattingContext {
 
 
     @Override
-    public FormattingContext previousContentContext() throws InvalidFormatPositionException {
+    public ContentTypeDefinition inspectPreviousContentType() throws InvalidFormatPositionException {
         final PositionalContentTypeDefinitionHolder prevContentType = locatePreviousContentTypeOrNull();
         if (prevContentType == null) {
             throw new InvalidFormatPositionException("No content type exists before current position");
         }
-        return new PartitionedFormattingContext(positions, prevContentType.getPosition(), contentTypeDefinitionFactory);
+        return contentTypeDefinitionFactory.contentTypeDefintionByName(positions[prevContentType.getPosition()]
+                .getType());
     }
 
 
     @Override
-    public boolean hasNextContent() {
+    public boolean hasMoreContent() {
         return locateNextContentTypeOrNull() != null;
     }
 
 
     @Override
-    public FormattingContext nextContentContext() throws InvalidFormatPositionException {
+    public FormattingContext impersonateNextContentContext() throws InvalidFormatPositionException {
         final PositionalContentTypeDefinitionHolder nextContentType = locateNextContentTypeOrNull();
         if (nextContentType == null) {
             throw new InvalidFormatPositionException("No content type exists after current position");
         }
-        return new PartitionedFormattingContext(positions, nextContentType.getPosition(), contentTypeDefinitionFactory);
+        return new SkipAheadFormattingContext(positions, currentPosition, nextContentType.getPosition(),
+                contentTypeDefinitionFactory);
     }
 
 

@@ -36,6 +36,6 @@ public class DefineContentTypeDefinition extends AbstractFeatureContentTypeDefin
 
     @Override
     public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
-        return new MultiLineFixedIndentFormattingStrategy("", "\t");
+        return new MultiLineFixedIndentFormattingStrategy("", "\t", formattingContextSupplier);
     }
 }

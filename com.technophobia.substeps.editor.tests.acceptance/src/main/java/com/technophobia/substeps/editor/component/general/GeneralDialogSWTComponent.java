@@ -10,57 +10,63 @@ import com.technophobia.substeps.editor.component.AbstractSWTLocatable;
 import com.technophobia.substeps.editor.component.SWTRootComponent;
 import com.technophobia.substeps.editor.steps.SWTBotInitialiser;
 
-public class GeneralDialogSWTComponent extends AbstractSWTLocatable<SWTBot>
-		implements SWTRootComponent<SWTBot> {
+public class GeneralDialogSWTComponent extends AbstractSWTLocatable<SWTBot> implements SWTRootComponent<SWTBot> {
 
-	//
-	// Commands
-	//
+    //
+    // Commands
+    //
 
-	// probably needs moving - not specific to dialogs
-	public void clickButton(final String buttonText) {
-		locate().button(buttonText).click();
-	}
+    // probably needs moving - not specific to dialogs
+    public void clickButton(final String buttonText) {
+        locate().button(buttonText).click();
+    }
 
-	public void setFocus(final String dialogName) {
-		final SWTBot bot = locate();
-		try {
-			Thread.sleep(3000);
-		} catch (final InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		final SWTBotShell shell = SWTTestUtil.dialogAtDepth(bot, 1);
-//		SWTTestUtil.setActiveShellHack(shell.widget);
-		shell.setFocus();
-	}
 
-	public TreeSWTComponent tree() {
-		return new TreeSWTComponent(this);
-	}
+    public void setFocus(final String dialogName) {
+        final SWTBot bot = locate();
+        try {
+            Thread.sleep(3000);
+        } catch (final InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        final SWTBotShell shell = SWTTestUtil.dialogNamed(bot, dialogName);
+        shell.activate();
+        // SWTTestUtil.setActiveShellHack(shell.widget);
+        shell.setFocus();
+    }
 
-	public ListSWTComponent list() {
-		return new ListSWTComponent(this);
-	}
 
-	public TableSWTComponent table() {
-		return new TableSWTComponent(this);
-	}
+    public TreeSWTComponent tree() {
+        return new TreeSWTComponent(this);
+    }
 
-	//
-	// Queries
-	//
-	public boolean isDialogPresent(final String dialogTitle) {
-		try {
-			locate().waitUntil(Conditions.shellIsActive(dialogTitle));
-			return true;
-		} catch (final TimeoutException ex) {
-			return false;
-		}
-	}
 
-	@Override
-	public SWTBot doLocate() {
-		return SWTBotInitialiser.bot();
-	}
+    public ListSWTComponent list() {
+        return new ListSWTComponent(this);
+    }
+
+
+    public TableSWTComponent table() {
+        return new TableSWTComponent(this);
+    }
+
+
+    //
+    // Queries
+    //
+    public boolean isDialogPresent(final String dialogTitle) {
+        try {
+            locate().waitUntil(Conditions.shellIsActive(dialogTitle));
+            return true;
+        } catch (final TimeoutException ex) {
+            return false;
+        }
+    }
+
+
+    @Override
+    public SWTBot doLocate() {
+        return SWTBotInitialiser.bot();
+    }
 }

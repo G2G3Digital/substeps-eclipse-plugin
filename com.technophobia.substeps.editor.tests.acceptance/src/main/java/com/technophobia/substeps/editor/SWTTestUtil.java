@@ -1,6 +1,5 @@
 package com.technophobia.substeps.editor;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,44 +10,45 @@ import java.util.Set;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
-import com.technophobia.substeps.editor.steps.SWTBotInitialiser;
-
 public class SWTTestUtil {
 
-//    public static void setActiveShellHack(final String shellTitle) {
-//        final SWTBot bot = SWTBotInitialiser.bot();
-//        setActiveShellHack(bot.shell(shellTitle).widget);
-//    }
-//
-//
-//    public static void setActiveShellHack(final Shell shell) {
-//        final SWTBot bot = SWTBotInitialiser.bot();
-//        Field field;
-//        try {
-//            field = Display.class.getDeclaredField("activeShell");
-//            field.setAccessible(true);
-//            field.set(bot.getDisplay(), shell);
-//        } catch (final Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        Display.getDefault().syncExec(new Runnable() {
-//            @Override
-//            public void run() {
-//                shell.setVisible(true);
-//            }
-//        });
-//    }
-//
-//
-//    public static void setMainFrameToActiveShellHack() {
-//        final SWTBot bot = SWTBotInitialiser.bot();
-//        setActiveShellHack(bot.shells()[0].widget);
-//    }
+    // public static void setActiveShellHack(final String shellTitle) {
+    // final SWTBot bot = SWTBotInitialiser.bot();
+    // setActiveShellHack(bot.shell(shellTitle).widget);
+    // }
+    //
+    //
+    // public static void setActiveShellHack(final Shell shell) {
+    // final SWTBot bot = SWTBotInitialiser.bot();
+    // Field field;
+    // try {
+    // field = Display.class.getDeclaredField("activeShell");
+    // field.setAccessible(true);
+    // field.set(bot.getDisplay(), shell);
+    // } catch (final Exception e) {
+    // e.printStackTrace();
+    // }
+    //
+    // Display.getDefault().syncExec(new Runnable() {
+    // @Override
+    // public void run() {
+    // shell.setVisible(true);
+    // }
+    // });
+    // }
+    //
+    //
+    // public static void setMainFrameToActiveShellHack() {
+    // final SWTBot bot = SWTBotInitialiser.bot();
+    // setActiveShellHack(bot.shells()[0].widget);
+    // }
+
+    public static SWTBotShell dialogNamed(final SWTBot bot, final String name) {
+        return bot.shell(name);
+    }
 
 
     public static SWTBotShell dialogAtDepth(final SWTBot bot, final int depth) {

@@ -20,6 +20,9 @@ package com.technophobia.substeps.document.formatting.strategy;
 
 import org.eclipse.jface.text.formatter.IFormattingStrategy;
 
+import com.technophobia.substeps.document.formatting.FormattingContext;
+import com.technophobia.substeps.supplier.Supplier;
+
 /**
  * Implementation of {@link IFormattingStrategy} that formats multiple lines,
  * each with a specific indent
@@ -39,10 +42,14 @@ public class MultiLineFixedIndentFormattingStrategy extends DefaultFormattingStr
      */
     private final String subsequentLineIndent;
 
+    private final Supplier<FormattingContext> formattingContextSupplier;
 
-    public MultiLineFixedIndentFormattingStrategy(final String initialLineIndent, final String subsequentLineIndent) {
+
+    public MultiLineFixedIndentFormattingStrategy(final String initialLineIndent, final String subsequentLineIndent,
+            final Supplier<FormattingContext> formattingContextSupplier) {
         this.initialLineIndent = initialLineIndent;
         this.subsequentLineIndent = subsequentLineIndent;
+        this.formattingContextSupplier = formattingContextSupplier;
     }
 
 
@@ -54,42 +61,29 @@ public class MultiLineFixedIndentFormattingStrategy extends DefaultFormattingStr
 
         if (lines.length > 0) {
             final StringBuffer sb = new StringBuffer();
+            leadingNewLines(sb);
 
             sb.append(initialLineIndent + lines[0].trim());
-            if (lines.length > 1) {
-                sb.append(NEWLINE);
-            }
 
             for (int i = 1; i < lines.length; i++) {
                 final String trimmed = lines[i].trim();
-                if (trimmed.length() == 0) {
-                    sb.append("");
-                } else {
+                if (trimmed.length() > 0) {
+                    sb.append(NEWLINE);
                     sb.append(subsequentLineIndent + trimmed);
-                    // don't add new line to last line as its taken care of by
-                    // tailingNewLines()
-                    if (i < lines.length - 1) {
-                        sb.append(NEWLINE);
-                    }
                 }
             }
 
-            tailingNewLines(content, sb);
+            // tailingNewLines(sb);
             return sb.toString();
         }
         return "";
     }
 
 
-    private void tailingNewLines(final String content, final StringBuffer sb) {
-        for (int i = content.length() - 1; i >= 0 && isNewline(content, i); i -= NEWLINE.length()) {
-            sb.append(NEWLINE);
+    private void leadingNewLines(final StringBuffer sb) {
+        if (formattingContextSupplier.get().hasPreviousContent()
+                && !formattingContextSupplier.get().inspectPreviousContentType().isOptional()) {
+            sb.append(NEWLINE + NEWLINE);
         }
     }
-
-
-    private boolean isNewline(final String content, final int endPos) {
-        return content.substring(endPos - (NEWLINE.length() - 1), endPos + 1).equals(NEWLINE);
-    }
-
 }

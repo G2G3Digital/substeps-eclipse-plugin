@@ -1,7 +1,7 @@
 package com.technophobia.substeps.editor.controller;
 
-import com.technophobia.substeps.editor.SWTTestUtil;
 import com.technophobia.substeps.editor.component.ButtonManagerComponent;
+import com.technophobia.substeps.editor.component.EditorContainerSWTComponent;
 import com.technophobia.substeps.editor.component.EditorSWTComponent;
 import com.technophobia.substeps.editor.component.FormEditorSWTComponent;
 import com.technophobia.substeps.editor.component.ViewManagerSWTComponent;
@@ -13,95 +13,96 @@ import com.technophobia.substeps.editor.component.menu.MenuManagerSWTComponent;
 
 public class FeatureFileEditorController extends AbstractSWTController {
 
-	//
-	// Commands
-	//
+    //
+    // Commands
+    //
 
-	public void createFeatureFileInProject(final String featureFileName,
-			final String projectName) {
-		final TreeSWTComponent projectNode = selectProjectNode(projectName);
-		projectNode.clickContextMenuItem("New", "File");
+    public void createFeatureFileInProject(final String featureFileName, final String projectName) {
+        final TreeSWTComponent projectNode = selectProjectNode(projectName);
+        projectNode.clickContextMenuItem("New", "File");
 
-		new GeneralDialogSWTComponent().setFocus("New File");
-		new FormEditorSWTComponent().textWithLabel("File name:").setText(
-				normalizedFeatureFileName(featureFileName) + ".feature");
-		new ButtonManagerComponent().buttonFor("Finish").click();
+        new GeneralDialogSWTComponent().setFocus("New File");
+        new FormEditorSWTComponent().textWithLabel("File name:").setText(
+                normalizedFeatureFileName(featureFileName) + ".feature");
+        new ButtonManagerComponent().buttonFor("Finish").click();
 
-		try {
-			Thread.sleep(4000);
-		} catch (final InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+        try {
+            Thread.sleep(4000);
+        } catch (final InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
-	public void deleteFileInProject(final String featureFileName,
-			final String projectName) {
 
-		final TreeItemSWTComponent featureFileTreeItem = selectProjectNode(
-				projectName).expandNode(projectName).select(featureFileName);
+    public void deleteFileInProject(final String featureFileName, final String projectName) {
 
-		featureFileTreeItem.clickDelete();
+        final TreeItemSWTComponent featureFileTreeItem = selectProjectNode(projectName).expandNode(projectName).select(
+                featureFileName);
 
-		new GeneralDialogSWTComponent().setFocus("Confirm Delete");
-		new ButtonManagerComponent().buttonFor("OK").click();
+        featureFileTreeItem.clickDelete();
 
-		try {
-			Thread.sleep(4000);
-		} catch (final InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+        new GeneralDialogSWTComponent().setFocus("Confirm Delete");
+        new ButtonManagerComponent().buttonFor("OK").click();
 
-	public void setEditorContentsTo(final String text) {
+        try {
+            Thread.sleep(4000);
+        } catch (final InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
-		final EditorSWTComponent editorComponent = new EditorSWTComponent();
-		editorComponent.setContentsTo(text);
-		editorComponent.save();
-	}
 
-	public void formatContent() {
-//		SWTTestUtil.setMainFrameToActiveShellHack();
-		new MenuManagerSWTComponent().menuFor("Edit").menuFor("Content Format")
-				.click();
+    public void setEditorContentsTo(final String text) {
 
-		new EditorSWTComponent().save();
-	}
+        final EditorSWTComponent editorComponent = new EditorSWTComponent();
+        editorComponent.setContentsTo(text);
+        editorComponent.save();
+    }
 
-	public void closeAllOpenEditors() {
-		new EditorSWTComponent().closeAll();
-	}
 
-	//
-	// Queries
-	//
-	public boolean doesFeatureFileExistForProject(final String featureFileName,
-			final String projectName) {
+    public void formatContent() {
+        // SWTTestUtil.setMainFrameToActiveShellHack();
+        new MenuManagerSWTComponent().menuFor("Edit").menuFor("Content Format").click();
 
-		final TreeItemSWTComponent projectNode = selectProjectNode(projectName)
-				.expandNode(projectName);
+        new EditorSWTComponent().save();
+    }
 
-		return projectNode.isItemExist(featureFileName);
-	}
 
-	public String currentEditorContents() {
-		return new EditorSWTComponent().content();
-	}
+    public void closeAllOpenEditors() {
+        new EditorContainerSWTComponent().closeAll();
+    }
 
-	private TreeSWTComponent selectProjectNode(final String projectName) {
-		final ViewSWTComponent view = new ViewManagerSWTComponent()
-				.viewByTitle("Package Explorer");
-		final TreeSWTComponent tree = view.treeInView();
 
-		return tree.select(projectName);
-	}
+    //
+    // Queries
+    //
+    public boolean doesFeatureFileExistForProject(final String featureFileName, final String projectName) {
 
-	private String normalizedFeatureFileName(final String featureFileName) {
-		if (featureFileName.endsWith(".feature")) {
-			return featureFileName.substring(0, featureFileName.length()
-					- ".feature".length());
-		}
-		return featureFileName;
-	}
+        final TreeItemSWTComponent projectNode = selectProjectNode(projectName).expandNode(projectName);
+
+        return projectNode.isItemExist(featureFileName);
+    }
+
+
+    public String currentEditorContents() {
+        return new EditorSWTComponent().content();
+    }
+
+
+    private TreeSWTComponent selectProjectNode(final String projectName) {
+        final ViewSWTComponent view = new ViewManagerSWTComponent().viewByTitle("Package Explorer");
+        final TreeSWTComponent tree = view.treeInView();
+
+        return tree.select(projectName);
+    }
+
+
+    private String normalizedFeatureFileName(final String featureFileName) {
+        if (featureFileName.endsWith(".feature")) {
+            return featureFileName.substring(0, featureFileName.length() - ".feature".length());
+        }
+        return featureFileName;
+    }
 }

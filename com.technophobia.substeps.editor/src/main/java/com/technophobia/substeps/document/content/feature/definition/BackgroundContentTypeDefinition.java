@@ -16,6 +16,7 @@ public class BackgroundContentTypeDefinition extends AbstractFeatureContentTypeD
     public static final String CONTENT_TYPE_ID = "__feature_background";
     public static final String PREFIX_TEXT = "Background:";
 
+
     public BackgroundContentTypeDefinition() {
         super(CONTENT_TYPE_ID, PREFIX_TEXT, false);
     }
@@ -23,7 +24,11 @@ public class BackgroundContentTypeDefinition extends AbstractFeatureContentTypeD
 
     @Override
     public IPredicateRule partitionRule() {
-        return singleLineRule(PREFIX_TEXT, id());
+        return paragraphRule(PREFIX_TEXT, id(), true, TagContentTypeDefinition.PREFIX_TEXT,
+                CommentContentTypeDefinition.PREFIX_TEXT, BackgroundContentTypeDefinition.PREFIX_TEXT,
+                ScenarioContentTypeDefinition.PREFIX_TEXT, ScenarioOutlineContentTypeDefinition.PREFIX_TEXT,
+                GivenContentTypeDefinition.PREFIX_TEXT, WhenContentTypeDefinition.PREFIX_TEXT,
+                ThenContentTypeDefinition.PREFIX_TEXT);
     }
 
 
@@ -35,6 +40,7 @@ public class BackgroundContentTypeDefinition extends AbstractFeatureContentTypeD
 
     @Override
     public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
-        return new StartOfUnitFormattingStrategy(formattingContextSupplier, new FixedIndentFormattingStrategy("  "));
+        return new StartOfUnitFormattingStrategy(1, 1, formattingContextSupplier, new FixedIndentFormattingStrategy(
+                "  "));
     }
 }
