@@ -4,7 +4,8 @@ Bundle-Name: Testingtools
 Bundle-SymbolicName: com.technophobia.substeps.core.bundle
 Bundle-Version: 0.0.14.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: commons-io-2.1.jar,
+Bundle-ClassPath: velocity-1.5.jar,
+ commons-io-2.1.jar,
  guava-10.0.jar,
  kxml2-2.2.2.jar,
  slf4j-api-1.6.4.jar,
@@ -17,4 +18,6 @@ Export-Package: com.technophobia.substeps.glossary,
  com.technophobia.substeps.runner,
  com.technophobia.substeps.runner.runtime,
  com.technophobia.substeps.runner.setupteardown,
- com.technophobia.substeps.runner.syntax
+ com.technophobia.substeps.runner.syntax,
+ org.apache.velocity,
+ org.apache.velocity.exception

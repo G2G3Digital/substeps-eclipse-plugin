@@ -100,14 +100,14 @@
 	<modules>
 		<module>../com.technophobia.substeps.target</module>
 		<module>../com.technophobia.substeps.core.bundle</module>
-		<module>../com.technophobia.substeps.testingtools</module>
+		<!--module>../com.technophobia.substeps.testingtools</module-->
 		<module>../com.technophobia.substeps.editor</module>
-		<module>../com.technophobia.substeps.editor.tests.unit</module>
-		<!--module>../com.technophobia.substeps.editor.tests.acceptance</module-->
+		<!--module>../com.technophobia.substeps.editor.tests.unit</module>
 		<module>../com.technophobia.substeps.testlauncher</module>
 		<module>../com.technophobia.substeps.feature</module>
 		<module>../com.technophobia.substeps.repository</module>
-		<module>../com.technophobia.substeps.updatesite</module>
+		<module>../com.technophobia.substeps.updatesite</module-->
+		<module>../com.technophobia.substeps.editor.tests.acceptance</module>
 	</modules>
 
 	<profiles>
