@@ -13,6 +13,9 @@ import com.technophobia.substeps.editor.component.menu.MenuManagerSWTComponent;
 
 public class FeatureFileEditorController extends AbstractSWTController {
 
+    static int count = 1;
+
+
     //
     // Commands
     //
@@ -21,17 +24,13 @@ public class FeatureFileEditorController extends AbstractSWTController {
         final TreeSWTComponent projectNode = selectProjectNode(projectName);
         projectNode.clickContextMenuItem("New", "File");
 
-        new GeneralDialogSWTComponent().setFocus("New File");
+        final GeneralDialogSWTComponent dialog = new GeneralDialogSWTComponent("New File");
+        dialog.setFocus();
         new FormEditorSWTComponent().textWithLabel("File name:").setText(
                 normalizedFeatureFileName(featureFileName) + ".feature");
         new ButtonManagerComponent().buttonFor("Finish").click();
+        dialog.loseFocus();
 
-        try {
-            Thread.sleep(4000);
-        } catch (final InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
 
@@ -42,15 +41,10 @@ public class FeatureFileEditorController extends AbstractSWTController {
 
         featureFileTreeItem.clickDelete();
 
-        new GeneralDialogSWTComponent().setFocus("Confirm Delete");
+        final GeneralDialogSWTComponent dialog = new GeneralDialogSWTComponent("Confirm Delete");
+        dialog.setFocus();
         new ButtonManagerComponent().buttonFor("OK").click();
-
-        try {
-            Thread.sleep(4000);
-        } catch (final InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        dialog.loseFocus();
     }
 
 

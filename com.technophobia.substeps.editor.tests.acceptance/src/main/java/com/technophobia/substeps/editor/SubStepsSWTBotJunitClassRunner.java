@@ -21,11 +21,11 @@ public class SubStepsSWTBotJunitClassRunner extends JunitFeatureRunner {
     @Override
     public void run(final RunNotifier notifier) {
         try {
-            System.out.println("****** Run");
             Thread.sleep(10000);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
+
         final RunListener failureSpy = new ScreenshotCaptureListener();
         notifier.removeListener(failureSpy); // remove existing listeners that
                                              // could be added by suite or

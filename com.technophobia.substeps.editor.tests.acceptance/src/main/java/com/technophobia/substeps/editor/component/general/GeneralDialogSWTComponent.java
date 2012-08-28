@@ -1,16 +1,26 @@
 package com.technophobia.substeps.editor.component.general;
 
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
-import com.technophobia.substeps.editor.SWTTestUtil;
 import com.technophobia.substeps.editor.component.AbstractSWTLocatable;
 import com.technophobia.substeps.editor.component.SWTRootComponent;
 import com.technophobia.substeps.editor.steps.SWTBotInitialiser;
+import com.technophobia.substeps.editor.steps.ShellStack;
 
 public class GeneralDialogSWTComponent extends AbstractSWTLocatable<SWTBot> implements SWTRootComponent<SWTBot> {
+
+    private final ShellStack shellStack;
+    private final String dialogName;
+
+
+    public GeneralDialogSWTComponent(final String dialogName) {
+        this.dialogName = dialogName;
+        this.shellStack = SWTBotInitialiser.shellStack();
+    }
+
 
     //
     // Commands
@@ -22,18 +32,27 @@ public class GeneralDialogSWTComponent extends AbstractSWTLocatable<SWTBot> impl
     }
 
 
-    public void setFocus(final String dialogName) {
+    public void setFocus() {
+        System.out.println("Gaining focus to " + dialogName);
         final SWTBot bot = locate();
+        shellStack.dialogHasOpened(bot);
+        final SWTBotShell shell = new SWTBotShell(shellStack.currentShell());
+        shell.activate();
+        // SWTTestUtil.setActiveShellHack(shell.widget);
+        shell.setFocus();
+    }
+
+
+    public void loseFocus() {
+        System.out.println("Losing focus to " + dialogName);
+        shellStack.dialogHasClosed();
+
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         } catch (final InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        final SWTBotShell shell = SWTTestUtil.dialogNamed(bot, dialogName);
-        shell.activate();
-        // SWTTestUtil.setActiveShellHack(shell.widget);
-        shell.setFocus();
     }
 
 
@@ -57,7 +76,7 @@ public class GeneralDialogSWTComponent extends AbstractSWTLocatable<SWTBot> impl
     //
     public boolean isDialogPresent(final String dialogTitle) {
         try {
-            locate().waitUntil(Conditions.shellIsActive(dialogTitle));
+            locate();
             return true;
         } catch (final TimeoutException ex) {
             return false;
@@ -67,6 +86,14 @@ public class GeneralDialogSWTComponent extends AbstractSWTLocatable<SWTBot> impl
 
     @Override
     public SWTBot doLocate() {
-        return SWTBotInitialiser.bot();
+        // If there are 2 shells open, then we are ready (in this, we assume no
+        // more than 1 dialog can be open at any time
+        final SWTWorkbenchBot bot = SWTBotInitialiser.bot();
+        final int visibleShellSize = shellStack.visibleShellSize(bot);
+        if (visibleShellSize > 1) {
+            return bot;
+        }
+
+        return null;
     }
 }
