@@ -3,7 +3,6 @@ package com.technophobia.substeps.editor.component.menu;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
-import com.technophobia.substeps.editor.SWTTestUtil;
 import com.technophobia.substeps.editor.component.AbstractSWTLocatable;
 import com.technophobia.substeps.editor.component.SWTComponent;
 import com.technophobia.substeps.editor.component.SWTLocatable;

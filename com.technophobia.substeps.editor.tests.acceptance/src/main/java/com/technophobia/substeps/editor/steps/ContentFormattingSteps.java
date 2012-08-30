@@ -8,13 +8,12 @@ import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.technophobia.substeps.editor.SWTTestUtil;
 import com.technophobia.substeps.editor.controller.FeatureFileEditorController;
 import com.technophobia.substeps.editor.controller.ProjectSWTController;
 import com.technophobia.substeps.model.SubSteps.Step;
 import com.technophobia.substeps.model.SubSteps.StepImplementations;
 
-@StepImplementations(requiredInitialisationClasses={EditorBeforeAndAfterExecutor.class, SWTBotInitialiser.class})
+@StepImplementations(requiredInitialisationClasses = { EditorBeforeAndAfterExecutor.class, SWTBotInitialiser.class })
 public class ContentFormattingSteps extends AbstractEditorSteps {
 
     private static final Logger LOG = LoggerFactory.getLogger(ContentFormattingSteps.class);
@@ -24,15 +23,9 @@ public class ContentFormattingSteps extends AbstractEditorSteps {
 
     @Step("Given I am working on the \"([^\"]*)\" Perspective")
     public void navigateToPerspective(final String perspectiveName) {
+        LOG.debug("Given I am working on the " + perspectiveName + " Perspective");
 
         final ProjectSWTController controller = createController(ProjectSWTController.class);
-        try {
-            Thread.sleep(2000);
-        } catch (final InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
         controller.navigateToPerspective(perspectiveName);
     }
 
@@ -45,7 +38,7 @@ public class ContentFormattingSteps extends AbstractEditorSteps {
 
     @Step("Given there is a general project named \"([^\"]*)\"")
     public void ensureProjectExistsNamed(final String projectName) {
-        // TODO - add logging
+        LOG.debug("Given there is a general project named " + projectName);
 
         final ProjectSWTController controller = createController(ProjectSWTController.class);
 
@@ -57,6 +50,7 @@ public class ContentFormattingSteps extends AbstractEditorSteps {
 
     @Step("Given I am working in a new editor named \"([^\"]*)\" in project \"([^\"]*)\"")
     public void ensureNewEditor(final String featureFileName, final String projectName) {
+        LOG.debug("Given I am working in a new editor named " + featureFileName + " in project " + projectName);
 
         final FeatureFileEditorController controller = createController(FeatureFileEditorController.class);
 
@@ -71,6 +65,7 @@ public class ContentFormattingSteps extends AbstractEditorSteps {
 
     @Step("Given the text from file \"([^\"]*)\" exists in the editor")
     public void insertTextFromFileToEditor(final String fileName) {
+        LOG.debug("Given the text from file " + fileName + " exists in the editor");
 
         final FeatureFileEditorController controller = createController(FeatureFileEditorController.class);
 
@@ -80,6 +75,8 @@ public class ContentFormattingSteps extends AbstractEditorSteps {
 
     @Step("When I format the contents of the editor")
     public void formatEditorContents() {
+        LOG.debug("When I format the contents of the editor");
+
         final FeatureFileEditorController controller = createController(FeatureFileEditorController.class);
 
         controller.formatContent();
@@ -88,6 +85,7 @@ public class ContentFormattingSteps extends AbstractEditorSteps {
 
     @Step("Then the editor contents match file \"([^\"]*)\"")
     public void assertEditorContentsMatch(final String fileName) {
+        LOG.debug("Then the editor contents match file " + fileName);
         final FeatureFileEditorController controller = createController(FeatureFileEditorController.class);
 
         final String textFromFile = removeTrailingNewlines(textFromFile(fileName));
