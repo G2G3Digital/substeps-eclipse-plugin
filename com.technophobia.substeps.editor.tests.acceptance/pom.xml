@@ -19,6 +19,7 @@
 	  <profile>
 	    <id>run-tests</id-->	
 	<build>
+          	<finalName>${artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>

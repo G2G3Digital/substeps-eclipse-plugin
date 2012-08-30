@@ -13,6 +13,10 @@
 	<artifactId>com.technophobia.substeps.feature</artifactId>
 	
 	<packaging>eclipse-feature</packaging>
+
+	<build>
+          <finalName>${artifactId}</finalName>
+        </build>
 	
 	<organization>
         <name>Technophobia Ltd</name>

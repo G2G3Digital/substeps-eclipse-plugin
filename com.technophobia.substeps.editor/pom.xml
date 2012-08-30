@@ -13,6 +13,10 @@
 	<artifactId>com.technophobia.substeps.editor</artifactId>
 
 	<packaging>eclipse-plugin</packaging>
+
+	<build>
+	  <finalName>${artifactId}</finalName>
+	</build>
 	
 	<organization>
         <name>Technophobia Ltd</name>
