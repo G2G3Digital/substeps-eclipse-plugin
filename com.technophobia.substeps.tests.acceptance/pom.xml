@@ -11,7 +11,7 @@
 		<relativePath>../com.technophobia.substeps.parent</relativePath>
 	</parent>
 
-	<artifactId>com.technophobia.substeps.editor.tests.acceptance</artifactId>
+	<artifactId>com.technophobia.substeps.tests.acceptance</artifactId>
 
 	<packaging>eclipse-test-plugin</packaging>
 
