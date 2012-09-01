@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tests
-Bundle-SymbolicName: com.technophobia.substeps.editor.tests.acceptance
+Bundle-SymbolicName: com.technophobia.substeps.tests.acceptance
 Bundle-Version: 0.0.14.qualifier
 Bundle-ActivationPolicy: lazy
 Fragment-Host: com.technophobia.substeps.editor
