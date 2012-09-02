@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TypedPosition;
+import org.eclipse.jface.text.formatter.IFormattingStrategy;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
@@ -36,6 +37,7 @@ import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.formatting.FormattingContext;
 import com.technophobia.substeps.document.formatting.InvalidFormatPositionException;
+import com.technophobia.substeps.supplier.Supplier;
 
 @RunWith(JMock.class)
 public class PartitionedFormattingContextTest {
@@ -88,7 +90,7 @@ public class PartitionedFormattingContextTest {
         final TypedPosition[] positions = positions(position(0, 10, "position-1"));
         final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-        formattingContext.previousContentContext().currentContentType();
+        formattingContext.inspectPreviousContentType();
     }
 
 
@@ -106,7 +108,7 @@ public class PartitionedFormattingContextTest {
             }
         });
 
-        assertThat(formattingContext.previousContentContext().currentContentType(), is(previousContentType));
+        assertThat(formattingContext.inspectPreviousContentType(), is(previousContentType));
     }
 
 
@@ -126,7 +128,7 @@ public class PartitionedFormattingContextTest {
             }
         });
 
-        assertThat(formattingContext.previousContentContext().currentContentType(), is(previousContentType));
+        assertThat(formattingContext.inspectPreviousContentType(), is(previousContentType));
     }
 
 
@@ -135,7 +137,7 @@ public class PartitionedFormattingContextTest {
         final TypedPosition[] positions = positions(position(0, 10, "position-1"));
         final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-        assertFalse(formattingContext.hasNextContent());
+        assertFalse(formattingContext.hasMoreContent());
     }
 
 
@@ -145,7 +147,7 @@ public class PartitionedFormattingContextTest {
                 position(11, 10, IDocument.DEFAULT_CONTENT_TYPE));
         final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-        assertFalse(formattingContext.hasNextContent());
+        assertFalse(formattingContext.hasMoreContent());
     }
 
 
@@ -154,7 +156,7 @@ public class PartitionedFormattingContextTest {
         final TypedPosition[] positions = positions(position(0, 10, "position-1"), position(11, 10, "position-2"));
         final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-        assertTrue(formattingContext.hasNextContent());
+        assertTrue(formattingContext.hasMoreContent());
     }
 
 
@@ -163,31 +165,54 @@ public class PartitionedFormattingContextTest {
         final TypedPosition[] positions = positions(position(0, 10, "position-1"));
         final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
-        formattingContext.nextContentContext();
+        formattingContext.impersonateNextContentContext();
     }
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void nextContentTypeReturnsCorrectContentType() throws Exception {
-        final ContentTypeDefinition nextContentType = context.mock(ContentTypeDefinition.class);
+        final ContentTypeDefinition currentContentType = context
+                .mock(ContentTypeDefinition.class, "currentContentType");
+        final ContentTypeDefinition nextContentType = context.mock(ContentTypeDefinition.class, "nextContentType");
+
+        final Supplier<FormattingContext> formattingContextSupplier = context.mock(Supplier.class);
+        final IFormattingStrategy formattingStrategy = context.mock(IFormattingStrategy.class);
 
         final TypedPosition[] positions = positions(position(0, 10, "position-1"), position(11, 10, "position-2"));
         final FormattingContext formattingContext = formattingContextForPosition(positions, 0);
 
         context.checking(new Expectations() {
             {
+                oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-1");
+                will(returnValue(currentContentType));
+
                 oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-2");
                 will(returnValue(nextContentType));
+
+                oneOf(currentContentType).id();
+                will(returnValue("current id"));
+
+                oneOf(nextContentType).formattingStrategy(formattingContextSupplier);
+                will(returnValue(formattingStrategy));
             }
         });
 
-        assertThat(formattingContext.nextContentContext().currentContentType(), is(nextContentType));
+        final ContentTypeDefinition impersonatedContentContextType = formattingContext.impersonateNextContentContext()
+                .currentContentType();
+        assertThat(impersonatedContentContextType.id(), is("current id"));
+        assertThat(impersonatedContentContextType.formattingStrategy(formattingContextSupplier), is(formattingStrategy));
     }
 
 
     @Test
     public void nextContentTypeReturnsCorrectNonWhitespace() throws Exception {
+        final ContentTypeDefinition currentContentType = context
+                .mock(ContentTypeDefinition.class, "currentContentType");
         final ContentTypeDefinition nextContentType = context.mock(ContentTypeDefinition.class, "nextContentType");
+
+        final Supplier<FormattingContext> formattingContextSupplier = context.mock(Supplier.class);
+        final IFormattingStrategy formattingStrategy = context.mock(IFormattingStrategy.class);
 
         final TypedPosition[] positions = positions(position(0, 10, "position-1"),
                 position(11, 10, IDocument.DEFAULT_CONTENT_TYPE), position(21, 10, "position-2"));
@@ -195,12 +220,24 @@ public class PartitionedFormattingContextTest {
 
         context.checking(new Expectations() {
             {
+                oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-1");
+                will(returnValue(currentContentType));
+
                 oneOf(contentTypeDefinitionFactory).contentTypeDefintionByName("position-2");
                 will(returnValue(nextContentType));
+
+                oneOf(currentContentType).id();
+                will(returnValue("current id"));
+
+                oneOf(nextContentType).formattingStrategy(formattingContextSupplier);
+                will(returnValue(formattingStrategy));
             }
         });
 
-        assertThat(formattingContext.nextContentContext().currentContentType(), is(nextContentType));
+        final ContentTypeDefinition impersonatedContentContextType = formattingContext.impersonateNextContentContext()
+                .currentContentType();
+        assertThat(impersonatedContentContextType.id(), is("current id"));
+        assertThat(impersonatedContentContextType.formattingStrategy(formattingContextSupplier), is(formattingStrategy));
     }
 
 

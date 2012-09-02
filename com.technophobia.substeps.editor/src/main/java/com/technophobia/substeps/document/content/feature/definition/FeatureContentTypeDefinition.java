@@ -15,6 +15,7 @@ public class FeatureContentTypeDefinition extends AbstractFeatureContentTypeDefi
     public static final String CONTENT_TYPE_ID = "__feature_feature";
     public static final String PREFIX_TEXT = "Feature:";
 
+
     public FeatureContentTypeDefinition() {
         super(CONTENT_TYPE_ID, PREFIX_TEXT, false);
     }
@@ -22,7 +23,9 @@ public class FeatureContentTypeDefinition extends AbstractFeatureContentTypeDefi
 
     @Override
     public IPredicateRule partitionRule() {
-        return paragraphRule(PREFIX_TEXT, id(), false, TagContentTypeDefinition.PREFIX_TEXT, CommentContentTypeDefinition.PREFIX_TEXT, BackgroundContentTypeDefinition.PREFIX_TEXT, ScenarioContentTypeDefinition.PREFIX_TEXT, ScenarioOutlineContentTypeDefinition.PREFIX_TEXT);
+        return paragraphRule(PREFIX_TEXT, id(), true, TagContentTypeDefinition.PREFIX_TEXT,
+                CommentContentTypeDefinition.PREFIX_TEXT, BackgroundContentTypeDefinition.PREFIX_TEXT,
+                ScenarioContentTypeDefinition.PREFIX_TEXT, ScenarioOutlineContentTypeDefinition.PREFIX_TEXT);
     }
 
 
@@ -34,6 +37,6 @@ public class FeatureContentTypeDefinition extends AbstractFeatureContentTypeDefi
 
     @Override
     public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
-        return new MultiLineFixedIndentFormattingStrategy("", "\t\t");
+        return new MultiLineFixedIndentFormattingStrategy("", "\t\t", formattingContextSupplier);
     }
 }

@@ -25,13 +25,13 @@ public interface FormattingContext {
     boolean hasPreviousContent();
 
 
-    FormattingContext previousContentContext() throws InvalidFormatPositionException;
+    ContentTypeDefinition inspectPreviousContentType() throws InvalidFormatPositionException;
 
 
-    boolean hasNextContent();
+    boolean hasMoreContent();
 
 
-    FormattingContext nextContentContext() throws InvalidFormatPositionException;
+    FormattingContext impersonateNextContentContext() throws InvalidFormatPositionException;
 
 
     ContentTypeDefinition currentContentType();

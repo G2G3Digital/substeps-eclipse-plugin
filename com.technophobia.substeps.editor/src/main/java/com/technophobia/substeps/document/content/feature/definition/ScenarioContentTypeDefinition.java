@@ -36,7 +36,8 @@ public class ScenarioContentTypeDefinition extends AbstractFeatureContentTypeDef
 
     @Override
     public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
-        return new StartOfUnitFormattingStrategy(formattingContextSupplier, new FixedIndentFormattingStrategy("  "));
+        return new StartOfUnitFormattingStrategy(1, 1, formattingContextSupplier, new FixedIndentFormattingStrategy(
+                "  "));
     }
 
 }
