@@ -2,52 +2,52 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<groupId>com.technophobia.substeps</groupId>
 	<artifactId>com.technophobia.substeps.parent</artifactId>
 	<version>0.0.14-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	
-	<organization>
-        <name>Technophobia Ltd</name>
-        <url>www.technophobia.com/</url>
-    </organization>
 
-    <licenses>
-        <license>
-            <name>LGPL 3.0 license</name>
-            <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
-            <distribution>manual</distribution>
-      </license>
-    </licenses>
-	
+	<organization>
+		<name>Technophobia Ltd</name>
+		<url>www.technophobia.com/</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>LGPL 3.0 license</name>
+			<url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+			<distribution>manual</distribution>
+		</license>
+	</licenses>
+
 	<properties>
 		<tycho.version>0.15.0</tycho.version>
 	</properties>
-	
-	<repositories> 
-      <repository> 
-	    <id>juno</id> 
- 	    <layout>p2</layout> 
-	    <url>http://download.eclipse.org/releases/juno</url> 
-	  </repository>
-	  <repository>
-	  	<id>swtbot</id>
-	  	<layout>p2</layout>
-	  	<url>http://download.eclipse.org/technology/swtbot/helios/dev-build/update-site</url>
-	  </repository> 
+
+	<repositories>
+		<repository>
+			<id>juno</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/juno</url>
+		</repository>
+		<repository>
+			<id>swtbot</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/technology/swtbot/helios/dev-build/update-site</url>
+		</repository>
 	</repositories>
-	
+
 	<build>
 		<plugins>
 			<plugin>
-        			<groupId>org.apache.maven.plugins</groupId>
-			        <artifactId>maven-compiler-plugin</artifactId>
-			        <version>2.5.1</version>
-			        <configuration>
-			          <source>1.6</source>
-			          <target>1.6</target>
-			        </configuration>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
@@ -70,33 +70,16 @@
 							<classifier>substeps</classifier>
 						</artifact>
 					</target>
-					<!--environments>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86_64</arch>
-						</environment>
-						<environment>
-							<os>win32</os>
-							<ws>win32</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>win32</os>
-							<ws>win32</ws>
-							<arch>x86_64</arch>
-						</environment>
-					</environments-->
+					<!--environments> <environment> <os>linux</os> <ws>gtk</ws> <arch>x86</arch> 
+						</environment> <environment> <os>linux</os> <ws>gtk</ws> <arch>x86_64</arch> 
+						</environment> <environment> <os>win32</os> <ws>win32</ws> <arch>x86</arch> 
+						</environment> <environment> <os>win32</os> <ws>win32</ws> <arch>x86_64</arch> 
+						</environment> </environments -->
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<modules>
 		<module>../com.technophobia.substeps.target</module>
 		<module>../com.technophobia.substeps.core.bundle</module>
@@ -107,27 +90,32 @@
 		<module>../com.technophobia.substeps.feature</module>
 		<module>../com.technophobia.substeps.repository</module>
 		<module>../com.technophobia.substeps.updatesite</module>
-		<module>../com.technophobia.substeps.tests.acceptance</module>
 	</modules>
 
 	<profiles>
-	<profile>
-            <id>internalDev</id>
-             
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>${nexus.snapshot.artifacts}</id>
-                    <name>${nexus.snapshot.artifacts}</name>
-                    <url>${nexus.snapshot.url}</url>
-                    <uniqueVersion>false</uniqueVersion>
-                </snapshotRepository>
-                <repository>
-                    <id>${nexus.release.artifacts}</id>
-                    <name>${nexus.release.artifacts}</name>
-                    <url>${nexus.releases.url}</url>
-                </repository>
-            </distributionManagement>
-            
-        </profile>
+		<profile>
+			<id>run-tests</id>
+			<modules>
+				<module>../com.technophobia.substeps.tests.acceptance</module>			
+			</modules>
+		</profile>
+		<profile>
+			<id>internalDev</id>
+
+			<distributionManagement>
+				<snapshotRepository>
+					<id>${nexus.snapshot.artifacts}</id>
+					<name>${nexus.snapshot.artifacts}</name>
+					<url>${nexus.snapshot.url}</url>
+					<uniqueVersion>false</uniqueVersion>
+				</snapshotRepository>
+				<repository>
+					<id>${nexus.release.artifacts}</id>
+					<name>${nexus.release.artifacts}</name>
+					<url>${nexus.releases.url}</url>
+				</repository>
+			</distributionManagement>
+
+		</profile>
 	</profiles>
 </project>
