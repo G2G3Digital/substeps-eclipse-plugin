@@ -13,7 +13,7 @@ import com.technophobia.substeps.supplier.Supplier;
 public class DefineContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
 
     public static final String CONTENT_TYPE_ID = "__substeps_define";
-    public static final String PREFIX_TEXT = "Define";
+    public static final String PREFIX_TEXT = "Define:";
 
 
     public DefineContentTypeDefinition() {
