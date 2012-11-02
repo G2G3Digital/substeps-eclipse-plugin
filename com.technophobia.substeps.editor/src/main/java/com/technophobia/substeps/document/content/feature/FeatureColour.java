@@ -31,8 +31,9 @@ public enum FeatureColour {
     GREEN(new RGB(0, 128, 0)), //
     BLUE(new RGB(0, 0, 128)), //
     BLACK(new RGB(0, 0, 0)), //
-    PINK(new RGB(255, 105, 180));
-
+    PINK(new RGB(255, 105, 180)),
+    SLATE(new RGB(112, 138, 144));
+    
     private RGB colour;
 
 

@@ -12,6 +12,7 @@ import org.eclipse.jface.text.rules.WordRule;
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.FeatureColour;
+import com.technophobia.substeps.document.text.rule.SingleLineWithTrailingCommentRule;
 import com.technophobia.substeps.document.text.rule.UntilOtherContentTypeSequenceRule;
 
 public abstract class AbstractFeatureContentTypeDefinition implements ContentTypeDefinition {
@@ -52,7 +53,27 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
 
 
     protected IRule fixedWordRule(final String word, final IToken token) {
-        return new WordRule(word(word), token);
+//      return new WordRule(word(word), token);
+	  	WordRule rule = new WordRule(new IWordDetector() {
+				
+	  		/**
+	  		 * Only really interested in the keyword, so only pick words which start with the same character
+	  		 */
+				@Override
+				public boolean isWordStart(char c) {
+					return c == word.charAt(0);
+				}
+				
+				/**
+				 * "Words" may contain any non-whitespace characters
+				 */
+				@Override
+				public boolean isWordPart(char c) {
+					return !Character.isWhitespace(c);
+				}
+			});
+	  	rule.addWord(word, token);
+	  	return rule;
     }
 
 
@@ -64,6 +85,13 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
         return new EndOfLineRule(startSequence, token);
     }
 
+    protected IPredicateRule singleLineWithTrailingCommentRule(final String startString, final String tokenId) {
+        return singleLineWithTrailingCommentRule(startString, new Token(tokenId));
+    }
+    
+    protected IPredicateRule singleLineWithTrailingCommentRule(final String startSequence, final IToken token) {
+        return new SingleLineWithTrailingCommentRule(startSequence, token);
+    }
 
     protected IPredicateRule paragraphRule(final String startString, final String tokenId, final boolean breaksOnEOF, final String... validProceedingContentTypes) {
         return paragraphRule(startString, new Token(tokenId), breaksOnEOF, validProceedingContentTypes);
@@ -74,6 +102,11 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
     }
 
     protected IWordDetector word(final String word) {
+    	// This is rubbish, just detects anything matching any starting part of word
+    	// i.e. if word is "Then", then the only "words" are: "T", "Th", "The" "Then".
+    	// So "Theory" is not a word, which works ok for our purposes, but "T" is a
+    	// word, which is certainly not.
+    	// see instead fixedWordRule()
         return new IWordDetector() {
             int i = 0;
 

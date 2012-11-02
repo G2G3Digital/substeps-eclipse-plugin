@@ -2,7 +2,6 @@ package com.technophobia.substeps.render.fake;
 
 import com.technophobia.substeps.model.SubSteps.Step;
 
-@SuppressWarnings("unused")
 public class FakeStepImplementationRendererTarget {
 
     @Step("Given this is a non-parameterised step definition")
