@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SubstepsEclipseEditor
 Bundle-SymbolicName: com.technophobia.substeps.editor;singleton:=true
-Bundle-Version: 0.0.15.qualifier
+Bundle-Version: 0.0.15
 Bundle-Activator: com.technophobia.substeps.FeatureEditorPlugin
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
