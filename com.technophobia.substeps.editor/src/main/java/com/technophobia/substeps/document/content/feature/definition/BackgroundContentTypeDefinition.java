@@ -40,7 +40,7 @@ public class BackgroundContentTypeDefinition extends AbstractFeatureContentTypeD
 
     @Override
     public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
-        return new StartOfUnitFormattingStrategy(1, 1, formattingContextSupplier, new FixedIndentFormattingStrategy(
-                "  "));
+        return new StartOfUnitFormattingStrategy(2, 0, formattingContextSupplier, new FixedIndentFormattingStrategy(
+                "  ", formattingContextSupplier));
     }
 }

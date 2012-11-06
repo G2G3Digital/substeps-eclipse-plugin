@@ -19,7 +19,7 @@ public class ThenContentTypeDefinition extends AbstractKeywordContentTypeDefinit
 
     @Override
     public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
-        return new FixedIndentFormattingStrategy("\t ");
+        return new FixedIndentFormattingStrategy("\t ", formattingContextSupplier);
     }
 
 }

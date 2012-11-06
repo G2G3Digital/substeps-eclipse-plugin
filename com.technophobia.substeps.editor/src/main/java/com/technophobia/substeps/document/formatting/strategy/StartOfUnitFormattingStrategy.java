@@ -63,13 +63,23 @@ public class StartOfUnitFormattingStrategy extends DefaultFormattingStrategy {
          * (!previousContext.currentContentType().isOptional()) { prefixNewLine
          * = true; } } }
          */
-        final String formattedContent = formattingStrategy.format(content.trim(), isLineStart, indentation, positions);
+        final String formattedContent = removeLeadingNewlines(formattingStrategy.format(content.trim(), isLineStart,
+                indentation, positions));
 
         final StringBuffer sb = new StringBuffer();
         addNewlinesTo(numLeadingLines, hasPreviousContent(), sb);
         sb.append(formattedContent);
         addNewlinesTo(numTrailingLines, hasNextContent() && !isOptional(), sb);
         return sb.toString();
+    }
+
+
+    private String removeLeadingNewlines(final String content) {
+        if (content.length() > 0 && content.startsWith(NEWLINE)) {
+            return removeLeadingNewlines(content.substring(NEWLINE.length()));
+        }
+
+        return content;
     }
 
 
