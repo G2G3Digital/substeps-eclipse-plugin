@@ -93,7 +93,10 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
     private List<Class<?>> toList(final Iterator<Class<?>> it) {
         final List<Class<?>> list = new ArrayList<Class<?>>();
         while (it.hasNext()) {
-            list.add(it.next());
+            final Class<?> nextClass = it.next();
+            if (nextClass != null) {
+                list.add(nextClass);
+            }
         }
         return list;
     }

@@ -11,7 +11,7 @@ Bundle-ClassPath: velocity-1.5.jar,
  slf4j-api-1.6.4.jar,
  xmlpull-1.1.3.1.jar,
  xstream-1.4.2.jar,
- substeps-core-0.0.7.jar
+ substeps-core-1.0.2-SNAPSHOT.jar
 Require-Bundle: org.junit;bundle-version="4.10.0"
 Export-Package: com.technophobia.substeps.glossary,
  com.technophobia.substeps.model,
