@@ -78,6 +78,17 @@ Feature: feature file content formatting
 	|contentformat/input/unindented-tags-before-scenario-outline	|contentformat/output/indented-tags-before-scenario-outline|
 	|contentformat/input/indented-tags-before-scenario-outline		|contentformat/output/indented-tags-before-scenario-outline|
 
+  Scenario Outline: Adequate newline between feature and background
+	Given the text from file "<InputFile>" exists in the editor
+	 When I format the contents of the editor
+	 Then the editor contents match file "<OutputFile>"
+
+  Examples:
+	|InputFile															|OutputFile|
+	|contentformat/input/no-newline-between-feature-and-background		|contentformat/output/newline-between-feature-and-background|
+	|contentformat/input/newline-between-feature-and-background			|contentformat/output/newline-between-feature-and-background|
+	|contentformat/input/2-newlines-between-feature-and-background		|contentformat/output/newline-between-feature-and-background|
+
   Scenario Outline: Adequate newline between background and scenario
 	Given the text from file "<InputFile>" exists in the editor
 	 When I format the contents of the editor
