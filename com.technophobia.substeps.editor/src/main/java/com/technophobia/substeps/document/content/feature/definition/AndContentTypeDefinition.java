@@ -10,7 +10,7 @@ import com.technophobia.substeps.document.formatting.FormattingContext;
 import com.technophobia.substeps.document.formatting.strategy.FixedIndentFormattingStrategy;
 import com.technophobia.substeps.supplier.Supplier;
 
-public class AndContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
+public class AndContentTypeDefinition extends AbstractKeywordContentTypeDefinition {
 
     public static final String CONTENT_TYPE_ID = "__feature_and";
     public static final String PREFIX_TEXT = "And";

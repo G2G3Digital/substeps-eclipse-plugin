@@ -24,7 +24,7 @@ public class ScenarioExampleContentTypeDefinition extends AbstractFeatureContent
 
     @Override
     public IPredicateRule partitionRule() {
-        return singleLineRule(PREFIX_TEXT, id());
+        return singleLineWithTrailingCommentRule(PREFIX_TEXT, id());
     }
 
 

@@ -6,13 +6,17 @@
 	<parent>
 		<groupId>com.technophobia.substeps</groupId>
 		<artifactId>com.technophobia.substeps.parent</artifactId>
-		<version>0.0.14-SNAPSHOT</version>
+		<version>0.0.15-SNAPSHOT</version>
 		<relativePath>../com.technophobia.substeps.parent</relativePath>
 	</parent>
 
 	<artifactId>com.technophobia.substeps.editor</artifactId>
 
 	<packaging>eclipse-plugin</packaging>
+
+	<build>
+	  <finalName>${artifactId}</finalName>
+	</build>
 	
 	<organization>
         <name>Technophobia Ltd</name>
