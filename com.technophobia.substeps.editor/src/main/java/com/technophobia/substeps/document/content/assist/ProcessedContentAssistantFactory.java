@@ -22,6 +22,7 @@ import com.technophobia.substeps.supplier.Supplier;
  */
 public class ProcessedContentAssistantFactory implements ContentAssistantFactory {
 
+    private static final String DEFAULT_PARTITION_CONTENT_TYPE = "__dftl_partition_content_type";
     private final Supplier<IContentAssistProcessor> processorSupplier;
     private final Callback1<IContentAssistant>[] contentAssistantDecorators;
 
@@ -44,6 +45,7 @@ public class ProcessedContentAssistantFactory implements ContentAssistantFactory
         assistant.setContentAssistProcessor(processor, ThenContentTypeDefinition.CONTENT_TYPE_ID);
         assistant.setContentAssistProcessor(processor, AndContentTypeDefinition.CONTENT_TYPE_ID);
         assistant.setContentAssistProcessor(processor, DefineContentTypeDefinition.CONTENT_TYPE_ID);
+        assistant.setContentAssistProcessor(processor, DEFAULT_PARTITION_CONTENT_TYPE);
 
         for (final Callback1<IContentAssistant> callback : contentAssistantDecorators) {
             callback.doCallback(assistant);

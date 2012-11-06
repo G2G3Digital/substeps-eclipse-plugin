@@ -2,9 +2,10 @@ package com.technophobia.substeps.document.content.assist.feature;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -30,7 +31,7 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
 
         final IJavaProject javaProject = new ProjectToJavaProjectTransformer().from(project);
         final ClassLoader classLoader = new JavaProjectClassLoader(javaProject);
-        final String[] outputFolders = outputFoldersForProject(javaProject);
+        final Set<String> outputFolders = outputFoldersForProject(javaProject);
 
         final List<Class<?>> stepClasses = new ArrayList<Class<?>>();
         for (final String outputFolder : outputFolders) {
@@ -42,8 +43,8 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
     }
 
 
-    private String[] outputFoldersForProject(final IJavaProject project) {
-        final Collection<String> outputFolders = new ArrayList<String>();
+    private Set<String> outputFoldersForProject(final IJavaProject project) {
+        final Set<String> outputFolders = new HashSet<String>();
         final IPath projectLocation = projectLocationPath(project);
 
         try {
@@ -70,7 +71,7 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
                     "Could not get output folder location for project " + project.getElementName());
         }
 
-        return outputFolders.toArray(new String[outputFolders.size()]);
+        return outputFolders;
     }
 
 
