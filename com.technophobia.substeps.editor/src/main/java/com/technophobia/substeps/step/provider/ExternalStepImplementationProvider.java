@@ -26,7 +26,6 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
 
     private final Transformer<IProject, List<StepImplementationsDescriptor>> stepImplementationLoader;
     private final Map<IProject, Set<String>> externalStepClassesForProject;
-    private final Set<IProject> staleProjects;
 
 
     public ExternalStepImplementationProvider(
@@ -34,7 +33,6 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
         super();
         this.stepImplementationLoader = stepImplementationLoader;
         this.externalStepClassesForProject = new HashMap<IProject, Set<String>>();
-        this.staleProjects = new HashSet<IProject>();
     }
 
 
@@ -48,9 +46,9 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
                 if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
                     final Set<IProject> projects = findProjectsInChangeset(event);
                     for (final IProject project : projects) {
-                        clearStepImplementationsFor(project);
+                        markAsStale(project);
                     }
-                    staleProjects.addAll(projects);
+
                 }
             }
         });
@@ -58,12 +56,10 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
 
 
     @Override
-    public Collection<String> suggestionsFor(final IProject project) {
-        if (staleProjects.contains(project)) {
-            loadProject(project);
-            staleProjects.remove(project);
-        }
-        return super.suggestionsFor(project);
+    public Collection<String> stepImplementationClasses(final IProject project) {
+        clean(project);
+        return externalStepClassesForProject.containsKey(project) ? externalStepClassesForProject.get(project)
+                : Collections.<String> emptyList();
     }
 
 
@@ -71,14 +67,6 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
     protected void clearStepImplementationsFor(final IProject project) {
         super.clearStepImplementationsFor(project);
         this.externalStepClassesForProject.remove(project);
-    }
-
-
-    @Override
-    public Collection<String> stepImplementationClasses(final IProject project) {
-
-        return externalStepClassesForProject.containsKey(project) ? externalStepClassesForProject.get(project)
-                : Collections.<String> emptyList();
     }
 
 
