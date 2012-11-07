@@ -2,9 +2,7 @@ package com.technophobia.substeps.step.provider;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -19,12 +17,9 @@ public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionPro
 
     private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
 
-    private final Set<IProject> staleProjects;
-
 
     public SubstepSuggestionProvider(final Transformer<IProject, Syntax> projectToSyntaxTransformer) {
         this.projectToSyntaxTransformer = projectToSyntaxTransformer;
-        this.staleProjects = new HashSet<IProject>();
     }
 
 
@@ -37,20 +32,9 @@ public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionPro
             @Override
             public void doCallback(final IFile file) {
                 final IProject project = file.getProject();
-                clearStepImplementationsFor(project);
-                staleProjects.add(project);
+                markAsStale(project);
             }
         }));
-    }
-
-
-    @Override
-    public Collection<String> suggestionsFor(final IProject project) {
-        if (staleProjects.contains(project)) {
-            loadProject(project);
-            staleProjects.remove(project);
-        }
-        return super.suggestionsFor(project);
     }
 
 
