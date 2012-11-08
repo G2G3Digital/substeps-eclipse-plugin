@@ -35,7 +35,8 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
 
     private final PartitionScannerFactory partitionScannerFactory;
 
-
+    private IDocument thisDocument = null;
+    
     public PartitionScannedDocumentProvider(final PartitionScannerFactory partitionScannerFactory) {
         this.partitionScannerFactory = partitionScannerFactory;
     }
@@ -43,13 +44,18 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
 
     @Override
     protected IDocument createDocument(final Object element) throws CoreException {
-        final IDocument document = super.createDocument(element);
-        if (document != null) {
-            attachPartitionerTo(document);
+    	thisDocument = super.createDocument(element);
+        if (thisDocument != null) {
+            attachPartitionerTo(thisDocument);
         }
 
-        return document;
+        return thisDocument;
     }
+    
+    public IDocument getDocuemnt()
+	{
+		return thisDocument;
+	}
 
 
     /**

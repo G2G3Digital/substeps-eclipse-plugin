@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  org.eclipse.swt;bundle-version="3.100.0",
  org.eclipse.jface;bundle-version="3.8.0",
  org.eclipse.jdt.launching;bundle-version="3.6.100",
- org.eclipse.ui.workbench;bundle-version="3.103.0"
+ org.eclipse.ui.workbench;bundle-version="3.103.0",
+ org.eclipse.ui;bundle-version="3.103.0"
 Export-Package: com.technophobia.eclipse.transformer,
  com.technophobia.substeps,
  com.technophobia.substeps.actions,

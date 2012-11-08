@@ -23,6 +23,7 @@ import java.util.ResourceBundle;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleActivator;
@@ -108,11 +109,26 @@ public class FeatureEditorPlugin implements BundleActivator, Logger {
         return suggestionManager;
     }
 
+    public static void info(final String msg){
+    	instance().log.log(new Status(IStatus.INFO, PLUGIN_ID, msg));
+	}
 
     @Override
     public void log(final int status, final String message) {
         instance().log.log(new Status(status, PLUGIN_ID, message));
     }
+
+    public static void log(final Throwable ex) {
+        instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Error", ex));
+    }
+
+	public static void error(final String msg){
+		instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg));
+	}
+
+	public static void error(final String msg, final Throwable t){
+		instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg, t));
+	}
 
 
     public static FeatureEditorPlugin instance() {
@@ -135,4 +151,7 @@ public class FeatureEditorPlugin implements BundleActivator, Logger {
 
         suggestionManager.load(ResourcesPlugin.getWorkspace());
     }
+    
+   
+
 }
