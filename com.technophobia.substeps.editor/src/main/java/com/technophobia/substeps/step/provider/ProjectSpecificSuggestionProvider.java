@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -23,15 +22,12 @@ public class ProjectSpecificSuggestionProvider extends AbstractMultiProjectSugge
     private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
     private final StepImplementationRenderer stepRenderer;
 
-    private final Set<IProject> staleProjects;
-
 
     public ProjectSpecificSuggestionProvider(final Transformer<IProject, Syntax> projectToSyntaxTransformer,
             final StepImplementationRenderer stepRenderer) {
         super();
         this.projectToSyntaxTransformer = projectToSyntaxTransformer;
         this.stepRenderer = stepRenderer;
-        this.staleProjects = new HashSet<IProject>();
     }
 
 
@@ -43,24 +39,15 @@ public class ProjectSpecificSuggestionProvider extends AbstractMultiProjectSugge
             @Override
             public void doCallback(final IProject project) {
                 clearStepImplementationsFor(project);
-                staleProjects.add(project);
+                markAsStale(project);
             }
         }));
     }
 
 
     @Override
-    public Collection<String> suggestionsFor(final IProject project) {
-        if (staleProjects.contains(project)) {
-            loadProject(project);
-            staleProjects.remove(project);
-        }
-        return super.suggestionsFor(project);
-    }
-
-
-    @Override
     public Collection<String> stepImplementationClasses(final IProject project) {
+        clean(project);
         final Syntax syntax = projectToSyntaxTransformer.from(project);
 
         final List<StepImplementation> stepImplementations = syntax.getStepImplementations();

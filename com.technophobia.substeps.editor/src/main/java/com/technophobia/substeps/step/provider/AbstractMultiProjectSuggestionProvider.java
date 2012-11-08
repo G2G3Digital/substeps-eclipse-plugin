@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -20,9 +22,12 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
 
     private final Map<IProject, List<String>> stepImplementationMap;
 
+    private final Set<IProject> staleProjects;
+
 
     public AbstractMultiProjectSuggestionProvider() {
         this.stepImplementationMap = new HashMap<IProject, List<String>>();
+        this.staleProjects = new HashSet<IProject>();
     }
 
 
@@ -63,9 +68,24 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
 
     @Override
     public Collection<String> suggestionsFor(final IProject project) {
+        clean(project);
         return stepImplementationMap.containsKey(project) ? stepImplementationMap.get(project) : Collections
                 .<String> emptyList();
 
+    }
+
+
+    protected void markAsStale(final IProject project) {
+        staleProjects.add(project);
+        clearStepImplementationsFor(project);
+    }
+
+
+    protected void clean(final IProject project) {
+        if (staleProjects.contains(project)) {
+            loadProject(project);
+            staleProjects.remove(project);
+        }
     }
 
 
