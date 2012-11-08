@@ -63,7 +63,9 @@ public class OptionalUnitPrefixFormattingStrategy extends DefaultFormattingStrat
         for (final String contentLine : contentLines) {
             if (contentLine.trim().length() > 0) {
                 sb.append(formattingStrategy.format(contentLine, isLineStart, indentation, positions));
-                sb.append(NEWLINE);
+                if (!(formattingStrategy instanceof OptionalUnitPrefixFormattingStrategy)) {
+                    sb.append(NEWLINE);
+                }
             }
         }
 
