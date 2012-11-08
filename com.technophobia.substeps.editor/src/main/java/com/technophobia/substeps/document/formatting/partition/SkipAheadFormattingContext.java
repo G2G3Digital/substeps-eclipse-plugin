@@ -70,4 +70,10 @@ public class SkipAheadFormattingContext extends PartitionedFormattingContext {
             }
         };
     }
+
+
+    @Override
+    protected int nextPosition() {
+        return skipAheadPosition + 1;
+    }
 }
