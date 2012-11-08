@@ -20,10 +20,18 @@ package com.technophobia.substeps.editor;
 
 import java.util.ResourceBundle;
 
+import org.eclipse.core.commands.contexts.IContextManagerListener;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.contexts.IContextActivation;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.TextOperationAction;
 
@@ -50,10 +58,10 @@ import com.technophobia.substeps.supplier.Supplier;
  * @author sforbes
  * 
  */
-public class FeatureEditor extends TextEditor implements FormattableEditorPart {
+public class FeatureEditor extends TextEditor implements FormattableEditorPart, IPartListener2 {
 
     private final ColourManager colourManager;
-
+    private IContextActivation currentActivateContext;
 
     @SuppressWarnings("unchecked")
     public FeatureEditor() {
@@ -69,6 +77,8 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart {
                 formattingContextFactory, contentAssistantFactory));
         setDocumentProvider(new PartitionScannedDocumentProvider(new ContentTypeRuleBasedPartitionScannerFactory(
                 contentTypeDefinitionFactory)));
+        
+        FeatureEditorPlugin.info("ctor");
     }
 
 
@@ -104,10 +114,34 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart {
         };
     }
 
-
+    private void activateContext(){
+    	if (currentActivateContext == null) {
+			final IContextService contextService = (IContextService) this.getSite().getWorkbenchWindow().getService(
+					IContextService.class);
+			currentActivateContext = contextService.activateContext(SUBSTEPS_CONTEXT);
+    	}
+    	// else we're already active 
+    }
+    
+    private void deactivateContext(){
+        if (currentActivateContext != null) {
+	        final IContextService contextService = (IContextService) this.getSite().getWorkbenchWindow().getService(
+					IContextService.class);
+	        
+	    	contextService.deactivateContext(currentActivateContext);
+	    	currentActivateContext = null;
+        }
+    }
+    
     @Override
     public void dispose() {
         colourManager.dispose();
+    	
+        
+		IPartService partService = (IPartService) this.getSite().getService(IPartService.class);
+		
+		partService.removePartListener(this);
+        
         super.dispose();
     }
 
@@ -122,4 +156,93 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart {
         setAction("ContentFormatProposal", action);
         getEditorSite().getActionBars().setGlobalActionHandler("ContentFormatProposal", action);
     }
+    
+    private static final String SUBSTEPS_CONTEXT = "com.technophobia.substeps.editor.SubstepsContext";
+    /**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void setSite(final IWorkbenchPartSite site){
+
+		super.setSite(site);
+		
+		// add an activation listener
+		
+		IPartService partService = (IPartService) site.getService(IPartService.class);
+		
+		partService.addPartListener(this);
+		
+	}
+	
+
+	public IDocument getCurrentDocument() {
+		PartitionScannedDocumentProvider docProvider = (PartitionScannedDocumentProvider)getDocumentProvider();
+		return docProvider.getDocuemnt();
+	}
+
+
+	@Override
+	public void partActivated(IWorkbenchPartReference partRef) {
+		
+		if (getEditorSite().getId().equals( partRef.getId())){
+			activateContext();
+		}
+	}
+
+
+	@Override
+	public void partBroughtToTop(IWorkbenchPartReference partRef) {
+		
+		if (getEditorSite().getId().equals( partRef.getId())){
+			activateContext();
+		}
+	}
+
+
+	@Override
+	public void partClosed(IWorkbenchPartReference partRef) {
+		
+		if (getEditorSite().getId().equals( partRef.getId())){
+			deactivateContext();
+		}
+	}
+
+
+	@Override
+	public void partDeactivated(IWorkbenchPartReference partRef) {
+		
+		if (getEditorSite().getId().equals( partRef.getId())){
+			deactivateContext();
+		}
+	}
+
+	@Override
+	public void partOpened(IWorkbenchPartReference partRef) {
+		
+		if (getEditorSite().getId().equals( partRef.getId())){
+			activateContext();
+			}
+	}
+
+
+	@Override
+	public void partHidden(IWorkbenchPartReference partRef) {
+		
+		if (getEditorSite().getId().equals( partRef.getId())){
+				deactivateContext();
+			}
+	}
+
+
+	@Override
+	public void partVisible(IWorkbenchPartReference partRef) {
+		// beware you get LOADS of these, to the point where it doesn't really stop when running eclipse via eclipse (during plugin dev)
+		
+	}
+
+
+	@Override
+	public void partInputChanged(IWorkbenchPartReference partRef) {
+		// not used yet... ?
+	}
 }

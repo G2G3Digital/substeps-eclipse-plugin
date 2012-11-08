@@ -136,6 +136,14 @@ public class FeatureRunnerPlugin extends AbstractUIPlugin implements BundleActiv
         instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Error", ex));
     }
 
+	public static void error(final String msg){
+		instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg));
+	}
+
+	public static void error(final String msg, final Throwable t){
+		instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg, t));
+	}
+
 
     public static FeatureRunnerPlugin instance() {
         return pluginInstance;

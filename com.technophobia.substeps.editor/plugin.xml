@@ -102,6 +102,12 @@
             sequence="M1+M2+F"
             commandId="com.technophobia.substeps.feature.format"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+   <key
+         commandId="com.technophobia.substeps.editor.navigate.to.substep.definition"
+         contextId="com.technophobia.substeps.editor.SubstepsContext"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="F3">
+   </key>
   </extension>
   <extension
         point="org.eclipse.ui.commands">
@@ -111,5 +117,19 @@
           id="com.technophobia.substeps.feature.format"
           name="Format">
       </command>
+    <command
+          defaultHandler="com.technophobia.substeps.document.navigation.JumpToSubStepDefinitionHandler"
+          id="com.technophobia.substeps.editor.navigate.to.substep.definition"
+          name="NavigateToSubstepDefinition">
+    </command>
+  </extension>
+  <extension
+        point="org.eclipse.ui.contexts">
+     <context
+           description="Substeps editor context"
+           id="com.technophobia.substeps.editor.SubstepsContext"
+           name="com.technophobia.substeps.editor.SubstepsContext"
+           parentId="org.eclipse.ui.contexts.window">
+     </context>
   </extension>
 </plugin>
