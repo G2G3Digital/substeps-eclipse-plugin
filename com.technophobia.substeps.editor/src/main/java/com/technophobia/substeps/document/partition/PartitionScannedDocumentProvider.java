@@ -64,10 +64,25 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
      * @param document
      *            The document to attach the partitioner to
      */
-    private void attachPartitionerTo(final IDocument document) {
-        final IDocumentPartitioner partitioner = new FastPartitioner(partitionScannerFactory.createScanner(),
+    private void attachPartitionerTo(final IDocument document, final Supplier<PartitionContext> partitionContextSupplier) {
+        final IDocumentPartitioner partitioner = new FastPartitioner(
+                partitionScannerFactory.createScanner(partitionContextSupplier),
                 partitionScannerFactory.legalContentTypes());
         partitioner.connect(document);
         document.setDocumentPartitioner(partitioner);
+    }
+
+
+    private Supplier<PartitionContext> partitionerContextFrom(final Object element) {
+        return new Supplier<PartitionContext>() {
+
+            @Override
+            public PartitionContext get() {
+                if (element instanceof IEditorInput) {
+                    return new EditorInputPartitionContext((IEditorInput) element);
+                }
+                return new CurrentSelectionPartitionContext();
+            }
+        };
     }
 }

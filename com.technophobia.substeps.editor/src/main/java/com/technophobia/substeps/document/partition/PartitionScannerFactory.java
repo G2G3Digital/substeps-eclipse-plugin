@@ -20,6 +20,8 @@ package com.technophobia.substeps.document.partition;
 
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
+import com.technophobia.substeps.supplier.Supplier;
+
 /**
  * Factory interface for {@link IPartitionTokenScanner}
  * 
@@ -33,7 +35,7 @@ public interface PartitionScannerFactory {
      * 
      * @return the newly created scanner
      */
-    IPartitionTokenScanner createScanner();
+    IPartitionTokenScanner createScanner(final Supplier<PartitionContext> partitionContextSupplier);
 
 
     /**

@@ -6,7 +6,7 @@
          point="org.eclipse.ui.views">
       <view
             name="%View.label"
-            icon="$nl$/icons/full/eview16/junit.gif"
+            icon="icons/full/eview16/junit.gif"
             category="org.eclipse.jdt.ui.java"
             fastViewWidthRatio="0.40"
             class="com.technophobia.substeps.junit.ui.SubstepsFeatureTestRunnerViewPart"

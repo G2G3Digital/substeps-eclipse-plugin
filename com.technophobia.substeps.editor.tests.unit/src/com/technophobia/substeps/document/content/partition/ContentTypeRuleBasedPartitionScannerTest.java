@@ -33,7 +33,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.technophobia.substeps.document.content.feature.FeatureContentTypeDefinitionFactory;
-import com.technophobia.substeps.document.content.feature.definition.AndContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.BackgroundContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.CommentContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.DefineContentTypeDefinition;
@@ -44,19 +43,18 @@ import com.technophobia.substeps.document.content.feature.definition.ScenarioExa
 import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleRowContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioOutlineContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.TagContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.ThenContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.WhenContentTypeDefinition;
 
 public class ContentTypeRuleBasedPartitionScannerTest {
 
     private static final String NEWLINE = System.getProperty("line.separator");
 
-    ContentTypeRuleBasedPartitionScanner partitionScanner;
+    private ContentTypeRuleBasedPartitionScanner partitionScanner;
 
 
     @Before
     public void initScanner() {
-        this.partitionScanner = new ContentTypeRuleBasedPartitionScanner(new FeatureContentTypeDefinitionFactory());
+        this.partitionScanner = new ContentTypeRuleBasedPartitionScanner(null,
+                new FeatureContentTypeDefinitionFactory());
     }
 
 
@@ -76,8 +74,8 @@ public class ContentTypeRuleBasedPartitionScannerTest {
 
     @Test
     public void canPartitionInlineComments() {
-        final String text = "#This is comment line 1" + NEWLINE + "Background:" + NEWLINE + "Given something # with a following comment" + NEWLINE
-                + "#This is comment line 2";
+        final String text = "#This is comment line 1" + NEWLINE + "Background:" + NEWLINE
+                + "Given something # with a following comment" + NEWLINE + "#This is comment line 2";
         final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
 
         final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
@@ -171,58 +169,7 @@ public class ContentTypeRuleBasedPartitionScannerTest {
     }
 
 
-    @Test
-    public void canPartitionGiven() {
-        final String text = "Tags: tag-1" + NEWLINE + "Scenario:A scenario" + NEWLINE + "Given Something" + NEWLINE
-                + "When something else" + NEWLINE + "Then a result";
-        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
-
-        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-        assertEquals(5, result.length);
-
-        checkType(result[2], GivenContentTypeDefinition.CONTENT_TYPE_ID, "Given Something" + NEWLINE);
-    }
-
-
-    @Test
-    public void canPartitionWhen() {
-        final String text = "Tags: tag-1" + NEWLINE + "Scenario:A scenario" + NEWLINE + "Given Something" + NEWLINE
-                + "When something else" + NEWLINE + "Then a result";
-        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
-
-        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-        assertEquals(5, result.length);
-
-        checkType(result[3], WhenContentTypeDefinition.CONTENT_TYPE_ID, "When something else" + NEWLINE);
-    }
-
-
-    @Test
-    public void canPartitionThen() {
-        final String text = "Tags: tag-1" + NEWLINE + "Scenario:A scenario" + NEWLINE + "Given Something" + NEWLINE
-                + "When something else" + NEWLINE + "Then a result";
-        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
-
-        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-        assertEquals(5, result.length);
-
-        checkType(result[4], ThenContentTypeDefinition.CONTENT_TYPE_ID, "Then a result");
-    }
-
-
-    @Test
-    public void canPartitionAnd() {
-        final String text = "Tags: tag-1" + NEWLINE + "Scenario:A scenario" + NEWLINE + "Given Something" + NEWLINE
-                + "When something else" + NEWLINE + "And another thing" + NEWLINE + "Then a result";
-        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
-
-        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
-        assertEquals(6, result.length);
-
-        checkType(result[4], AndContentTypeDefinition.CONTENT_TYPE_ID, "And another thing" + NEWLINE);
-    }
-
-
+    @SuppressWarnings("boxing")
     private void checkType(final ITypedRegion typedRegion, final String type, final String text) {
         assertThat(typedRegion.getType(), is(type));
         assertThat(typedRegion.getLength(), is(text.length()));
@@ -248,10 +195,6 @@ public class ContentTypeRuleBasedPartitionScannerTest {
         ids.add(ScenarioOutlineContentTypeDefinition.CONTENT_TYPE_ID);
         ids.add(ScenarioExampleContentTypeDefinition.CONTENT_TYPE_ID);
         ids.add(ScenarioExampleRowContentTypeDefinition.CONTENT_TYPE_ID);
-        ids.add(GivenContentTypeDefinition.CONTENT_TYPE_ID);
-        ids.add(WhenContentTypeDefinition.CONTENT_TYPE_ID);
-        ids.add(ThenContentTypeDefinition.CONTENT_TYPE_ID);
-        ids.add(AndContentTypeDefinition.CONTENT_TYPE_ID);
         ids.add(DefineContentTypeDefinition.CONTENT_TYPE_ID);
         return new FastPartitioner(partitionScanner, ids.toArray(new String[ids.size()]));
     }
