@@ -7,6 +7,7 @@ import org.eclipse.jface.text.rules.IRule;
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.formatting.FormattingContext;
 import com.technophobia.substeps.document.formatting.strategy.NullFormattingStrategy;
+import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.supplier.Supplier;
 
 /**
@@ -22,10 +23,12 @@ public class NullContentTypeDefinition implements ContentTypeDefinition {
         return "";
     }
 
+
     @Override
     public String prefixText() {
-    	return "";
+        return "";
     }
+
 
     @Override
     public boolean isOptional() {
@@ -34,7 +37,7 @@ public class NullContentTypeDefinition implements ContentTypeDefinition {
 
 
     @Override
-    public IPredicateRule partitionRule() {
+    public IPredicateRule partitionRule(final Supplier<PartitionContext> partitionContextSupplier) {
         return null;
     }
 

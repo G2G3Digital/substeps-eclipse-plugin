@@ -21,10 +21,13 @@ package com.technophobia.substeps;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -40,6 +43,7 @@ import com.technophobia.substeps.step.SuggestionSource;
 import com.technophobia.substeps.step.provider.ExternalStepImplementationProvider;
 import com.technophobia.substeps.step.provider.ProjectSpecificSuggestionProvider;
 import com.technophobia.substeps.step.provider.SubstepSuggestionProvider;
+import com.technophobia.substeps.supplier.Supplier;
 
 /**
  * BundleActivator/general bundle aware class for managing things such as
@@ -48,7 +52,7 @@ import com.technophobia.substeps.step.provider.SubstepSuggestionProvider;
  * @author sforbes
  * 
  */
-public class FeatureEditorPlugin implements BundleActivator, Logger {
+public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, Logger {
 
     private static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
@@ -106,6 +110,21 @@ public class FeatureEditorPlugin implements BundleActivator, Logger {
 
     public ProjectStepImplementationProvider getStepImplementationProvider() {
         return suggestionManager;
+    }
+
+
+    public Supplier<IResource> currentResourceSupplier() {
+        return new Supplier<IResource>() {
+            @Override
+            public IResource get() {
+                final IEditorPart activeEditor = getWorkbench().getActiveWorkbenchWindow().getActivePage()
+                        .getActiveEditor();
+                if (activeEditor != null) {
+                    return (IResource) activeEditor.getEditorInput().getAdapter(IResource.class);
+                }
+                return null;
+            }
+        };
     }
 
 

@@ -87,6 +87,15 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
     }
 
 
+    protected IRule fixedWordSetRule(final String[] words, final IToken token) {
+        final WordRule rule = new WordRule(startsWithDetector(firstLettersOf(words)));
+        for (final String word : words) {
+            rule.addWord(word, token);
+        }
+        return rule;
+    }
+
+
     protected IPredicateRule singleLineRule(final String startString, final String tokenId) {
         return singleLineRule(startString, new Token(tokenId));
     }
@@ -116,6 +125,15 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
     protected IPredicateRule paragraphRule(final String startString, final IToken token, final boolean breaksOnEOF,
             final String... validProceedingContentTypes) {
         return new UntilOtherContentTypeSequenceRule(startString, token, breaksOnEOF, validProceedingContentTypes);
+    }
+
+
+    protected char[] firstLettersOf(final String[] strings) {
+        final char[] chars = new char[strings.length];
+        for (int i = 0; i < strings.length; i++) {
+            chars[i] = strings[i].charAt(0);
+        }
+        return chars;
     }
 
 
@@ -155,6 +173,28 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
             public boolean isWordPart(final char c) {
                 i++;
                 return word.length() > i && word.charAt(i) == c;
+            }
+        };
+    }
+
+
+    protected IWordDetector startsWithDetector(final char[] firstLetters) {
+        return new IWordDetector() {
+
+            @Override
+            public boolean isWordStart(final char c) {
+                for (final char firstLetter : firstLetters) {
+                    if (firstLetter == c) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+
+            @Override
+            public boolean isWordPart(final char c) {
+                return !Character.isWhitespace(c);
             }
         };
     }
