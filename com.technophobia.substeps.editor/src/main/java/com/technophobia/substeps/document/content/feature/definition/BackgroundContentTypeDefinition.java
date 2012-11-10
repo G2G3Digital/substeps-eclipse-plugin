@@ -25,11 +25,7 @@ public class BackgroundContentTypeDefinition extends AbstractFeatureContentTypeD
 
     @Override
     public IPredicateRule partitionRule(final Supplier<PartitionContext> partitionContextSupplier) {
-        return paragraphRule(PREFIX_TEXT, id(), true, TagContentTypeDefinition.PREFIX_TEXT,
-                CommentContentTypeDefinition.PREFIX_TEXT, BackgroundContentTypeDefinition.PREFIX_TEXT,
-                ScenarioContentTypeDefinition.PREFIX_TEXT, ScenarioOutlineContentTypeDefinition.PREFIX_TEXT,
-                GivenContentTypeDefinition.PREFIX_TEXT, WhenContentTypeDefinition.PREFIX_TEXT,
-                ThenContentTypeDefinition.PREFIX_TEXT);
+        return singleLineWithTrailingCommentRule(PREFIX_TEXT, id());
     }
 
 

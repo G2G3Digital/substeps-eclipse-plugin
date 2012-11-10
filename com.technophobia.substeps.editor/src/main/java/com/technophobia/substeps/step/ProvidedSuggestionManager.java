@@ -45,7 +45,7 @@ public class ProvidedSuggestionManager implements ContextualSuggestionManager, P
 
 
     @Override
-    public List<String> suggestionsFor(final SuggestionType suggestionType, final IResource resource) {
+    public List<String> suggestionsFor(final IResource resource) {
 
         final Set<String> suggestions = new HashSet<String>();
 
@@ -53,10 +53,8 @@ public class ProvidedSuggestionManager implements ContextualSuggestionManager, P
 
         for (final Entry<SuggestionSource, Set<ProjectSuggestionProvider>> entry : projectSuggestionProviders
                 .entrySet()) {
-            if (suggestionType.isPermittedSuggestionSource(entry.getKey())) {
-                for (final ProjectSuggestionProvider provider : entry.getValue()) {
-                    suggestions.addAll(provider.suggestionsFor(project));
-                }
+            for (final ProjectSuggestionProvider provider : entry.getValue()) {
+                suggestions.addAll(provider.suggestionsFor(project));
             }
         }
         return new ArrayList<String>(suggestions);

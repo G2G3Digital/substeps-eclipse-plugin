@@ -51,7 +51,6 @@ import com.technophobia.substeps.document.content.feature.definition.StepContent
 import com.technophobia.substeps.document.content.feature.definition.TagContentTypeDefinition;
 import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
-import com.technophobia.substeps.step.SuggestionType;
 import com.technophobia.substeps.supplier.Supplier;
 
 @RunWith(JMock.class)
@@ -268,7 +267,7 @@ public class ContentTypeRuleBasedPartitionScannerTest {
                 allowing(partitionContext).suggestionManager();
                 will(returnValue(suggestionManager));
 
-                allowing(suggestionManager).suggestionsFor(SuggestionType.FEATURE, project);
+                allowing(suggestionManager).suggestionsFor(project);
                 will(returnValue(SUGGESTIONS));
             }
         });

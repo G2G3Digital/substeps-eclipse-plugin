@@ -49,7 +49,7 @@ public class ProvidedSuggestionManagerTest {
             }
         });
 
-        assertTrue(suggestionManager.suggestionsFor(SuggestionType.FEATURE, resource).isEmpty());
+        assertTrue(suggestionManager.suggestionsFor(resource).isEmpty());
     }
 
 
@@ -72,7 +72,7 @@ public class ProvidedSuggestionManagerTest {
         final ProvidedSuggestionManager suggestionManager = new ProvidedSuggestionManager(resourceToProjectTransformer);
         suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, provider);
 
-        assertThat(suggestionManager.suggestionsFor(SuggestionType.FEATURE, resource),
+        assertThat(suggestionManager.suggestionsFor(resource),
                 hasItems(suggestions.toArray(new String[suggestions.size()])));
     }
 
@@ -103,7 +103,7 @@ public class ProvidedSuggestionManagerTest {
 
         final Collection<String> expectedSuggestions = Arrays.asList("suggestion-11", "suggestion-12", "suggestion-13",
                 "suggestion-21", "suggestion-22", "suggestion-23");
-        assertThat(suggestionManager.suggestionsFor(SuggestionType.FEATURE, resource),
+        assertThat(suggestionManager.suggestionsFor(resource),
                 hasItems(expectedSuggestions.toArray(new String[expectedSuggestions.size()])));
     }
 
@@ -134,7 +134,7 @@ public class ProvidedSuggestionManagerTest {
 
         final Collection<String> expectedSuggestions = Arrays.asList("suggestion-1", "suggestion-2", "suggestion-3",
                 "suggestion-4");
-        assertThat(suggestionManager.suggestionsFor(SuggestionType.FEATURE, resource),
+        assertThat(suggestionManager.suggestionsFor(resource),
                 hasItems(expectedSuggestions.toArray(new String[expectedSuggestions.size()])));
     }
 
@@ -161,7 +161,7 @@ public class ProvidedSuggestionManagerTest {
         suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, provider2);
 
         final Collection<String> expectedSuggestions = Arrays.asList("suggestion-21", "suggestion-22", "suggestion-23");
-        assertThat(suggestionManager.suggestionsFor(SuggestionType.SUBSTEP, resource),
+        assertThat(suggestionManager.suggestionsFor(resource),
                 hasItems(expectedSuggestions.toArray(new String[expectedSuggestions.size()])));
     }
 }

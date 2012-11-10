@@ -18,7 +18,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.technophobia.substeps.step.ContextualSuggestionManager;
-import com.technophobia.substeps.step.SuggestionType;
 import com.technophobia.substeps.supplier.Supplier;
 
 @RunWith(JMock.class)
@@ -82,7 +81,7 @@ public class SuggestionManagerTextProcessorTest {
                 oneOf(suggestionManagerSupplier).get();
                 will(returnValue(suggestionManager));
 
-                oneOf(suggestionManager).suggestionsFor(SuggestionType.FEATURE, project);
+                oneOf(suggestionManager).suggestionsFor(project);
                 will(returnValue(suggestions));
             }
         });
@@ -103,7 +102,7 @@ public class SuggestionManagerTextProcessorTest {
                 oneOf(suggestionManagerSupplier).get();
                 will(returnValue(suggestionManager));
 
-                oneOf(suggestionManager).suggestionsFor(SuggestionType.FEATURE, project);
+                oneOf(suggestionManager).suggestionsFor(project);
                 will(returnValue(suggestions));
             }
         });

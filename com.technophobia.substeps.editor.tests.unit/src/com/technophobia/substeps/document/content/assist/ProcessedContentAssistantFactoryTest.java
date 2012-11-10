@@ -13,7 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.technophobia.substeps.document.content.feature.definition.GivenContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.StepContentTypeDefinition;
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Supplier;
 
@@ -58,7 +58,7 @@ public class ProcessedContentAssistantFactoryTest {
         });
 
         final IContentAssistant contentAssist = contentAssistantFactory.createContentAssist();
-        assertThat(contentAssist.getContentAssistProcessor(GivenContentTypeDefinition.CONTENT_TYPE_ID),
+        assertThat(contentAssist.getContentAssistProcessor(StepContentTypeDefinition.CONTENT_TYPE_ID),
                 is(contentAssistantProcessor));
     }
 }

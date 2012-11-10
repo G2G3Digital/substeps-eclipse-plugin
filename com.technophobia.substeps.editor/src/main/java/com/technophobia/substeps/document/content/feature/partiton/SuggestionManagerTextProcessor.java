@@ -7,7 +7,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.rules.IToken;
 
 import com.technophobia.substeps.step.ContextualSuggestionManager;
-import com.technophobia.substeps.step.SuggestionType;
 import com.technophobia.substeps.supplier.Supplier;
 
 public class SuggestionManagerTextProcessor implements TextProcessor<IToken> {
@@ -32,7 +31,7 @@ public class SuggestionManagerTextProcessor implements TextProcessor<IToken> {
         if (project != null) {
 
             final Collection<String> suggestions = new ArrayList<String>(suggestionManagerSupplier.get()
-                    .suggestionsFor(SuggestionType.FEATURE, project));
+                    .suggestionsFor(project));
 
             final boolean found = findSuggestion(text.trim(), suggestions);
             if (found) {
