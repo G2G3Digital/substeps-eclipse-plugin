@@ -24,8 +24,7 @@ public class DefineContentTypeDefinition extends AbstractFeatureContentTypeDefin
 
     @Override
     public IPredicateRule partitionRule(final Supplier<PartitionContext> partitionContextSupplier) {
-        return paragraphRule(PREFIX_TEXT, id(), true, CommentContentTypeDefinition.PREFIX_TEXT,
-                DefineContentTypeDefinition.PREFIX_TEXT);
+        return singleLineWithTrailingCommentRule(PREFIX_TEXT, id());
     }
 
 

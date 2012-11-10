@@ -34,9 +34,20 @@ public class CharacterScannerToProcessedTextExtractor implements TextExtractor<I
     private String readLine(final ICharacterScanner scanner) {
         final StringBuilder sb = new StringBuilder();
         int c = scanner.read();
-        while (c != EOF && c != NEWLINE && c != COMMENT) {
+        while (c != EOF && c != COMMENT) {
             sb.append((char) c);
             c = scanner.read();
+
+            if (c == NEWLINE) {
+                sb.append((char) c);
+                scanWhitespace(scanner, sb);
+                break;
+            }
+        }
+
+        // If we've got a comment, then unread it
+        if (c == EOF || c == COMMENT) {
+            scanner.unread();
         }
 
         final String text = sb.toString();
@@ -50,4 +61,21 @@ public class CharacterScannerToProcessedTextExtractor implements TextExtractor<I
         }
     }
 
+
+    // We need to scan any additional whitespace, as the next predicate rule
+    // after this needs to start at the 1st char to be matched - no trimming by
+    // the framework
+    private void scanWhitespace(final ICharacterScanner scanner, final StringBuilder sb) {
+        int c = scanner.read();
+        while (c != EOF) {
+            if (Character.isWhitespace(c)) {
+                sb.append((char) c);
+                c = scanner.read();
+            } else {
+                scanner.unread();
+                break;
+            }
+        }
+
+    }
 }

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -31,6 +32,8 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.editors.text.TextEditor;
@@ -39,9 +42,11 @@ import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.assist.ContentAssistantFactory;
+import com.technophobia.substeps.document.content.feature.FeatureColour;
 import com.technophobia.substeps.document.formatting.ContextAwareContentFormatter;
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
 import com.technophobia.substeps.document.formatting.strategy.NullFormattingStrategy;
+import com.technophobia.substeps.document.text.rule.word.AnySingleWordDetector;
 
 /**
  * SourceViewerConfiguration for rendering {@link TextEditor}s using a
@@ -87,7 +92,15 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
                 setDamagerRepairer(entry.getKey(), entry.getValue().damageRepairerRule(colourManager), reconciler);
             }
         }
+
+        setDamagerRepairer(IDocument.DEFAULT_CONTENT_TYPE, defaultDamageRepairer(), reconciler);
         return reconciler;
+    }
+
+
+    private IRule defaultDamageRepairer() {
+        final Token token = new Token(new TextAttribute(colourManager.getColor(FeatureColour.BLACK.colour())));
+        return new WordRule(new AnySingleWordDetector(), token);
     }
 
 

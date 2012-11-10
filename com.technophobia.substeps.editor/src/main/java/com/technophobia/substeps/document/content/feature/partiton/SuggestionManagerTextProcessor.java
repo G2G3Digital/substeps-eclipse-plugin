@@ -13,15 +13,15 @@ import com.technophobia.substeps.supplier.Supplier;
 public class SuggestionManagerTextProcessor implements TextProcessor<IToken> {
 
     private final Supplier<IProject> projectSupplier;
-    private final ContextualSuggestionManager suggestionManager;
+    private final Supplier<ContextualSuggestionManager> suggestionManagerSupplier;
     private final IToken successToken;
 
 
     public SuggestionManagerTextProcessor(final IToken successToken, final Supplier<IProject> projectSupplier,
-            final ContextualSuggestionManager suggestionManager) {
+            final Supplier<ContextualSuggestionManager> suggestionManagerSupplier) {
         this.successToken = successToken;
         this.projectSupplier = projectSupplier;
-        this.suggestionManager = suggestionManager;
+        this.suggestionManagerSupplier = suggestionManagerSupplier;
     }
 
 
@@ -31,8 +31,8 @@ public class SuggestionManagerTextProcessor implements TextProcessor<IToken> {
         final IProject project = projectSupplier.get();
         if (project != null) {
 
-            final Collection<String> suggestions = new ArrayList<String>(suggestionManager.suggestionsFor(
-                    SuggestionType.FEATURE, project));
+            final Collection<String> suggestions = new ArrayList<String>(suggestionManagerSupplier.get()
+                    .suggestionsFor(SuggestionType.FEATURE, project));
 
             final boolean found = findSuggestion(text.trim(), suggestions);
             if (found) {

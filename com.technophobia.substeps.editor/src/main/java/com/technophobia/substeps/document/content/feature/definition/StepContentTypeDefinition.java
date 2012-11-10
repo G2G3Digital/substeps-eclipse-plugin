@@ -8,7 +8,6 @@ import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.feature.FeatureColour;
 import com.technophobia.substeps.document.content.feature.partiton.CharacterScannerToProcessedTextExtractor;
@@ -19,6 +18,7 @@ import com.technophobia.substeps.document.content.feature.partiton.TextProcessor
 import com.technophobia.substeps.document.formatting.FormattingContext;
 import com.technophobia.substeps.document.formatting.strategy.FixedIndentFormattingStrategy;
 import com.technophobia.substeps.document.partition.PartitionContext;
+import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.supplier.Supplier;
 
 public class StepContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
@@ -42,7 +42,7 @@ public class StepContentTypeDefinition extends AbstractFeatureContentTypeDefinit
 
         final Token token = new Token(id());
         final TextProcessor<IToken> textProcessor = new SuggestionManagerTextProcessor(token,
-                projectSupplier(partitionContextSupplier), FeatureEditorPlugin.instance().getSuggestionManager());
+                projectSupplier(partitionContextSupplier), suggestionManagerSupplier(partitionContextSupplier));
         final TextExtractor<ICharacterScanner, IToken> textExtractor = new CharacterScannerToProcessedTextExtractor(
                 textProcessor);
 
@@ -62,6 +62,17 @@ public class StepContentTypeDefinition extends AbstractFeatureContentTypeDefinit
             @Override
             public IProject get() {
                 return partitionContextSupplier.get().currentProject();
+            }
+        };
+    }
+
+
+    private Supplier<ContextualSuggestionManager> suggestionManagerSupplier(
+            final Supplier<PartitionContext> partitionContextSupplier) {
+        return new Supplier<ContextualSuggestionManager>() {
+            @Override
+            public ContextualSuggestionManager get() {
+                return partitionContextSupplier.get().suggestionManager();
             }
         };
     }

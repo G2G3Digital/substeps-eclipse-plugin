@@ -14,6 +14,8 @@ import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.FeatureColour;
 import com.technophobia.substeps.document.text.rule.SingleLineWithTrailingCommentRule;
 import com.technophobia.substeps.document.text.rule.UntilOtherContentTypeSequenceRule;
+import com.technophobia.substeps.document.text.rule.word.MultipleChoiceSingleWordDetector;
+import com.technophobia.substeps.document.text.rule.word.SingleWordDetector;
 
 public abstract class AbstractFeatureContentTypeDefinition implements ContentTypeDefinition {
 
@@ -55,26 +57,7 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
 
     protected IRule fixedWordRule(final String word, final IToken token) {
         // return new WordRule(word(word), token);
-        final WordRule rule = new WordRule(new IWordDetector() {
-
-            /**
-             * Only really interested in the keyword, so only pick words which
-             * start with the same character
-             */
-            @Override
-            public boolean isWordStart(final char c) {
-                return c == word.charAt(0);
-            }
-
-
-            /**
-             * "Words" may contain any non-whitespace characters
-             */
-            @Override
-            public boolean isWordPart(final char c) {
-                return !Character.isWhitespace(c);
-            }
-        });
+        final WordRule rule = new WordRule(new SingleWordDetector(word));
         rule.addWord(word, token);
         return rule;
     }
@@ -88,7 +71,7 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
 
 
     protected IRule fixedWordSetRule(final String[] words, final IToken token) {
-        final WordRule rule = new WordRule(startsWithDetector(firstLettersOf(words)));
+        final WordRule rule = new WordRule(new MultipleChoiceSingleWordDetector(words));
         for (final String word : words) {
             rule.addWord(word, token);
         }
@@ -128,15 +111,6 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
     }
 
 
-    protected char[] firstLettersOf(final String[] strings) {
-        final char[] chars = new char[strings.length];
-        for (int i = 0; i < strings.length; i++) {
-            chars[i] = strings[i].charAt(0);
-        }
-        return chars;
-    }
-
-
     protected IWordDetector word(final String word) {
         // Update: I think 'rubbish' is a pretty harsh term, and while I agree
         // that it matches incorrectly on 'T' etc,
@@ -173,28 +147,6 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
             public boolean isWordPart(final char c) {
                 i++;
                 return word.length() > i && word.charAt(i) == c;
-            }
-        };
-    }
-
-
-    protected IWordDetector startsWithDetector(final char[] firstLetters) {
-        return new IWordDetector() {
-
-            @Override
-            public boolean isWordStart(final char c) {
-                for (final char firstLetter : firstLetters) {
-                    if (firstLetter == c) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-
-            @Override
-            public boolean isWordPart(final char c) {
-                return !Character.isWhitespace(c);
             }
         };
     }

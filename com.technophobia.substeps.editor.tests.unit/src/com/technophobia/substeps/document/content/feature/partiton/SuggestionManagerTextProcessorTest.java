@@ -31,9 +31,10 @@ public class SuggestionManagerTextProcessorTest {
 
     private Mockery context;
 
+    private Supplier<ContextualSuggestionManager> suggestionManagerSupplier;
     private Supplier<IProject> projectSupplier;
-    private ContextualSuggestionManager suggestionManager;
 
+    private ContextualSuggestionManager suggestionManager;
     private IProject project;
 
     private TextProcessor<IToken> textProcessor;
@@ -44,12 +45,13 @@ public class SuggestionManagerTextProcessorTest {
     public void initialise() {
         this.context = new Mockery();
 
-        this.projectSupplier = context.mock(Supplier.class);
-        this.suggestionManager = context.mock(ContextualSuggestionManager.class);
+        this.projectSupplier = context.mock(Supplier.class, "projectSupplier");
+        this.suggestionManagerSupplier = context.mock(Supplier.class, "suggestionManagerSupplier");
 
+        this.suggestionManager = context.mock(ContextualSuggestionManager.class);
         this.project = context.mock(IProject.class);
 
-        this.textProcessor = new SuggestionManagerTextProcessor(token, projectSupplier, suggestionManager);
+        this.textProcessor = new SuggestionManagerTextProcessor(token, projectSupplier, suggestionManagerSupplier);
     }
 
 
@@ -77,6 +79,9 @@ public class SuggestionManagerTextProcessorTest {
                 oneOf(projectSupplier).get();
                 will(returnValue(project));
 
+                oneOf(suggestionManagerSupplier).get();
+                will(returnValue(suggestionManager));
+
                 oneOf(suggestionManager).suggestionsFor(SuggestionType.FEATURE, project);
                 will(returnValue(suggestions));
             }
@@ -94,6 +99,9 @@ public class SuggestionManagerTextProcessorTest {
             {
                 oneOf(projectSupplier).get();
                 will(returnValue(project));
+
+                oneOf(suggestionManagerSupplier).get();
+                will(returnValue(suggestionManager));
 
                 oneOf(suggestionManager).suggestionsFor(SuggestionType.FEATURE, project);
                 will(returnValue(suggestions));
