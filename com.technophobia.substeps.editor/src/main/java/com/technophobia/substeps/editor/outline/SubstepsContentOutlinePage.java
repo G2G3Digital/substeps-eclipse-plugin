@@ -1,6 +1,7 @@
 package com.technophobia.substeps.editor.outline;
 
-import org.eclipse.jface.text.Position;
+import java.io.File;
+
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -16,21 +17,22 @@ import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
 import com.technophobia.substeps.supplier.Transformer;
 
-public class FeatureContentOutlinePage extends ContentOutlinePage {
+public class SubstepsContentOutlinePage extends ContentOutlinePage {
 
     private final ITextEditor textEditor;
 
+    private final ILabelProvider outlineLabelProvider;
     private ITreeContentProvider outlineContentProvider = null;
-    private ILabelProvider outlineLabelProvider = null;
     private IEditorInput input = null;
 
-    private final Transformer<Integer, Position> lineNumberToPositionTransformer;
+    private final Transformer<File, AbstractModelElement> fileToModelTransformer;
 
 
-    public FeatureContentOutlinePage(final ITextEditor textEditor,
-            final Transformer<Integer, Position> lineNumberToPositionTransformer) {
+    public SubstepsContentOutlinePage(final ITextEditor textEditor, final ILabelProvider outlineLabelProvider,
+            final Transformer<File, AbstractModelElement> fileToModelTransformer) {
         this.textEditor = textEditor;
-        this.lineNumberToPositionTransformer = lineNumberToPositionTransformer;
+        this.outlineLabelProvider = outlineLabelProvider;
+        this.fileToModelTransformer = fileToModelTransformer;
     }
 
 
@@ -39,10 +41,8 @@ public class FeatureContentOutlinePage extends ContentOutlinePage {
 
         super.createControl(parent);
         final TreeViewer viewer = getTreeViewer();
-        outlineContentProvider = new OutlineContentProvider(new FeatureFileToElementTransformer(
-                lineNumberToPositionTransformer), textEditor.getDocumentProvider());
+        outlineContentProvider = new OutlineContentProvider(fileToModelTransformer, textEditor.getDocumentProvider());
         viewer.setContentProvider(outlineContentProvider);
-        outlineLabelProvider = new OutlineLabelProvider();
         viewer.setLabelProvider(outlineLabelProvider);
         viewer.addSelectionChangedListener(this);
 

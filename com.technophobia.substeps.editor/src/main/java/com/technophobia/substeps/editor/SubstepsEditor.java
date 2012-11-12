@@ -16,4 +16,5 @@ public class SubstepsEditor extends FeatureEditor {
     protected ContentTypeDefinitionFactory contentTypeDefinitionFactory() {
         return new SubstepsContentDefinitionFactory();
     }
+
 }
