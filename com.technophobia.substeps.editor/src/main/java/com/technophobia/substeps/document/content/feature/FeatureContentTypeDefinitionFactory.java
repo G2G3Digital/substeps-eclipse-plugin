@@ -20,18 +20,15 @@ package com.technophobia.substeps.document.content.feature;
 
 import com.technophobia.substeps.document.content.AbstractContentDefinitionFactory;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
-import com.technophobia.substeps.document.content.feature.definition.AndContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.BackgroundContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.CommentContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.FeatureContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.GivenContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleRowContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioOutlineContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.StepContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.TagContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.ThenContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.WhenContentTypeDefinition;
 
 /**
  * Implementation of {@link ContentTypeDefinitionFactory} returning
@@ -48,9 +45,10 @@ public class FeatureContentTypeDefinitionFactory extends AbstractContentDefiniti
                 new ScenarioOutlineContentTypeDefinition(), //
                 new ScenarioExampleContentTypeDefinition(), //
                 new ScenarioExampleRowContentTypeDefinition(), //
-                new GivenContentTypeDefinition(), //
-                new WhenContentTypeDefinition(), //
-                new ThenContentTypeDefinition(), //
-                new AndContentTypeDefinition());
+                new StepContentTypeDefinition());
+        // new GivenContentTypeDefinition(), //
+        // new WhenContentTypeDefinition(), //
+        // new ThenContentTypeDefinition(), //
+        // new AndContentTypeDefinition());
     }
 }

@@ -10,12 +10,14 @@ public class FakeStepImplementationRendererTarget {
     }
 
 
+    @SuppressWarnings("unused")
     @Step("Given this is a single parameter step definition with \"([^\"]*)\"")
     public void given(final String parameter) {
         // no-op
     }
 
 
+    @SuppressWarnings("unused")
     @Step("Given this is a multi-parameter step definition with \"([^\"]*)\", \"([^\"]*)\" and \"([^\"]*)\"")
     public void given(final String parameter1, final String parameter2, final String parameter3) {
         // no-op

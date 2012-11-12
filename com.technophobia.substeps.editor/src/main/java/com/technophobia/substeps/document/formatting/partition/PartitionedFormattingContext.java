@@ -89,7 +89,7 @@ public class PartitionedFormattingContext implements FormattingContext {
 
 
     private PositionalContentTypeDefinitionHolder locatePreviousContentTypeOrNull() {
-        int pos = currentPosition - 1;
+        int pos = previousPosition();
         while (pos >= 0) {
             final String type = positions[pos].getType();
             if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
@@ -102,7 +102,7 @@ public class PartitionedFormattingContext implements FormattingContext {
 
 
     private PositionalContentTypeDefinitionHolder locateNextContentTypeOrNull() {
-        int pos = currentPosition + 1;
+        int pos = nextPosition();
         while (pos < positions.length) {
             final String type = positions[pos].getType();
             if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
@@ -111,6 +111,16 @@ public class PartitionedFormattingContext implements FormattingContext {
             pos++;
         }
         return null;
+    }
+
+
+    protected int previousPosition() {
+        return currentPosition - 1;
+    }
+
+
+    protected int nextPosition() {
+        return currentPosition + 1;
     }
 
     private static final class PositionalContentTypeDefinitionHolder {

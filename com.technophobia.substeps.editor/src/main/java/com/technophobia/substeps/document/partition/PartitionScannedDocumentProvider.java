@@ -22,7 +22,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
+
+import com.technophobia.substeps.FeatureEditorPlugin;
+import com.technophobia.substeps.supplier.Supplier;
 
 /**
  * DocumentProvider that attaches an {@link IDocumentPartitioner} to the
@@ -36,7 +40,8 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
     private final PartitionScannerFactory partitionScannerFactory;
 
     private IDocument thisDocument = null;
-    
+
+
     public PartitionScannedDocumentProvider(final PartitionScannerFactory partitionScannerFactory) {
         this.partitionScannerFactory = partitionScannerFactory;
     }
@@ -44,18 +49,18 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
 
     @Override
     protected IDocument createDocument(final Object element) throws CoreException {
-    	thisDocument = super.createDocument(element);
+        thisDocument = super.createDocument(element);
         if (thisDocument != null) {
-            attachPartitionerTo(thisDocument);
+            attachPartitionerTo(thisDocument, partitionerContextFrom(element));
         }
 
         return thisDocument;
     }
-    
-    public IDocument getDocuemnt()
-	{
-		return thisDocument;
-	}
+
+
+    public IDocument getDocuemnt() {
+        return thisDocument;
+    }
 
 
     /**
@@ -64,10 +69,26 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
      * @param document
      *            The document to attach the partitioner to
      */
-    private void attachPartitionerTo(final IDocument document) {
-        final IDocumentPartitioner partitioner = new FastPartitioner(partitionScannerFactory.createScanner(),
+    private void attachPartitionerTo(final IDocument document, final Supplier<PartitionContext> partitionContextSupplier) {
+        final IDocumentPartitioner partitioner = new FastPartitioner(
+                partitionScannerFactory.createScanner(partitionContextSupplier),
                 partitionScannerFactory.legalContentTypes());
         partitioner.connect(document);
         document.setDocumentPartitioner(partitioner);
+    }
+
+
+    private Supplier<PartitionContext> partitionerContextFrom(final Object element) {
+        return new Supplier<PartitionContext>() {
+
+            @Override
+            public PartitionContext get() {
+                if (element instanceof IEditorInput) {
+                    return new EditorInputPartitionContext((IEditorInput) element, FeatureEditorPlugin.instance()
+                            .getSuggestionManager());
+                }
+                return new CurrentSelectionPartitionContext();
+            }
+        };
     }
 }

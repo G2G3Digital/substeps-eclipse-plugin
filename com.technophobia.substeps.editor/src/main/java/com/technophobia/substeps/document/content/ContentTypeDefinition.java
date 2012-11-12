@@ -24,6 +24,7 @@ import org.eclipse.jface.text.rules.IRule;
 
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.formatting.FormattingContext;
+import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.supplier.Supplier;
 
 /**
@@ -40,13 +41,15 @@ public interface ContentTypeDefinition {
      * @return id
      */
     String id();
-    
+
+
     /**
      * Text that will be visible in the editor for this content type
      * 
      * @return prefixText
      */
     String prefixText();
+
 
     /**
      * Is this item optional in the editor
@@ -59,9 +62,11 @@ public interface ContentTypeDefinition {
     /**
      * Return the {@link PredicateRule} associated with this content type
      * 
+     * @param partitionContext
+     * 
      * @return PredicateRule
      */
-    IPredicateRule partitionRule();
+    IPredicateRule partitionRule(final Supplier<PartitionContext> partitionContextSupplier);
 
 
     /**

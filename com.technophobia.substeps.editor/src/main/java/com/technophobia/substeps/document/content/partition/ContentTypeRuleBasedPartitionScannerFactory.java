@@ -22,7 +22,9 @@ import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
+import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.document.partition.PartitionScannerFactory;
+import com.technophobia.substeps.supplier.Supplier;
 
 /**
  * Implementation of {@link PartitionScannerFactory} that backs onto a
@@ -42,8 +44,8 @@ public class ContentTypeRuleBasedPartitionScannerFactory implements PartitionSca
 
 
     @Override
-    public IPartitionTokenScanner createScanner() {
-        return new ContentTypeRuleBasedPartitionScanner(contentTypeDefinitionFactory);
+    public IPartitionTokenScanner createScanner(final Supplier<PartitionContext> partitionContextSupplier) {
+        return new ContentTypeRuleBasedPartitionScanner(partitionContextSupplier, contentTypeDefinitionFactory);
     }
 
 
