@@ -1,4 +1,4 @@
-package com.technophobia.substeps.editor.outline;
+package com.technophobia.substeps.editor.outline.feature;
 
 import java.util.List;
 import java.util.Map;

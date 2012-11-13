@@ -54,7 +54,6 @@ import com.technophobia.substeps.document.content.view.ContentTypeViewConfigurat
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
 import com.technophobia.substeps.document.formatting.partition.PartitionedFormattingContextFactory;
 import com.technophobia.substeps.document.partition.PartitionScannedDocumentProvider;
-import com.technophobia.substeps.editor.outline.FeatureFileToElementTransformer;
 import com.technophobia.substeps.editor.outline.OutlineLabelProvider;
 import com.technophobia.substeps.editor.outline.SubstepsContentOutlinePage;
 import com.technophobia.substeps.editor.outline.feature.FileToFeatureElementTransformer;
@@ -137,7 +136,7 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
 
 
     protected Transformer<File, AbstractModelElement> fileToModelTransformer() {
-        return new FileToFeatureElementTransformer(new FeatureFileToElementTransformer(lineNumberToDocumentOffset()));
+        return new FileToFeatureElementTransformer(lineNumberToDocumentOffset());
     }
 
 
@@ -297,7 +296,7 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     }
 
 
-    private Transformer<Integer, Position> lineNumberToDocumentOffset() {
+    protected Transformer<Integer, Position> lineNumberToDocumentOffset() {
         return new Transformer<Integer, Position>() {
             @Override
             public Position from(final Integer lineNumber) {

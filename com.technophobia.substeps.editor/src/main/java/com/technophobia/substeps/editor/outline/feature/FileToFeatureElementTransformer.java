@@ -2,6 +2,8 @@ package com.technophobia.substeps.editor.outline.feature;
 
 import java.io.File;
 
+import org.eclipse.jface.text.Position;
+
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
 import com.technophobia.substeps.editor.outline.model.FeatureElement;
@@ -15,8 +17,8 @@ public class FileToFeatureElementTransformer implements Transformer<File, Abstra
     private final FeatureFileParser parser;
 
 
-    public FileToFeatureElementTransformer(final Transformer<FeatureFile, FeatureElement> featureElementTransformer) {
-        this.featureElementTransformer = featureElementTransformer;
+    public FileToFeatureElementTransformer(final Transformer<Integer, Position> lineNumberToPositionTransformer) {
+        this.featureElementTransformer = new FeatureFileToElementTransformer(lineNumberToPositionTransformer);
         this.parser = new FeatureFileParser();
     }
 
