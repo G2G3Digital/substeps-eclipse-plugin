@@ -14,28 +14,24 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
-import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
-import com.technophobia.substeps.editor.outline.model.FeatureElement;
-import com.technophobia.substeps.model.FeatureFile;
-import com.technophobia.substeps.runner.FeatureFileParser;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class OutlineContentProvider implements ITreeContentProvider {
 
-    private FeatureElement root = null;
+    private AbstractModelElement root = null;
     private IEditorInput input;
     private final IDocumentProvider documentProvider;
 
-    private final Transformer<FeatureFile, FeatureElement> featureElementTransformer;
+    private final Transformer<File, AbstractModelElement> fileToElementTransformer;
 
     protected final static String TAG_POSITIONS = "__tag_positions";
     protected IPositionUpdater positionUpdater = new DefaultPositionUpdater(TAG_POSITIONS);
 
 
-    public OutlineContentProvider(final Transformer<FeatureFile, FeatureElement> featureElementTransformer,
+    public OutlineContentProvider(final Transformer<File, AbstractModelElement> fileToElementTransformer,
             final IDocumentProvider provider) {
-        this.featureElementTransformer = featureElementTransformer;
+        this.fileToElementTransformer = fileToElementTransformer;
         this.documentProvider = provider;
     }
 
@@ -90,6 +86,7 @@ public class OutlineContentProvider implements ITreeContentProvider {
 
     @Override
     public void dispose() {
+        // No-op
     }
 
 
@@ -102,6 +99,7 @@ public class OutlineContentProvider implements ITreeContentProvider {
                 try {
                     document.removePositionCategory(TAG_POSITIONS);
                 } catch (final BadPositionCategoryException x) {
+                    // No-op
                 }
                 document.removePositionUpdater(positionUpdater);
             }
@@ -115,7 +113,7 @@ public class OutlineContentProvider implements ITreeContentProvider {
                 document.addPositionCategory(TAG_POSITIONS);
                 document.addPositionUpdater(positionUpdater);
 
-                final FeatureElement rootElement = parseEditor(input);
+                final AbstractModelElement rootElement = parseEditor(input);
                 if (rootElement != null) {
                     root = rootElement;
                 }
@@ -124,34 +122,16 @@ public class OutlineContentProvider implements ITreeContentProvider {
     }
 
 
-    private FeatureElement parseEditor(final IEditorInput editorInput) {
+    private AbstractModelElement parseEditor(final IEditorInput editorInput) {
         final File file = asFile(editorInput);
 
-        final FeatureElement featureElement = parseFeatureFile(file);
-        return featureElement;
+        final AbstractModelElement element = fileToElementTransformer.from(file);
+        return element;
     }
 
 
     private File asFile(final IEditorInput editorInput) {
         final IFile file = ((FileEditorInput) editorInput).getFile();
         return new File(file.getLocation().makeAbsolute().toOSString());
-    }
-
-
-    private FeatureElement parseFeatureFile(final File file) {
-        try {
-            final FeatureFileParser parser = new FeatureFileParser();
-            final FeatureFile featureFile = parser.loadFeatureFile(file);
-            // final OutlineContentHandler contentHandler = new
-            // OutlineContentHandler();
-            // contentHandler.setPositionCategory(TAG_POSITIONS);
-            // contentHandler.setDocumentLocator(new LocatorImpl());
-            // xmlParser.setContentHandler(contentHandler);
-            // xmlParser.doParse(text);
-            return featureElementTransformer.from(featureFile);
-        } catch (final Exception ex) {
-            FeatureEditorPlugin.error("Couldn't parse feature file " + file.getAbsolutePath(), ex);
-            return null;
-        }
     }
 }

@@ -18,6 +18,7 @@
  */
 package com.technophobia.substeps.editor;
 
+import java.io.File;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.CoreException;
@@ -53,7 +54,10 @@ import com.technophobia.substeps.document.content.view.ContentTypeViewConfigurat
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
 import com.technophobia.substeps.document.formatting.partition.PartitionedFormattingContextFactory;
 import com.technophobia.substeps.document.partition.PartitionScannedDocumentProvider;
-import com.technophobia.substeps.editor.outline.FeatureContentOutlinePage;
+import com.technophobia.substeps.editor.outline.OutlineLabelProvider;
+import com.technophobia.substeps.editor.outline.SubstepsContentOutlinePage;
+import com.technophobia.substeps.editor.outline.feature.FileToFeatureElementTransformer;
+import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Supplier;
 import com.technophobia.substeps.supplier.Transformer;
@@ -68,7 +72,7 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
 
     private final ColourManager colourManager;
     private IContextActivation currentActivateContext;
-    private FeatureContentOutlinePage outlinePage;
+    private SubstepsContentOutlinePage outlinePage;
 
     private IEditorInput editorInput;
 
@@ -103,7 +107,7 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     public Object getAdapter(final Class required) {
         if (IContentOutlinePage.class.equals(required)) {
             if (outlinePage == null) {
-                outlinePage = new FeatureContentOutlinePage(this, lineNumberToDocumentOffset());
+                outlinePage = new SubstepsContentOutlinePage(this, new OutlineLabelProvider(), fileToModelTransformer());
                 if (getEditorInput() != null)
                     outlinePage.setInput(getEditorInput());
             }
@@ -128,6 +132,11 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
      */
     protected ContentTypeDefinitionFactory contentTypeDefinitionFactory() {
         return new FeatureContentTypeDefinitionFactory();
+    }
+
+
+    protected Transformer<File, AbstractModelElement> fileToModelTransformer() {
+        return new FileToFeatureElementTransformer(lineNumberToDocumentOffset());
     }
 
 
@@ -287,7 +296,7 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     }
 
 
-    private Transformer<Integer, Position> lineNumberToDocumentOffset() {
+    protected Transformer<Integer, Position> lineNumberToDocumentOffset() {
         return new Transformer<Integer, Position>() {
             @Override
             public Position from(final Integer lineNumber) {

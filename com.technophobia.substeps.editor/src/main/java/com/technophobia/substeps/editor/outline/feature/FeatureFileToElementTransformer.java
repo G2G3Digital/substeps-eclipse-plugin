@@ -1,4 +1,4 @@
-package com.technophobia.substeps.editor.outline;
+package com.technophobia.substeps.editor.outline.feature;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +13,7 @@ import com.technophobia.substeps.editor.outline.model.FeatureElement;
 import com.technophobia.substeps.editor.outline.model.ScenarioElement;
 import com.technophobia.substeps.editor.outline.model.ScenarioOutlineElement;
 import com.technophobia.substeps.editor.outline.model.StepElement;
+import com.technophobia.substeps.model.Background;
 import com.technophobia.substeps.model.ExampleParameter;
 import com.technophobia.substeps.model.FeatureFile;
 import com.technophobia.substeps.model.Scenario;
@@ -21,7 +22,6 @@ import com.technophobia.substeps.supplier.Transformer;
 
 public class FeatureFileToElementTransformer implements Transformer<FeatureFile, FeatureElement> {
 
-    private static final String NEWLINE = System.getProperty("line.separator");
     private final static String TAG_POSITIONS = "__tag_positions";
     private final Transformer<Integer, Position> lineNumberToPositionTransformer;
 
@@ -71,27 +71,24 @@ public class FeatureFileToElementTransformer implements Transformer<FeatureFile,
 
 
     private void addBackground(final FeatureElement element, final FeatureFile file) {
-        final List<Scenario> scenarios = file.getScenarios();
-        if (!scenarios.isEmpty()) {
-            final Scenario scenario = scenarios.get(0);
-            final String backgroundText = scenario.getBackgroundRawText();
-            if (backgroundText != null && backgroundText.length() > 0) {
-                final int backgroundLineNumber = backgroundLineNumberFor(scenario);
-                final BackgroundElement background = new BackgroundElement(backgroundText.substring(0,
-                        backgroundText.indexOf(NEWLINE)), asOffsetPosition(backgroundLineNumber));
-                addStepsTo(background, scenario.getBackgroundSteps());
-                element.setBackground(background);
-            }
+        final Background background = backgroundFor(file);
+        if (background != null) {
+            final int backgroundLineNumber = background.getLineNumber();
+            final BackgroundElement backgroundElement = new BackgroundElement(background.getDescription(),
+                    asOffsetPosition(backgroundLineNumber));
+            addStepsTo(backgroundElement, background.getSteps());
+            element.setBackground(backgroundElement);
         }
     }
 
 
-    @SuppressWarnings("unused")
-    private int backgroundLineNumberFor(final Scenario scenario) {
-        // if (scenario.getBackgroundSteps().size() > 0) {
-        // return scenario.getSteps().get(0).getSourceLineNumber();
-        // }
-        return 0;
+    private Background backgroundFor(final FeatureFile file) {
+        final List<Scenario> scenarios = file.getScenarios();
+        if (!scenarios.isEmpty()) {
+            final Scenario scenario = scenarios.get(0);
+            return scenario.getBackground();
+        }
+        return null;
     }
 
 

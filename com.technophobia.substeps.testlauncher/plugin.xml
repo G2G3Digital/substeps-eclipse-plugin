@@ -6,7 +6,7 @@
          point="org.eclipse.ui.views">
       <view
             name="%View.label"
-            icon="icons/full/eview16/junit.gif"
+            icon="icons/full/eview16/substeps.gif"
             category="org.eclipse.jdt.ui.java"
             fastViewWidthRatio="0.40"
             class="com.technophobia.substeps.junit.ui.SubstepsFeatureTestRunnerViewPart"
@@ -48,7 +48,7 @@
         point="org.eclipse.debug.ui.launchShortcuts">
      <shortcut
      	   label="%SubstepsFeatureShortcut.label"
-     	   icon="$nl$/icons/full/obj16/julaunch.gif"
+     	   icon="icons/full/eview16/substeps.gif"
            helpContextId="org.eclipse.jdt.junit.launch_shortcut"
            class="com.technophobia.substeps.junit.launcher.SubstepsFeatureLaunchShortcut"
            modes="run, debug"
@@ -100,7 +100,7 @@
   <extension
          point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage
-            icon="$nl$/icons/full/obj16/julaunch.gif"
+            icon="icons/full/eview16/substeps.gif"
             configTypeID="com.technophobia.substeps.junit.launchconfig"
             id="com.technophobia.substeps.junit.launchimage">
       </launchConfigurationTypeImage>
