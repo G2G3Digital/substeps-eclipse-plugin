@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
+import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Transformer;
 
 @RunWith(JMock.class)
@@ -51,7 +52,7 @@ public class ExternalStepImplementationProviderTest {
         final IProject project = aProjectWith("project");
         suggestionProvider.load(aWorkspaceWith(project));
 
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project);
+        final Collection<Suggestion> suggestions = suggestionProvider.suggestionsFor(project);
         assertTrue(suggestions.isEmpty());
     }
 
@@ -66,9 +67,12 @@ public class ExternalStepImplementationProviderTest {
                 aStepImplementation("stepClass2Project2", "step7", "step8"));
         suggestionProvider.load(aWorkspaceWith(project1, project2));
 
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project2);
+        final Collection<Suggestion> suggestions = suggestionProvider.suggestionsFor(project2);
         assertEquals(4, suggestions.size());
-        assertThat(suggestions, hasItems("step5", "step6", "step7", "step8"));
+        assertThat(
+                suggestions,
+                hasItems(new Suggestion("step5"), new Suggestion("step6"), new Suggestion("step7"), new Suggestion(
+                        "step8")));
 
     }
 
@@ -83,12 +87,15 @@ public class ExternalStepImplementationProviderTest {
                 aStepImplementation("stepClass2Project2", "step7", "step8"));
         suggestionProvider.load(aWorkspaceWith(project1, project2));
 
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project2);
+        final Collection<Suggestion> suggestions = suggestionProvider.suggestionsFor(project2);
         assertEquals(4, suggestions.size());
-        assertThat(suggestions, hasItems("step5", "step6", "step7", "step8"));
+        assertThat(
+                suggestions,
+                hasItems(new Suggestion("step5"), new Suggestion("step6"), new Suggestion("step7"), new Suggestion(
+                        "step8")));
 
         suggestionProvider.clearStepImplementationsFor(project2);
-        final Collection<String> updatedSuggestions = suggestionProvider.suggestionsFor(project2);
+        final Collection<Suggestion> updatedSuggestions = suggestionProvider.suggestionsFor(project2);
         assertTrue(updatedSuggestions.isEmpty());
     }
 
@@ -101,7 +108,7 @@ public class ExternalStepImplementationProviderTest {
         final IProject project2 = aProjectWith("project-2");
         suggestionProvider.load(aWorkspaceWith(project1, project2));
 
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project2);
+        final Collection<Suggestion> suggestions = suggestionProvider.suggestionsFor(project2);
         assertTrue(suggestions.isEmpty());
 
         context.checking(new Expectations() {
@@ -113,9 +120,12 @@ public class ExternalStepImplementationProviderTest {
         });
 
         suggestionProvider.loadProject(project2);
-        final Collection<String> updatedSuggestions = suggestionProvider.suggestionsFor(project2);
+        final Collection<Suggestion> updatedSuggestions = suggestionProvider.suggestionsFor(project2);
         assertEquals(4, updatedSuggestions.size());
-        assertThat(updatedSuggestions, hasItems("step5", "step6", "step7", "step8"));
+        assertThat(
+                updatedSuggestions,
+                hasItems(new Suggestion("step5"), new Suggestion("step6"), new Suggestion("step7"), new Suggestion(
+                        "step8")));
     }
 
 
@@ -130,7 +140,7 @@ public class ExternalStepImplementationProviderTest {
         });
 
         suggestionProvider.load(aWorkspaceWith(project));
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project);
+        final Collection<Suggestion> suggestions = suggestionProvider.suggestionsFor(project);
         assertTrue(suggestions.isEmpty());
     }
 
@@ -149,7 +159,7 @@ public class ExternalStepImplementationProviderTest {
         });
 
         suggestionProvider.load(aWorkspaceWith(project));
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project);
+        final Collection<Suggestion> suggestions = suggestionProvider.suggestionsFor(project);
         assertTrue(suggestions.isEmpty());
     }
 

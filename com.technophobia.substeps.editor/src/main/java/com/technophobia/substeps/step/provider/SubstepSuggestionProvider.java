@@ -9,7 +9,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 
 import com.technophobia.substeps.model.ParentStep;
+import com.technophobia.substeps.model.Step;
 import com.technophobia.substeps.model.Syntax;
+import com.technophobia.substeps.step.PatternSuggestion;
+import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Transformer;
 
@@ -39,13 +42,14 @@ public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionPro
 
 
     @Override
-    protected Collection<String> findStepImplementationsFor(final IProject project) {
+    protected Collection<Suggestion> findStepImplementationsFor(final IProject project) {
         final Syntax syntax = projectToSyntaxTransformer.from(project);
 
         final List<ParentStep> substeps = syntax.getSortedRootSubSteps();
-        final List<String> suggestions = new ArrayList<String>();
+        final List<Suggestion> suggestions = new ArrayList<Suggestion>();
         for (final ParentStep substep : substeps) {
-            suggestions.add(substep.getParent().getLine());
+            final Step parentStep = substep.getParent();
+            suggestions.add(new PatternSuggestion(parentStep.getPattern(), parentStep.getLine()));
         }
         return suggestions;
     }

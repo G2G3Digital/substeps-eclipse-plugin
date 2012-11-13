@@ -11,8 +11,9 @@ import org.eclipse.jdt.core.JavaCore;
 
 import com.technophobia.substeps.model.StepImplementation;
 import com.technophobia.substeps.model.Syntax;
-import com.technophobia.substeps.render.StepImplementationRenderer;
+import com.technophobia.substeps.render.StepImplementationToSuggestionRenderer;
 import com.technophobia.substeps.step.ProjectStepImplementationProvider;
+import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Transformer;
 
@@ -20,11 +21,11 @@ public class ProjectSpecificSuggestionProvider extends AbstractMultiProjectSugge
         ProjectStepImplementationProvider {
 
     private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
-    private final StepImplementationRenderer stepRenderer;
+    private final StepImplementationToSuggestionRenderer stepRenderer;
 
 
     public ProjectSpecificSuggestionProvider(final Transformer<IProject, Syntax> projectToSyntaxTransformer,
-            final StepImplementationRenderer stepRenderer) {
+            final StepImplementationToSuggestionRenderer stepRenderer) {
         super();
         this.projectToSyntaxTransformer = projectToSyntaxTransformer;
         this.stepRenderer = stepRenderer;
@@ -61,11 +62,11 @@ public class ProjectSpecificSuggestionProvider extends AbstractMultiProjectSugge
 
 
     @Override
-    protected Collection<String> findStepImplementationsFor(final IProject project) {
+    protected Collection<Suggestion> findStepImplementationsFor(final IProject project) {
         final Syntax syntax = projectToSyntaxTransformer.from(project);
 
         final List<StepImplementation> stepImplementations = syntax.getStepImplementations();
-        final Collection<String> suggestions = new ArrayList<String>(stepImplementations.size());
+        final Collection<Suggestion> suggestions = new ArrayList<Suggestion>(stepImplementations.size());
         for (final StepImplementation stepImplementation : stepImplementations) {
             suggestions.add(stepRenderer.render(stepImplementation));
         }

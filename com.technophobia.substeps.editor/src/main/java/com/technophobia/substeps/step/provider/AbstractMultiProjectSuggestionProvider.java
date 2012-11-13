@@ -17,16 +17,17 @@ import org.eclipse.jdt.core.JavaCore;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.step.ProjectSuggestionProvider;
+import com.technophobia.substeps.step.Suggestion;
 
 public abstract class AbstractMultiProjectSuggestionProvider implements ProjectSuggestionProvider {
 
-    private final Map<IProject, List<String>> stepImplementationMap;
+    private final Map<IProject, List<Suggestion>> stepImplementationMap;
 
     private final Set<IProject> staleProjects;
 
 
     public AbstractMultiProjectSuggestionProvider() {
-        this.stepImplementationMap = new HashMap<IProject, List<String>>();
+        this.stepImplementationMap = new HashMap<IProject, List<Suggestion>>();
         this.staleProjects = new HashSet<IProject>();
     }
 
@@ -54,7 +55,7 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
 
     protected void loadProject(final IProject project) {
         if (!stepImplementationMap.containsKey(project)) {
-            stepImplementationMap.put(project, new ArrayList<String>());
+            stepImplementationMap.put(project, new ArrayList<Suggestion>());
         }
 
         stepImplementationMap.get(project).addAll(findStepImplementationsFor(project));
@@ -67,10 +68,10 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
 
 
     @Override
-    public Collection<String> suggestionsFor(final IProject project) {
+    public Collection<Suggestion> suggestionsFor(final IProject project) {
         clean(project);
         return stepImplementationMap.containsKey(project) ? stepImplementationMap.get(project) : Collections
-                .<String> emptyList();
+                .<Suggestion> emptyList();
 
     }
 
@@ -89,5 +90,5 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
     }
 
 
-    protected abstract Collection<String> findStepImplementationsFor(IProject project);
+    protected abstract Collection<Suggestion> findStepImplementationsFor(IProject project);
 }

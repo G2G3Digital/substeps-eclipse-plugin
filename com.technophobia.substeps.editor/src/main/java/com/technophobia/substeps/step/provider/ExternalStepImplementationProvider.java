@@ -18,11 +18,15 @@ import org.eclipse.core.resources.IWorkspace;
 
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
+import com.technophobia.substeps.step.PatternSuggestion;
 import com.technophobia.substeps.step.ProjectStepImplementationProvider;
+import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class ExternalStepImplementationProvider extends AbstractMultiProjectSuggestionProvider implements
         ProjectStepImplementationProvider {
+
+    private static final String REGEX = "([^\"]*)\"";
 
     private final Transformer<IProject, List<StepImplementationsDescriptor>> stepImplementationLoader;
     private final Map<IProject, Set<String>> externalStepClassesForProject;
@@ -71,22 +75,54 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
 
 
     @Override
-    protected Collection<String> findStepImplementationsFor(final IProject project) {
+    protected Collection<Suggestion> findStepImplementationsFor(final IProject project) {
 
         final List<StepImplementationsDescriptor> stepImplementations = stepImplementationLoader.from(project);
         final Set<String> stepImplementationClasses = new HashSet<String>();
 
-        final Collection<String> suggestions = new ArrayList<String>();
+        final Collection<Suggestion> suggestions = new ArrayList<Suggestion>();
         for (final StepImplementationsDescriptor stepImplementation : stepImplementations) {
             stepImplementationClasses.add(stepImplementation.getClassName());
             for (final StepDescriptor step : stepImplementation.getExpressions()) {
-                suggestions.add(step.getExpression());
+                if (isPattern(step)) {
+                    suggestions.add(findPatternIn(step));
+                }
+                suggestions.add(new Suggestion(step.getExpression()));
             }
         }
 
         externalStepClassesForProject.put(project, stepImplementationClasses);
 
         return suggestions;
+    }
+
+
+    private boolean isPattern(final StepDescriptor step) {
+        final String expression = step.getExpression();
+        final String example = step.getExample();
+
+        return example != null && !example.equals(expression);
+    }
+
+
+    private Suggestion findPatternIn(final StepDescriptor step) {
+
+        String currentExpression = step.getExpression();
+        final StringBuilder sb = new StringBuilder();
+
+        int startChevronIndex = currentExpression.indexOf('<');
+        while (startChevronIndex > -1) {
+            final int endChevronIndex = currentExpression.indexOf('>');
+            if (endChevronIndex > startChevronIndex) {
+                sb.append(currentExpression.substring(0, startChevronIndex));
+                sb.append(REGEX);
+                currentExpression = currentExpression.substring(endChevronIndex + 1);
+                startChevronIndex = currentExpression.indexOf('<');
+            }
+        }
+        sb.append(currentExpression);
+
+        return new PatternSuggestion(sb.toString(), step.getExpression());
     }
 
 
