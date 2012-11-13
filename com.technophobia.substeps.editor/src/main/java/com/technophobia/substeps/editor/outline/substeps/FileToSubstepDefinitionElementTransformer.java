@@ -61,7 +61,8 @@ public class FileToSubstepDefinitionElementTransformer implements Transformer<Fi
             final Pattern pattern) {
         final ParentStep step = stepMap.getValueForPattern(pattern.pattern());
         final Position lineNumber = lineNumberToPositionTransformer.from(Integer.valueOf(step.getSourceLineNumber()));
-        final SubstepsDefinitionElement substepDefinition = new SubstepsDefinitionElement(pattern.pattern(), lineNumber);
+        final SubstepsDefinitionElement substepDefinition = new SubstepsDefinitionElement(step.getParent().getLine(),
+                lineNumber);
         addStepsTo(substepDefinition, step.getSteps());
         return substepDefinition;
     }
@@ -70,7 +71,7 @@ public class FileToSubstepDefinitionElementTransformer implements Transformer<Fi
     private void addStepsTo(final SubstepsDefinitionElement substepDefinition, final List<Step> steps) {
         for (final Step step : steps) {
             final Position position = lineNumberToPositionTransformer.from(Integer.valueOf(step.getSourceLineNumber()));
-            substepDefinition.addStep(new StepElement(step.getPattern(), position));
+            substepDefinition.addStep(new StepElement(step.getLine(), position));
         }
     }
 }
