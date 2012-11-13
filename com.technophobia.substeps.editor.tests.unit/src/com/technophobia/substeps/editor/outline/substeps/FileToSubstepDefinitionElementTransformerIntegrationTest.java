@@ -2,47 +2,48 @@ package com.technophobia.substeps.editor.outline.substeps;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.eclipse.jface.text.Position;
-import org.junit.Before;
 import org.junit.Test;
 
+import com.technophobia.substeps.editor.outline.AbstractFileToElementTransformerIntegrationTest;
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
 import com.technophobia.substeps.editor.outline.model.StepElement;
 import com.technophobia.substeps.editor.outline.model.SubstepsDefinitionElement;
 import com.technophobia.substeps.editor.outline.model.SubstepsRootElement;
 import com.technophobia.substeps.supplier.Transformer;
 
-public class FileToSubstepDefinitionElementTransformerIntegrationTest {
+public class FileToSubstepDefinitionElementTransformerIntegrationTest extends
+        AbstractFileToElementTransformerIntegrationTest<SubstepsRootElement> {
+
     private static final String FILENAME = "resources/substepsfiletoelementtest.substeps";
-    private File file;
-
-    private Transformer<File, AbstractModelElement> transformer;
-
-
-    @Before
-    public void initialise() {
-
-        this.file = new File(FILENAME);
-
-        this.transformer = new FileToSubstepDefinitionElementTransformer(new LineNumberAsPositionTransformer());
-    }
 
 
     @Test
     public void canParseSubstepsFile() {
 
-        final AbstractModelElement root = transformer.from(file);
+        final SubstepsRootElement root = doTransformation();
 
         checkSubstepRootIsValid(root);
 
-        final SubstepsRootElement substepRoot = (SubstepsRootElement) root;
-        checkDefinitionsAreValid(substepRoot.getSubstepsDefinitions());
+        checkDefinitionsAreValid(getElementsOfType(SubstepsDefinitionElement.class, root.getChildren()));
+    }
+
+
+    @Override
+    protected String filename() {
+        return FILENAME;
+    }
+
+
+    @Override
+    protected Transformer<File, AbstractModelElement> createTransformer(
+            final Transformer<Integer, Position> lineNumberToPositionTransformer) {
+        return new FileToSubstepDefinitionElementTransformer(lineNumberToPositionTransformer);
     }
 
 
@@ -67,30 +68,9 @@ public class FileToSubstepDefinitionElementTransformerIntegrationTest {
             final String... expectedSteps) {
         checkText(definition, name);
 
-        assertThat(Integer.valueOf(definition.getSteps().size()), is(Integer.valueOf(expectedSteps.length)));
-        checkSteps(definition.getSteps(), expectedSteps);
-    }
+        final Collection<StepElement> steps = getElementsOfType(StepElement.class, definition.getChildren());
 
-
-    private void checkText(final AbstractModelElement element, final String expectedText) {
-        assertThat(element.getText(), is(expectedText));
-    }
-
-
-    private void checkSteps(final Collection<StepElement> steps, final String... expectedSteps) {
         assertThat(Integer.valueOf(steps.size()), is(Integer.valueOf(expectedSteps.length)));
-
-        final Iterator<StepElement> it = steps.iterator();
-        for (final String expectedStep : expectedSteps) {
-            assertTrue(it.hasNext());
-            assertThat(it.next().getText(), is(expectedStep));
-        }
-    }
-
-    private static final class LineNumberAsPositionTransformer implements Transformer<Integer, Position> {
-        @Override
-        public Position from(final Integer from) {
-            return new Position(from.intValue());
-        }
+        checkSteps(steps, expectedSteps);
     }
 }

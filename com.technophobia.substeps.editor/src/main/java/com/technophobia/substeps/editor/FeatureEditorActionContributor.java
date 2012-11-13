@@ -46,6 +46,12 @@ public class FeatureEditorActionContributor extends TextEditorActionContributor 
 
 
     @Override
+    public void dispose() {
+        super.dispose();
+    }
+
+
+    @Override
     public void contributeToMenu(final IMenuManager menuManager) {
         super.contributeToMenu(menuManager);
 
@@ -59,6 +65,7 @@ public class FeatureEditorActionContributor extends TextEditorActionContributor 
 
     @Override
     public void setActiveEditor(final IEditorPart part) {
+
         super.setActiveEditor(part);
 
         ITextEditor editor = null;
@@ -68,5 +75,4 @@ public class FeatureEditorActionContributor extends TextEditorActionContributor 
 
         contentFormatProposal.setAction(getAction(editor, "ContentFormatProposal"));
     }
-
 }

@@ -7,4 +7,10 @@ public class StepElement extends AbstractModelElement {
     public StepElement(final String text, final Position position) {
         super(text, position);
     }
+
+
+    @Override
+    public String toString() {
+        return "Step:" + getText() + "(" + getPosition() + ")";
+    }
 }
