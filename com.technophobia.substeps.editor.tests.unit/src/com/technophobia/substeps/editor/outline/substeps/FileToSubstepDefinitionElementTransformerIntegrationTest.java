@@ -10,6 +10,7 @@ import java.util.Iterator;
 import org.eclipse.jface.text.Position;
 import org.junit.Test;
 
+import com.technophobia.eclipse.supplier.CurrentProjectSupplier;
 import com.technophobia.substeps.editor.outline.AbstractFileToElementTransformerIntegrationTest;
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
 import com.technophobia.substeps.editor.outline.model.StepElement;
@@ -43,7 +44,8 @@ public class FileToSubstepDefinitionElementTransformerIntegrationTest extends
     @Override
     protected Transformer<File, AbstractModelElement> createTransformer(
             final Transformer<Integer, Position> lineNumberToPositionTransformer) {
-        return new FileToSubstepDefinitionElementTransformer(lineNumberToPositionTransformer);
+        return new FileToSubstepDefinitionElementTransformer(lineNumberToPositionTransformer,
+                new CurrentProjectSupplier());
     }
 
 

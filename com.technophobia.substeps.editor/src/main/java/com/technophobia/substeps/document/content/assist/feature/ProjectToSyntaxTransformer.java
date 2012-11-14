@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 
+import com.technophobia.eclipse.supplier.ConstantSupplier;
 import com.technophobia.eclipse.transformer.ProjectToJavaProjectTransformer;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.classloader.ClassLoadedClassAnalyser;
@@ -43,7 +44,8 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
 
         try {
             return SyntaxBuilder.buildSyntax(stepClasses, new File(projectLocationPath(javaProject).toOSString()),
-                    true, null, new ClassLoadedClassAnalyser(classLoader), false);
+                    true, null, new ClassLoadedClassAnalyser(classLoader), false, new MarkerSyntaxErrorReporter(
+                            new ConstantSupplier<IProject>(project)));
         } catch (final RuntimeException ex) {
             FeatureEditorPlugin.instance().log(IStatus.WARNING,
                     "Error when building syntax for project " + project + ": " + ex.getMessage());

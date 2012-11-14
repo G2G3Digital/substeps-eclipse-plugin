@@ -2,6 +2,7 @@ package com.technophobia.substeps.editor;
 
 import java.io.File;
 
+import com.technophobia.eclipse.supplier.CurrentProjectSupplier;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.feature.SubstepsContentDefinitionFactory;
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
@@ -25,6 +26,6 @@ public class SubstepsEditor extends FeatureEditor {
 
     @Override
     protected Transformer<File, AbstractModelElement> fileToModelTransformer() {
-        return new FileToSubstepDefinitionElementTransformer(lineNumberToDocumentOffset());
+        return new FileToSubstepDefinitionElementTransformer(lineNumberToDocumentOffset(), new CurrentProjectSupplier());
     }
 }
