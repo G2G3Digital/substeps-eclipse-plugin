@@ -104,10 +104,14 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
                 completionProposals.add(new CompletionProposal(suggestionText, offset, 0, suggestionText.length()));
             } else {
                 // only include if the suggestion matches
-                if (suggestion.isMatch(startOfLine) || suggestion.isPartialMatch(startOfLine)) {
+                if (suggestion.isMatch(startOfLine)) {
                     completionProposals.add(new CompletionProposal(suggestionText, offset - startOfLine.length(),
                             startOfLine.length(), suggestionText.length()));
-
+                } else if (suggestion.isPartialMatch(startOfLine)) {
+                    // TODO: Rich wanted to look at this, by doing something
+                    // funky with partial patterns or something
+                    completionProposals.add(new CompletionProposal(suggestionText, offset - startOfLine.length(),
+                            startOfLine.length(), suggestionText.length()));
                 }
             }
         }

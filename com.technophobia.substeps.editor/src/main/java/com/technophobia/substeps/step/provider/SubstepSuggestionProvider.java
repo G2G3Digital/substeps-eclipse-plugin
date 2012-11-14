@@ -46,7 +46,7 @@ public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionPro
         final Syntax syntax = projectToSyntaxTransformer.from(project);
 
         final List<ParentStep> substeps = syntax.getSortedRootSubSteps();
-        final List<Suggestion> suggestions = new ArrayList<Suggestion>();
+        final List<Suggestion> suggestions = new ArrayList<Suggestion>(substeps.size());
         for (final ParentStep substep : substeps) {
             final Step parentStep = substep.getParent();
             suggestions.add(new PatternSuggestion(parentStep.getPattern(), parentStep.getLine()));

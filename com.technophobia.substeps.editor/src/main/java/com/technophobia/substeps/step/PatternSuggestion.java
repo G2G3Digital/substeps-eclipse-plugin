@@ -1,5 +1,6 @@
 package com.technophobia.substeps.step;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PatternSuggestion extends Suggestion {
@@ -15,13 +16,15 @@ public class PatternSuggestion extends Suggestion {
 
     @Override
     public boolean isMatch(final String line) {
-        return pattern.matcher(line).matches();
+        final Matcher matcher = pattern.matcher(line);
+        return matcher.matches();
     }
 
 
     @Override
     public boolean isPartialMatch(final String line) {
-        return pattern.matcher(line).hitEnd();
+        final Matcher matcher = pattern.matcher(line);
+        return matcher.matches() || matcher.hitEnd();
     }
 
 
