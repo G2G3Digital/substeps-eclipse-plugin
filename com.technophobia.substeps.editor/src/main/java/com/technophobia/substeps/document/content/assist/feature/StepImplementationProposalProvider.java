@@ -17,7 +17,6 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.document.content.assist.CompletionProposalProvider;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
-import com.technophobia.substeps.step.SuggestionType;
 
 /**
  * Implementation of {@link CompletionProposalProvider} that looks up all class
@@ -46,14 +45,10 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
         // final Syntax syntax = siteToSyntaxTransformer.to(site);
         final IResource resource = activeEditorResource();
 
-        final SuggestionType suggestionType = suggestionTypeForResource(resource);
-        if (suggestionType != null) {
-            final List<String> suggestions = suggestionManager.suggestionsFor(suggestionType, resource);
+        final List<String> suggestions = suggestionManager.suggestionsFor(resource);
+        Collections.sort(suggestions);
 
-            Collections.sort(suggestions);
-            return createCompletionsForSuggestions(document, offset, suggestions);
-        }
-        return new ICompletionProposal[] { new NoCompletionsProposal() };
+        return createCompletionsForSuggestions(document, offset, suggestions);
     }
 
 
@@ -65,26 +60,6 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
     private IResource activeEditorResource() {
         return (IResource) site.getWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()
                 .getAdapter(IResource.class);
-    }
-
-
-    /**
-     * Find the {@link SuggestionType} of the resource, based on the file
-     * extension
-     * 
-     * @param resource
-     *            The resource to be inspected
-     * @return suggestion type of the resource
-     */
-    private SuggestionType suggestionTypeForResource(final IResource resource) {
-        final String fileExtension = resource.getFileExtension();
-        if ("substeps".equalsIgnoreCase(fileExtension)) {
-            return SuggestionType.SUBSTEP;
-        }
-        if ("feature".equalsIgnoreCase(fileExtension)) {
-            return SuggestionType.FEATURE;
-        }
-        return null;
     }
 
 

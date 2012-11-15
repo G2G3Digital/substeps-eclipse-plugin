@@ -9,6 +9,7 @@ import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.formatting.FormattingContext;
+import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.supplier.Supplier;
 
 public class SkipAheadFormattingContext extends PartitionedFormattingContext {
@@ -41,8 +42,8 @@ public class SkipAheadFormattingContext extends PartitionedFormattingContext {
 
 
             @Override
-            public IPredicateRule partitionRule() {
-                return currentTypeDefinition.partitionRule();
+            public IPredicateRule partitionRule(final Supplier<PartitionContext> partitionContextSupplier) {
+                return currentTypeDefinition.partitionRule(partitionContextSupplier);
             }
 
 

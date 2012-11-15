@@ -25,6 +25,8 @@ import org.eclipse.jface.text.rules.Token;
 
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
+import com.technophobia.substeps.document.partition.PartitionContext;
+import com.technophobia.substeps.supplier.Supplier;
 
 /**
  * Partition Scanner that partitions editor elements based on their Content type
@@ -37,7 +39,8 @@ public class ContentTypeRuleBasedPartitionScanner extends RuleBasedPartitionScan
     private final String[] contentTypes;
 
 
-    public ContentTypeRuleBasedPartitionScanner(final ContentTypeDefinitionFactory contentTypeDefinitionFactory) {
+    public ContentTypeRuleBasedPartitionScanner(final Supplier<PartitionContext> partitionContextSupplier,
+            final ContentTypeDefinitionFactory contentTypeDefinitionFactory) {
 
         final ContentTypeDefinition[] contentTypeDefinitions = contentTypeDefinitionFactory.contentTypeDefinitions();
         final String[] contentTypeDefinitionIds = new String[contentTypeDefinitions.length];
@@ -50,10 +53,10 @@ public class ContentTypeRuleBasedPartitionScanner extends RuleBasedPartitionScan
         int i = 0;
         for (final ContentTypeDefinition contentTypeDefinition : contentTypeDefinitions) {
             contentTypeDefinitionIds[i] = contentTypeDefinition.id();
-            partitionRules[i + 2] = contentTypeDefinition.partitionRule();
+            partitionRules[i + 2] = contentTypeDefinition.partitionRule(partitionContextSupplier);
             i++;
         }
-        
+
         this.contentTypes = contentTypeDefinitionIds;
         setPredicateRules(partitionRules);
     }

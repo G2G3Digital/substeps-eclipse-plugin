@@ -205,6 +205,7 @@ public class PartitionedFormattingContextTest {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void nextContentTypeReturnsCorrectNonWhitespace() throws Exception {
         final ContentTypeDefinition currentContentType = context

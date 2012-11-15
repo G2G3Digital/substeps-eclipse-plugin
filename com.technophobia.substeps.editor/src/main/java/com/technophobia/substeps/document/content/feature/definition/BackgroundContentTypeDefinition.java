@@ -9,6 +9,7 @@ import com.technophobia.substeps.document.content.feature.FeatureColour;
 import com.technophobia.substeps.document.formatting.FormattingContext;
 import com.technophobia.substeps.document.formatting.strategy.FixedIndentFormattingStrategy;
 import com.technophobia.substeps.document.formatting.strategy.StartOfUnitFormattingStrategy;
+import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.supplier.Supplier;
 
 public class BackgroundContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
@@ -23,12 +24,8 @@ public class BackgroundContentTypeDefinition extends AbstractFeatureContentTypeD
 
 
     @Override
-    public IPredicateRule partitionRule() {
-        return paragraphRule(PREFIX_TEXT, id(), true, TagContentTypeDefinition.PREFIX_TEXT,
-                CommentContentTypeDefinition.PREFIX_TEXT, BackgroundContentTypeDefinition.PREFIX_TEXT,
-                ScenarioContentTypeDefinition.PREFIX_TEXT, ScenarioOutlineContentTypeDefinition.PREFIX_TEXT,
-                GivenContentTypeDefinition.PREFIX_TEXT, WhenContentTypeDefinition.PREFIX_TEXT,
-                ThenContentTypeDefinition.PREFIX_TEXT);
+    public IPredicateRule partitionRule(final Supplier<PartitionContext> partitionContextSupplier) {
+        return singleLineWithTrailingCommentRule(PREFIX_TEXT, id());
     }
 
 

@@ -14,6 +14,8 @@ import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.FeatureColour;
 import com.technophobia.substeps.document.text.rule.SingleLineWithTrailingCommentRule;
 import com.technophobia.substeps.document.text.rule.UntilOtherContentTypeSequenceRule;
+import com.technophobia.substeps.document.text.rule.word.MultipleChoiceSingleWordDetector;
+import com.technophobia.substeps.document.text.rule.word.SingleWordDetector;
 
 public abstract class AbstractFeatureContentTypeDefinition implements ContentTypeDefinition {
 
@@ -55,26 +57,7 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
 
     protected IRule fixedWordRule(final String word, final IToken token) {
         // return new WordRule(word(word), token);
-        final WordRule rule = new WordRule(new IWordDetector() {
-
-            /**
-             * Only really interested in the keyword, so only pick words which
-             * start with the same character
-             */
-            @Override
-            public boolean isWordStart(final char c) {
-                return c == word.charAt(0);
-            }
-
-
-            /**
-             * "Words" may contain any non-whitespace characters
-             */
-            @Override
-            public boolean isWordPart(final char c) {
-                return !Character.isWhitespace(c);
-            }
-        });
+        final WordRule rule = new WordRule(new SingleWordDetector(word));
         rule.addWord(word, token);
         return rule;
     }
@@ -83,6 +66,15 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
     protected IRule fixedMultiWordRule(final String word, final IToken token) {
         final WordRule rule = new WordRule(word(word));
         rule.addWord(word, token);
+        return rule;
+    }
+
+
+    protected IRule fixedWordSetRule(final String[] words, final IToken token) {
+        final WordRule rule = new WordRule(new MultipleChoiceSingleWordDetector(words));
+        for (final String word : words) {
+            rule.addWord(word, token);
+        }
         return rule;
     }
 
