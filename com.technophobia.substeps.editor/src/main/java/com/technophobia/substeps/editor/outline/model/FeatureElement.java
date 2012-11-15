@@ -23,30 +23,15 @@ public class FeatureElement extends AbstractModelElement {
     }
 
 
-    public BackgroundElement getBackground() {
-        return background;
-    }
-
-
     public void setBackground(final BackgroundElement background) {
         this.background = background;
         this.background.setParent(this);
     }
 
 
-    public Collection<ScenarioElement> getScenarios() {
-        return scenarios;
-    }
-
-
     public void addScenario(final ScenarioElement scenario) {
         scenario.setParent(this);
         this.scenarios.add(scenario);
-    }
-
-
-    public Collection<ScenarioOutlineElement> getScenarioOutlines() {
-        return scenarioOutlines;
     }
 
 
@@ -67,5 +52,11 @@ public class FeatureElement extends AbstractModelElement {
 
         Collections.sort(results);
         return Collections.unmodifiableCollection(results);
+    }
+
+
+    @Override
+    public String toString() {
+        return "Feature:" + getText() + "(" + getPosition() + ")";
     }
 }

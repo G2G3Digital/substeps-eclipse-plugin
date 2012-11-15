@@ -7,4 +7,10 @@ public class ScenarioElement extends AbstractStepContainerElement {
     public ScenarioElement(final String text, final Position position) {
         super(text, position);
     }
+
+
+    @Override
+    public String toString() {
+        return "Scenario:" + getText() + "(" + getPosition() + ")";
+    }
 }

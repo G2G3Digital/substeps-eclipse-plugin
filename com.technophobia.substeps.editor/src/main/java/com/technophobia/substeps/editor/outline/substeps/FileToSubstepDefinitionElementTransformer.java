@@ -6,8 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.Position;
 
+import com.technophobia.substeps.document.content.assist.feature.MarkerSyntaxErrorReporter;
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
 import com.technophobia.substeps.editor.outline.model.StepElement;
 import com.technophobia.substeps.editor.outline.model.SubstepsDefinitionElement;
@@ -16,6 +18,7 @@ import com.technophobia.substeps.model.ParentStep;
 import com.technophobia.substeps.model.PatternMap;
 import com.technophobia.substeps.model.Step;
 import com.technophobia.substeps.runner.syntax.SubStepDefinitionParser;
+import com.technophobia.substeps.supplier.Supplier;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class FileToSubstepDefinitionElementTransformer implements Transformer<File, AbstractModelElement> {
@@ -25,9 +28,10 @@ public class FileToSubstepDefinitionElementTransformer implements Transformer<Fi
 
 
     public FileToSubstepDefinitionElementTransformer(
-            final Transformer<Integer, Position> lineNumberToPositionTransformer) {
+            final Transformer<Integer, Position> lineNumberToPositionTransformer,
+            final Supplier<IProject> projectSupplier) {
         this.lineNumberToPositionTransformer = lineNumberToPositionTransformer;
-        this.parser = new SubStepDefinitionParser();
+        this.parser = new SubStepDefinitionParser(new MarkerSyntaxErrorReporter(projectSupplier));
     }
 
 

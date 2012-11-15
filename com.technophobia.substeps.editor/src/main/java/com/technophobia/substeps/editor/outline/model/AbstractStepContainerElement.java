@@ -17,11 +17,6 @@ public abstract class AbstractStepContainerElement extends AbstractModelElement 
     }
 
 
-    public Collection<StepElement> getSteps() {
-        return steps;
-    }
-
-
     public void addStep(final StepElement stepElement) {
         stepElement.setParent(this);
         steps.add(stepElement);
@@ -30,6 +25,6 @@ public abstract class AbstractStepContainerElement extends AbstractModelElement 
 
     @Override
     public Collection<AbstractModelElement> getChildren() {
-        return Collections.<AbstractModelElement> unmodifiableCollection(getSteps());
+        return Collections.<AbstractModelElement> unmodifiableCollection(steps);
     }
 }

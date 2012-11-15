@@ -36,6 +36,11 @@ public class OutlineContentProvider implements ITreeContentProvider {
     }
 
 
+    public AbstractModelElement getRoot() {
+        return root;
+    }
+
+
     @Override
     public Object[] getChildren(final Object parentElement) {
         if (parentElement == input) {

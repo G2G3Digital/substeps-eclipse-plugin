@@ -107,7 +107,8 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     public Object getAdapter(final Class required) {
         if (IContentOutlinePage.class.equals(required)) {
             if (outlinePage == null) {
-                outlinePage = new SubstepsContentOutlinePage(this, new OutlineLabelProvider(), fileToModelTransformer());
+                outlinePage = new SubstepsContentOutlinePage(this, new OutlineLabelProvider(),
+                        fileToModelTransformer(), documentOffsetToLineNumber());
                 if (getEditorInput() != null)
                     outlinePage.setInput(getEditorInput());
             }
@@ -201,6 +202,17 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
         setAction("ContentFormatProposal", action);
         getEditorSite().getActionBars().setGlobalActionHandler("ContentFormatProposal", action);
     }
+
+    // @Override
+    // protected void handleCursorPositionChanged() {
+    // super.handleCursorPositionChanged();
+    //
+    // final ISelection selection =
+    // getEditorSite().getSelectionProvider().getSelection();
+    // if (selection != null && outlinePage != null) {
+    // outlinePage.setSelection(selection);
+    // }
+    // }
 
     private static final String SUBSTEPS_CONTEXT = "com.technophobia.substeps.editor.SubstepsContext";
 
@@ -309,6 +321,24 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                     }
                 }
                 return new Position(0);
+            }
+        };
+    }
+
+
+    protected Transformer<Position, Integer> documentOffsetToLineNumber() {
+        return new Transformer<Position, Integer>() {
+            @Override
+            public Integer from(final Position offset) {
+                if (editorInput != null) {
+                    try {
+                        final IDocument document = getDocumentProvider().getDocument(editorInput);
+                        return Integer.valueOf(document.getLineOfOffset(offset.getOffset()));
+                    } catch (final BadLocationException e) {
+                        FeatureEditorPlugin.info("Couldn't get line number for offset " + offset + " in document");
+                    }
+                }
+                return Integer.valueOf(-1);
             }
         };
     }

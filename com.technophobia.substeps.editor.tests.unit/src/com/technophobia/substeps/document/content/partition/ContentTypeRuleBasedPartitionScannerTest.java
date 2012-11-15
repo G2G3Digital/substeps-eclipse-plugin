@@ -51,6 +51,7 @@ import com.technophobia.substeps.document.content.feature.definition.StepContent
 import com.technophobia.substeps.document.content.feature.definition.TagContentTypeDefinition;
 import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
+import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Supplier;
 
 @RunWith(JMock.class)
@@ -58,8 +59,8 @@ public class ContentTypeRuleBasedPartitionScannerTest {
 
     private static final String NEWLINE = System.getProperty("line.separator");
 
-    protected static final Collection<String> SUGGESTIONS = Arrays.asList("Given something", "When something else",
-            "Then a result");
+    protected static final Collection<Suggestion> SUGGESTIONS = Arrays.asList(new Suggestion("Given something"),
+            new Suggestion("When something else"), new Suggestion("Then a result"));
 
     private Mockery context;
 

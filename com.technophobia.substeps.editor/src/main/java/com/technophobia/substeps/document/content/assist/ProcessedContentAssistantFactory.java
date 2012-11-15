@@ -37,14 +37,6 @@ public class ProcessedContentAssistantFactory implements ContentAssistantFactory
         final ContentAssistant assistant = new ContentAssistant();
         final IContentAssistProcessor processor = processorSupplier.get();
 
-        // assistant.setContentAssistProcessor(processor,
-        // GivenContentTypeDefinition.CONTENT_TYPE_ID);
-        // assistant.setContentAssistProcessor(processor,
-        // WhenContentTypeDefinition.CONTENT_TYPE_ID);
-        // assistant.setContentAssistProcessor(processor,
-        // ThenContentTypeDefinition.CONTENT_TYPE_ID);
-        // assistant.setContentAssistProcessor(processor,
-        // AndContentTypeDefinition.CONTENT_TYPE_ID);
         assistant.setContentAssistProcessor(processor, StepContentTypeDefinition.CONTENT_TYPE_ID);
         assistant.setContentAssistProcessor(processor, DefineContentTypeDefinition.CONTENT_TYPE_ID);
         assistant.setContentAssistProcessor(processor, DEFAULT_PARTITION_CONTENT_TYPE);

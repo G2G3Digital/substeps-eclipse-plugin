@@ -7,4 +7,10 @@ public class BackgroundElement extends AbstractStepContainerElement {
     public BackgroundElement(final String text, final Position position) {
         super(text, position);
     }
+
+
+    @Override
+    public String toString() {
+        return "Background :" + getText() + "(" + getPosition() + ")";
+    }
 }

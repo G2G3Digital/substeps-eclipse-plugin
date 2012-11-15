@@ -7,7 +7,7 @@ import org.eclipse.core.resources.IWorkspace;
 
 public interface ProjectSuggestionProvider {
 
-    Collection<String> suggestionsFor(IProject project);
+    Collection<Suggestion> suggestionsFor(IProject project);
 
 
     void load(IWorkspace workspace);

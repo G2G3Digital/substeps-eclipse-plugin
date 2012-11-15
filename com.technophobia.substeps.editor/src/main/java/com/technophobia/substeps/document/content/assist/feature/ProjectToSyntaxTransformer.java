@@ -14,10 +14,13 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 
+import com.technophobia.eclipse.supplier.ConstantSupplier;
 import com.technophobia.eclipse.transformer.ProjectToJavaProjectTransformer;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.classloader.ClassLoadedClassAnalyser;
 import com.technophobia.substeps.classloader.JavaProjectClassLoader;
+import com.technophobia.substeps.model.ParentStep;
+import com.technophobia.substeps.model.PatternMap;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.runner.runtime.ClassLocator;
 import com.technophobia.substeps.runner.runtime.StepClassLocator;
@@ -38,8 +41,18 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
             final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
             stepClasses.addAll(stepClasses(outputFolder, classLocator));
         }
-        return SyntaxBuilder.buildSyntax(stepClasses, new File(projectLocationPath(javaProject).toOSString()), true,
-                null, new ClassLoadedClassAnalyser(classLoader), false);
+
+        try {
+            return SyntaxBuilder.buildSyntax(stepClasses, new File(projectLocationPath(javaProject).toOSString()),
+                    true, null, new ClassLoadedClassAnalyser(classLoader), false, new MarkerSyntaxErrorReporter(
+                            new ConstantSupplier<IProject>(project)));
+        } catch (final RuntimeException ex) {
+            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+                    "Error when building syntax for project " + project + ": " + ex.getMessage());
+            final Syntax nullSyntax = new Syntax();
+            nullSyntax.setSubStepsMap(new PatternMap<ParentStep>());
+            return nullSyntax;
+        }
     }
 
 

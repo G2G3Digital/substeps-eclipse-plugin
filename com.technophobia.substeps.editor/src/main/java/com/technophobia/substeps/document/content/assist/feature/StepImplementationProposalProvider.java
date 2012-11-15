@@ -17,6 +17,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.document.content.assist.CompletionProposalProvider;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
+import com.technophobia.substeps.step.Suggestion;
 
 /**
  * Implementation of {@link CompletionProposalProvider} that looks up all class
@@ -45,7 +46,7 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
         // final Syntax syntax = siteToSyntaxTransformer.to(site);
         final IResource resource = activeEditorResource();
 
-        final List<String> suggestions = suggestionManager.suggestionsFor(resource);
+        final List<Suggestion> suggestions = suggestionManager.suggestionsFor(resource);
         Collections.sort(suggestions);
 
         return createCompletionsForSuggestions(document, offset, suggestions);
@@ -77,7 +78,7 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
      * @return Applicable {@link ICompletionProposal}s
      */
     private ICompletionProposal[] createCompletionsForSuggestions(final IDocument document, final int offset,
-            final Collection<String> suggestions) {
+            final Collection<Suggestion> suggestions) {
 
         final Collection<ICompletionProposal> completionProposals = createPopulatedCompletionsForSuggestions(document,
                 offset, suggestions);
@@ -91,29 +92,26 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
 
 
     private Collection<ICompletionProposal> createPopulatedCompletionsForSuggestions(final IDocument document,
-            final int offset, final Collection<String> suggestions) {
+            final int offset, final Collection<Suggestion> suggestions) {
         final List<ICompletionProposal> completionProposals = new ArrayList<ICompletionProposal>();
 
         // filter the list based on current text
         final String startOfLine = getLineUpTo(document, offset);
 
-        for (final String suggestion : suggestions) {
-            // TODO - position the cursor at the first < in order to be able
-            // to replace with something sensible
+        for (final Suggestion suggestion : suggestions) {
+            final String suggestionText = suggestion.getText();
             if (startOfLine == null) {
-                completionProposals.add(new CompletionProposal(suggestion, offset, 0, suggestion.length()));
+                completionProposals.add(new CompletionProposal(suggestionText, offset, 0, suggestionText.length()));
             } else {
                 // only include if the suggestion matches
-                if (suggestion.toUpperCase().startsWith(startOfLine.toUpperCase())) {
-                    // String actualReplacement =
-                    // replacement.substring(startOfLastWord.length());
-                    // result.add(
-                    // new CompletionProposal(actualReplacement, offset, 0,
-                    // actualReplacement.length()));
-
-                    completionProposals.add(new CompletionProposal(suggestion, offset - startOfLine.length(),
-                            startOfLine.length(), suggestion.length()));
-
+                if (suggestion.isMatch(startOfLine)) {
+                    completionProposals.add(new CompletionProposal(suggestionText, offset - startOfLine.length(),
+                            startOfLine.length(), suggestionText.length()));
+                } else if (suggestion.isPartialMatch(startOfLine)) {
+                    // TODO: Rich wanted to look at this, by doing something
+                    // funky with partial patterns or something
+                    completionProposals.add(new CompletionProposal(suggestionText, offset - startOfLine.length(),
+                            startOfLine.length(), suggestionText.length()));
                 }
             }
         }
