@@ -17,7 +17,6 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.document.content.assist.CompletionProposalProvider;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
-import com.technophobia.substeps.step.SuggestionType;
 
 /**
  * Implementation of {@link CompletionProposalProvider} that looks up all class
@@ -46,14 +45,10 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
         // final Syntax syntax = siteToSyntaxTransformer.to(site);
         final IResource resource = activeEditorResource();
 
-        final SuggestionType suggestionType = suggestionTypeForResource(resource);
-        if (suggestionType != null) {
-            final List<String> suggestions = suggestionManager.suggestionsFor(suggestionType, resource);
+        final List<String> suggestions = suggestionManager.suggestionsFor(resource);
+        Collections.sort(suggestions);
 
-            Collections.sort(suggestions);
-            return createCompletionsForSuggestions(document, offset, suggestions);
-        }
-        return new ICompletionProposal[] { new NoCompletionsProposal() };
+        return createCompletionsForSuggestions(document, offset, suggestions);
     }
 
 
@@ -65,26 +60,6 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
     private IResource activeEditorResource() {
         return (IResource) site.getWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()
                 .getAdapter(IResource.class);
-    }
-
-
-    /**
-     * Find the {@link SuggestionType} of the resource, based on the file
-     * extension
-     * 
-     * @param resource
-     *            The resource to be inspected
-     * @return suggestion type of the resource
-     */
-    private SuggestionType suggestionTypeForResource(final IResource resource) {
-        final String fileExtension = resource.getFileExtension();
-        if ("substeps".equalsIgnoreCase(fileExtension)) {
-            return SuggestionType.SUBSTEP;
-        }
-        if ("feature".equalsIgnoreCase(fileExtension)) {
-            return SuggestionType.FEATURE;
-        }
-        return null;
     }
 
 
@@ -120,24 +95,24 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
         final List<ICompletionProposal> completionProposals = new ArrayList<ICompletionProposal>();
 
         // filter the list based on current text
-        final String startOfLastWord = getLastWord(document, offset);
+        final String startOfLine = getLineUpTo(document, offset);
 
         for (final String suggestion : suggestions) {
             // TODO - position the cursor at the first < in order to be able
             // to replace with something sensible
-            if (startOfLastWord == null) {
+            if (startOfLine == null) {
                 completionProposals.add(new CompletionProposal(suggestion, offset, 0, suggestion.length()));
             } else {
                 // only include if the suggestion matches
-                if (suggestion.toUpperCase().startsWith(startOfLastWord.toUpperCase())) {
+                if (suggestion.toUpperCase().startsWith(startOfLine.toUpperCase())) {
                     // String actualReplacement =
                     // replacement.substring(startOfLastWord.length());
                     // result.add(
                     // new CompletionProposal(actualReplacement, offset, 0,
                     // actualReplacement.length()));
 
-                    completionProposals.add(new CompletionProposal(suggestion, offset - startOfLastWord.length(),
-                            startOfLastWord.length(), suggestion.length()));
+                    completionProposals.add(new CompletionProposal(suggestion, offset - startOfLine.length(),
+                            startOfLine.length(), suggestion.length()));
 
                 }
             }
@@ -155,13 +130,13 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
      *            position in the document of the cursor
      * @return
      */
-    private String getLastWord(final IDocument document, final int offset) {
+    private String getLineUpTo(final IDocument document, final int offset) {
         try {
             final int lineNumber = document.getLineOfOffset(offset);
             final int lineStart = document.getLineOffset(lineNumber);
 
             final String line = document.get(lineStart, offset - lineStart);
-            return line.trim();
+            return removeLeadingSpace(line);
 
         } catch (final BadLocationException e) {
             FeatureEditorPlugin.instance().log(IStatus.ERROR, "Could not get last word");
@@ -170,4 +145,8 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
         return null;
     }
 
+
+    private String removeLeadingSpace(final String text) {
+        return text.replaceAll("^\\s+", "");
+    }
 }

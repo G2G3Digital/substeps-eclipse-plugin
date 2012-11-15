@@ -25,18 +25,15 @@ import org.junit.Test;
 
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.NullContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.AndContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.BackgroundContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.CommentContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.FeatureContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.GivenContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleRowContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioOutlineContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.StepContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.TagContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.ThenContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.WhenContentTypeDefinition;
 
 public class FeatureContentTypeDefinitionFactoryTest {
 
@@ -59,10 +56,7 @@ public class FeatureContentTypeDefinitionFactoryTest {
         assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_scenario_outline") instanceof ScenarioOutlineContentTypeDefinition);
         assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_example") instanceof ScenarioExampleContentTypeDefinition);
         assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_example_row") instanceof ScenarioExampleRowContentTypeDefinition);
-        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_given") instanceof GivenContentTypeDefinition);
-        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_when") instanceof WhenContentTypeDefinition);
-        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_then") instanceof ThenContentTypeDefinition);
-        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_and") instanceof AndContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_step") instanceof StepContentTypeDefinition);
     }
 
 

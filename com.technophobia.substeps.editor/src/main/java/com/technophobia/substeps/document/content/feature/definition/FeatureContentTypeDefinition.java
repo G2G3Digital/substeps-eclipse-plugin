@@ -8,6 +8,7 @@ import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.feature.FeatureColour;
 import com.technophobia.substeps.document.formatting.FormattingContext;
 import com.technophobia.substeps.document.formatting.strategy.MultiLineFixedIndentFormattingStrategy;
+import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.supplier.Supplier;
 
 public class FeatureContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
@@ -22,7 +23,7 @@ public class FeatureContentTypeDefinition extends AbstractFeatureContentTypeDefi
 
 
     @Override
-    public IPredicateRule partitionRule() {
+    public IPredicateRule partitionRule(final Supplier<PartitionContext> partitionContextSupplier) {
         return paragraphRule(PREFIX_TEXT, id(), true, TagContentTypeDefinition.PREFIX_TEXT,
                 CommentContentTypeDefinition.PREFIX_TEXT, BackgroundContentTypeDefinition.PREFIX_TEXT,
                 ScenarioContentTypeDefinition.PREFIX_TEXT, ScenarioOutlineContentTypeDefinition.PREFIX_TEXT);

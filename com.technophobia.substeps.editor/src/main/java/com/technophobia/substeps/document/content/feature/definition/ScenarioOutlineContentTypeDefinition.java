@@ -9,6 +9,7 @@ import com.technophobia.substeps.document.content.feature.FeatureColour;
 import com.technophobia.substeps.document.formatting.FormattingContext;
 import com.technophobia.substeps.document.formatting.strategy.FixedIndentFormattingStrategy;
 import com.technophobia.substeps.document.formatting.strategy.StartOfUnitFormattingStrategy;
+import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.supplier.Supplier;
 
 public class ScenarioOutlineContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
@@ -23,14 +24,14 @@ public class ScenarioOutlineContentTypeDefinition extends AbstractFeatureContent
 
 
     @Override
-    public IPredicateRule partitionRule() {
+    public IPredicateRule partitionRule(final Supplier<PartitionContext> partitionContextSupplier) {
         return singleLineWithTrailingCommentRule(PREFIX_TEXT, id());
     }
 
 
     @Override
     public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedWordRule(PREFIX_TEXT, colourToken(FeatureColour.BLUE, colourManager));
+        return fixedMultiWordRule(PREFIX_TEXT, colourToken(FeatureColour.BLUE, colourManager));
     }
 
 

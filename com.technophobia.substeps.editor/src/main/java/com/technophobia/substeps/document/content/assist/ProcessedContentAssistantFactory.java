@@ -4,11 +4,8 @@ import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 
-import com.technophobia.substeps.document.content.feature.definition.AndContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.DefineContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.GivenContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.ThenContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.WhenContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.StepContentTypeDefinition;
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Supplier;
 
@@ -40,10 +37,15 @@ public class ProcessedContentAssistantFactory implements ContentAssistantFactory
         final ContentAssistant assistant = new ContentAssistant();
         final IContentAssistProcessor processor = processorSupplier.get();
 
-        assistant.setContentAssistProcessor(processor, GivenContentTypeDefinition.CONTENT_TYPE_ID);
-        assistant.setContentAssistProcessor(processor, WhenContentTypeDefinition.CONTENT_TYPE_ID);
-        assistant.setContentAssistProcessor(processor, ThenContentTypeDefinition.CONTENT_TYPE_ID);
-        assistant.setContentAssistProcessor(processor, AndContentTypeDefinition.CONTENT_TYPE_ID);
+        // assistant.setContentAssistProcessor(processor,
+        // GivenContentTypeDefinition.CONTENT_TYPE_ID);
+        // assistant.setContentAssistProcessor(processor,
+        // WhenContentTypeDefinition.CONTENT_TYPE_ID);
+        // assistant.setContentAssistProcessor(processor,
+        // ThenContentTypeDefinition.CONTENT_TYPE_ID);
+        // assistant.setContentAssistProcessor(processor,
+        // AndContentTypeDefinition.CONTENT_TYPE_ID);
+        assistant.setContentAssistProcessor(processor, StepContentTypeDefinition.CONTENT_TYPE_ID);
         assistant.setContentAssistProcessor(processor, DefineContentTypeDefinition.CONTENT_TYPE_ID);
         assistant.setContentAssistProcessor(processor, DEFAULT_PARTITION_CONTENT_TYPE);
 

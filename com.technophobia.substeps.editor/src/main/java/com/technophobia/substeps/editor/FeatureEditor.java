@@ -18,14 +18,18 @@
  */
 package com.technophobia.substeps.editor;
 
+import java.io.File;
 import java.util.ResourceBundle;
 
-import org.eclipse.core.commands.contexts.IContextManagerListener;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -34,6 +38,7 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.TextOperationAction;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import com.technophobia.eclipse.editor.FormattableEditorPart;
 import com.technophobia.substeps.FeatureEditorPlugin;
@@ -49,8 +54,13 @@ import com.technophobia.substeps.document.content.view.ContentTypeViewConfigurat
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
 import com.technophobia.substeps.document.formatting.partition.PartitionedFormattingContextFactory;
 import com.technophobia.substeps.document.partition.PartitionScannedDocumentProvider;
+import com.technophobia.substeps.editor.outline.OutlineLabelProvider;
+import com.technophobia.substeps.editor.outline.SubstepsContentOutlinePage;
+import com.technophobia.substeps.editor.outline.feature.FileToFeatureElementTransformer;
+import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Supplier;
+import com.technophobia.substeps.supplier.Transformer;
 
 /**
  * TextEditor whose text is configured to view as a feature file
@@ -62,6 +72,10 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
 
     private final ColourManager colourManager;
     private IContextActivation currentActivateContext;
+    private SubstepsContentOutlinePage outlinePage;
+
+    private IEditorInput editorInput;
+
 
     @SuppressWarnings("unchecked")
     public FeatureEditor() {
@@ -77,7 +91,7 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                 formattingContextFactory, contentAssistantFactory));
         setDocumentProvider(new PartitionScannedDocumentProvider(new ContentTypeRuleBasedPartitionScannerFactory(
                 contentTypeDefinitionFactory)));
-        
+
         FeatureEditorPlugin.info("ctor");
     }
 
@@ -88,6 +102,29 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     }
 
 
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Object getAdapter(final Class required) {
+        if (IContentOutlinePage.class.equals(required)) {
+            if (outlinePage == null) {
+                outlinePage = new SubstepsContentOutlinePage(this, new OutlineLabelProvider(), fileToModelTransformer());
+                if (getEditorInput() != null)
+                    outlinePage.setInput(getEditorInput());
+            }
+            return outlinePage;
+        }
+        return super.getAdapter(required);
+    }
+
+
+    @Override
+    protected void doSetInput(final IEditorInput input) throws CoreException {
+        super.doSetInput(input);
+
+        this.editorInput = input;
+    }
+
+
     /**
      * Return a new {@link ContentTypeDefinitionFactory}
      * 
@@ -95,6 +132,11 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
      */
     protected ContentTypeDefinitionFactory contentTypeDefinitionFactory() {
         return new FeatureContentTypeDefinitionFactory();
+    }
+
+
+    protected Transformer<File, AbstractModelElement> fileToModelTransformer() {
+        return new FileToFeatureElementTransformer(lineNumberToDocumentOffset());
     }
 
 
@@ -114,34 +156,37 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
         };
     }
 
-    private void activateContext(){
-    	if (currentActivateContext == null) {
-			final IContextService contextService = (IContextService) this.getSite().getWorkbenchWindow().getService(
-					IContextService.class);
-			currentActivateContext = contextService.activateContext(SUBSTEPS_CONTEXT);
-    	}
-    	// else we're already active 
+
+    private void activateContext() {
+        if (currentActivateContext == null) {
+            final IContextService contextService = (IContextService) this.getSite().getWorkbenchWindow()
+                    .getService(IContextService.class);
+            currentActivateContext = contextService.activateContext(SUBSTEPS_CONTEXT);
+        }
+        // else we're already active
     }
-    
-    private void deactivateContext(){
+
+
+    private void deactivateContext() {
         if (currentActivateContext != null) {
-	        final IContextService contextService = (IContextService) this.getSite().getWorkbenchWindow().getService(
-					IContextService.class);
-	        
-	    	contextService.deactivateContext(currentActivateContext);
-	    	currentActivateContext = null;
+            final IContextService contextService = (IContextService) this.getSite().getWorkbenchWindow()
+                    .getService(IContextService.class);
+
+            contextService.deactivateContext(currentActivateContext);
+            currentActivateContext = null;
         }
     }
-    
+
+
     @Override
     public void dispose() {
         colourManager.dispose();
-    	
-        
-		IPartService partService = (IPartService) this.getSite().getService(IPartService.class);
-		
-		partService.removePartListener(this);
-        
+        outlinePage.setInput(null);
+
+        final IPartService partService = (IPartService) this.getSite().getService(IPartService.class);
+
+        partService.removePartListener(this);
+
         super.dispose();
     }
 
@@ -156,93 +201,115 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
         setAction("ContentFormatProposal", action);
         getEditorSite().getActionBars().setGlobalActionHandler("ContentFormatProposal", action);
     }
-    
+
     private static final String SUBSTEPS_CONTEXT = "com.technophobia.substeps.editor.SubstepsContext";
+
+
     /**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void setSite(final IWorkbenchPartSite site){
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setSite(final IWorkbenchPartSite site) {
 
-		super.setSite(site);
-		
-		// add an activation listener
-		
-		IPartService partService = (IPartService) site.getService(IPartService.class);
-		
-		partService.addPartListener(this);
-		
-	}
-	
+        super.setSite(site);
 
-	public IDocument getCurrentDocument() {
-		PartitionScannedDocumentProvider docProvider = (PartitionScannedDocumentProvider)getDocumentProvider();
-		return docProvider.getDocuemnt();
-	}
+        // add an activation listener
+
+        final IPartService partService = (IPartService) site.getService(IPartService.class);
+
+        partService.addPartListener(this);
+
+    }
 
 
-	@Override
-	public void partActivated(IWorkbenchPartReference partRef) {
-		
-		if (getEditorSite().getId().equals( partRef.getId())){
-			activateContext();
-		}
-	}
+    public IDocument getCurrentDocument() {
+        final PartitionScannedDocumentProvider docProvider = (PartitionScannedDocumentProvider) getDocumentProvider();
+        return docProvider.getDocuemnt();
+    }
 
 
-	@Override
-	public void partBroughtToTop(IWorkbenchPartReference partRef) {
-		
-		if (getEditorSite().getId().equals( partRef.getId())){
-			activateContext();
-		}
-	}
+    @Override
+    public void partActivated(final IWorkbenchPartReference partRef) {
+
+        if (getEditorSite().getId().equals(partRef.getId())) {
+            activateContext();
+        }
+    }
 
 
-	@Override
-	public void partClosed(IWorkbenchPartReference partRef) {
-		
-		if (getEditorSite().getId().equals( partRef.getId())){
-			deactivateContext();
-		}
-	}
+    @Override
+    public void partBroughtToTop(final IWorkbenchPartReference partRef) {
+
+        if (getEditorSite().getId().equals(partRef.getId())) {
+            activateContext();
+        }
+    }
 
 
-	@Override
-	public void partDeactivated(IWorkbenchPartReference partRef) {
-		
-		if (getEditorSite().getId().equals( partRef.getId())){
-			deactivateContext();
-		}
-	}
+    @Override
+    public void partClosed(final IWorkbenchPartReference partRef) {
 
-	@Override
-	public void partOpened(IWorkbenchPartReference partRef) {
-		
-		if (getEditorSite().getId().equals( partRef.getId())){
-			activateContext();
-			}
-	}
+        if (getEditorSite().getId().equals(partRef.getId())) {
+            deactivateContext();
+        }
+    }
 
 
-	@Override
-	public void partHidden(IWorkbenchPartReference partRef) {
-		
-		if (getEditorSite().getId().equals( partRef.getId())){
-				deactivateContext();
-			}
-	}
+    @Override
+    public void partDeactivated(final IWorkbenchPartReference partRef) {
+
+        if (getEditorSite().getId().equals(partRef.getId())) {
+            deactivateContext();
+        }
+    }
 
 
-	@Override
-	public void partVisible(IWorkbenchPartReference partRef) {
-		// beware you get LOADS of these, to the point where it doesn't really stop when running eclipse via eclipse (during plugin dev)
-		
-	}
+    @Override
+    public void partOpened(final IWorkbenchPartReference partRef) {
+
+        if (getEditorSite().getId().equals(partRef.getId())) {
+            activateContext();
+        }
+    }
 
 
-	@Override
-	public void partInputChanged(IWorkbenchPartReference partRef) {
-		// not used yet... ?
-	}
+    @Override
+    public void partHidden(final IWorkbenchPartReference partRef) {
+
+        if (getEditorSite().getId().equals(partRef.getId())) {
+            deactivateContext();
+        }
+    }
+
+
+    @Override
+    public void partVisible(final IWorkbenchPartReference partRef) {
+        // beware you get LOADS of these, to the point where it doesn't really
+        // stop when running eclipse via eclipse (during plugin dev)
+
+    }
+
+
+    @Override
+    public void partInputChanged(final IWorkbenchPartReference partRef) {
+        // not used yet... ?
+    }
+
+
+    protected Transformer<Integer, Position> lineNumberToDocumentOffset() {
+        return new Transformer<Integer, Position>() {
+            @Override
+            public Position from(final Integer lineNumber) {
+                if (editorInput != null) {
+                    try {
+                        final IDocument document = getDocumentProvider().getDocument(editorInput);
+                        return new Position(document.getLineOffset(lineNumber.intValue()));
+                    } catch (final BadLocationException e) {
+                        FeatureEditorPlugin.info("Couldn't get offset for line " + lineNumber + " in document");
+                    }
+                }
+                return new Position(0);
+            }
+        };
+    }
 }
