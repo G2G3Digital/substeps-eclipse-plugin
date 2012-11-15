@@ -137,31 +137,5 @@ public class ProvidedSuggestionManagerTest {
         assertThat(suggestionManager.suggestionsFor(resource),
                 hasItems(expectedSuggestions.toArray(new String[expectedSuggestions.size()])));
     }
-
-
-    @Test
-    public void providerIsIgnoredIfSourceIsNotSupported() {
-        final ProjectSuggestionProvider provider1 = context.mock(ProjectSuggestionProvider.class, "provider1");
-        final ProjectSuggestionProvider provider2 = context.mock(ProjectSuggestionProvider.class, "provider2");
-        final IProject project = context.mock(IProject.class);
-        final Collection<String> suggestions2 = Arrays.asList("suggestion-21", "suggestion-22", "suggestion-23");
-
-        context.checking(new Expectations() {
-            {
-                oneOf(resourceToProjectTransformer).from(resource);
-                will(returnValue(project));
-
-                oneOf(provider2).suggestionsFor(project);
-                will(returnValue(suggestions2));
-            }
-        });
-
-        final ProvidedSuggestionManager suggestionManager = new ProvidedSuggestionManager(resourceToProjectTransformer);
-        suggestionManager.addProvider(SuggestionSource.SUBSTEP_DEFINITION, provider1);
-        suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, provider2);
-
-        final Collection<String> expectedSuggestions = Arrays.asList("suggestion-21", "suggestion-22", "suggestion-23");
-        assertThat(suggestionManager.suggestionsFor(resource),
-                hasItems(expectedSuggestions.toArray(new String[expectedSuggestions.size()])));
-    }
+    
 }
