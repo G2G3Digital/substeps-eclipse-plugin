@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.is;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.supplier.Transformer;
 
 public class ReplacesConstantWithAnotherConstantValueTestNameTransformerTest {
 
@@ -21,12 +21,12 @@ public class ReplacesConstantWithAnotherConstantValueTestNameTransformerTest {
 
     @Test
     public void replacesOriginalValueCorrectly() {
-        assertThat(transformer.to("original"), is("new"));
+        assertThat(transformer.from("original"), is("new"));
     }
 
 
     @Test
     public void maintainsValueWhenNotRequiringReplacement() {
-        assertThat(transformer.to("different"), is("different"));
+        assertThat(transformer.from("different"), is("different"));
     }
 }

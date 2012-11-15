@@ -362,7 +362,7 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
             }
             return positions;
         } catch (final BadLocationException ex) {
-            FeatureEditorPlugin.log(IStatus.ERROR,
+            FeatureEditorPlugin.instance().log(IStatus.ERROR,
                     "Could not get all typed positions for document, message was " + ex.getMessage());
         }
         return new TypedPosition[0];
@@ -662,8 +662,8 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
      * @return <code>true</code> if the position can be added,
      *         <code>false</code> if it should be ignored
      */
-    protected boolean positionAboutToBeAdded(@SuppressWarnings("unused") final IDocument doc, final String category,
-            final Position position) {
+    @SuppressWarnings("unused")
+    protected boolean positionAboutToBeAdded(final IDocument doc, final String category, final Position position) {
         return true;
     }
 

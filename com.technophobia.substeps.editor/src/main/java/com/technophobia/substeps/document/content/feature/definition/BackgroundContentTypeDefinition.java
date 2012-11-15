@@ -14,27 +14,33 @@ import com.technophobia.substeps.supplier.Supplier;
 public class BackgroundContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
 
     public static final String CONTENT_TYPE_ID = "__feature_background";
+    public static final String PREFIX_TEXT = "Background:";
 
 
     public BackgroundContentTypeDefinition() {
-        super(CONTENT_TYPE_ID, false);
+        super(CONTENT_TYPE_ID, PREFIX_TEXT, false);
     }
 
 
     @Override
     public IPredicateRule partitionRule() {
-        return singleLineRule("Background:", id());
+        return paragraphRule(PREFIX_TEXT, id(), true, TagContentTypeDefinition.PREFIX_TEXT,
+                CommentContentTypeDefinition.PREFIX_TEXT, BackgroundContentTypeDefinition.PREFIX_TEXT,
+                ScenarioContentTypeDefinition.PREFIX_TEXT, ScenarioOutlineContentTypeDefinition.PREFIX_TEXT,
+                GivenContentTypeDefinition.PREFIX_TEXT, WhenContentTypeDefinition.PREFIX_TEXT,
+                ThenContentTypeDefinition.PREFIX_TEXT);
     }
 
 
     @Override
     public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedWordRule("Background:", colourToken(FeatureColour.BLUE, colourManager));
+        return fixedWordRule(PREFIX_TEXT, colourToken(FeatureColour.BLUE, colourManager));
     }
 
 
     @Override
     public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
-        return new StartOfUnitFormattingStrategy(formattingContextSupplier, new FixedIndentFormattingStrategy("  "));
+        return new StartOfUnitFormattingStrategy(2, 0, formattingContextSupplier, new FixedIndentFormattingStrategy(
+                "  ", formattingContextSupplier));
     }
 }

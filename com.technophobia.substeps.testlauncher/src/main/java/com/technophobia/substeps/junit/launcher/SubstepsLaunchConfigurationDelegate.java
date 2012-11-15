@@ -8,10 +8,12 @@ import java.io.OutputStreamWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,6 +30,7 @@ import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.AbstractJavaLaunchConfigurationDelegate;
 import org.eclipse.jdt.launching.ExecutionArguments;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
@@ -36,6 +39,7 @@ import org.eclipse.jdt.launching.SocketUtil;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
 
 import com.technophobia.eclipse.launcher.config.SubstepsLaunchConfigurationConstants;
+import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorkingCopyDecorator;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
@@ -282,6 +286,7 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
         final String vmArgs = getVMArguments(configuration);
         final ExecutionArguments execArgs = new ExecutionArguments(vmArgs, pgmArgs);
         vmArguments.addAll(Arrays.asList(execArgs.getVMArgumentsArray()));
+        vmArguments.addAll(substepsVMArguments(configuration));
         programArguments.addAll(Arrays.asList(execArgs.getProgramArgumentsArray()));
 
         final String testFailureNames = configuration.getAttribute(
@@ -327,6 +332,65 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
         if (testFailureNames.length() > 0) {
             programArguments.add("-testfailures"); //$NON-NLS-1$
             programArguments.add(testFailureNames);
+        }
+    }
+
+
+    private Collection<String> substepsVMArguments(final ILaunchConfiguration configuration) {
+        final Collection<String> results = new ArrayList<String>();
+        final IProject project = projectFromConfig(configuration);
+
+        if (project != null) {
+            results.add("-DsubstepsFeatureFile="
+                    + project.getRawLocation().addTrailingSeparator()
+                            .append(getConfigAttribute(configuration, SubstepsFeatureLaunchShortcut.ATTR_FEATURE_FILE))
+                            .toOSString());
+
+            results.add("-DsubstepsFile="
+                    + project
+                            .getRawLocation()
+                            .addTrailingSeparator()
+                            .append(getConfigAttribute(configuration,
+                                    SubstepsLaunchConfigurationConstants.ATTR_SUBSTEPS_FILE)).toOSString());
+
+            final Collection<String> stepImplementationClasses = FeatureEditorPlugin.instance()
+                    .getStepImplementationProvider().stepImplementationClasses(project);
+            results.add("-DsubstepsImplClasses=" + createStringFrom(stepImplementationClasses));
+
+            results.add("-DsubstepsTags=--unimplemented");
+
+            try {
+                results.add("-DoutputFolder="
+                        + getJavaProject(configuration).getOutputLocation().removeFirstSegments(1).toOSString());
+            } catch (final JavaModelException e) {
+                FeatureRunnerPlugin.log(e);
+            } catch (final CoreException e) {
+                FeatureRunnerPlugin.log(e);
+            }
+
+            // results.add(getConfigAttribute(configuration,
+            // IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS));
+        }
+        return results;
+    }
+
+
+    private IProject projectFromConfig(final ILaunchConfiguration configuration) {
+        try {
+            return getJavaProject(configuration).getProject();
+        } catch (final CoreException e) {
+            FeatureRunnerPlugin.log(e);
+            return null;
+        }
+    }
+
+
+    private String getConfigAttribute(final ILaunchConfiguration configuration, final String configName) {
+        try {
+            return configuration.getAttribute(configName, "");
+        } catch (final CoreException e) {
+            FeatureRunnerPlugin.log(e);
+            return "";
         }
     }
 
@@ -454,5 +518,17 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
     @Override
     protected void abort(final String message, final Throwable exception, final int code) throws CoreException {
         throw new CoreException(new Status(IStatus.ERROR, FeatureRunnerPlugin.PLUGIN_ID, code, message, exception));
+    }
+
+
+    private String createStringFrom(final Collection<String> collection) {
+        final StringBuilder sb = new StringBuilder();
+        if (collection != null) {
+            for (final String stepImpl : collection) {
+                sb.append(stepImpl);
+                sb.append(";");
+            }
+        }
+        return sb.toString();
     }
 }

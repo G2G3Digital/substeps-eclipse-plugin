@@ -65,7 +65,6 @@ import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 import com.technophobia.eclipse.transformer.Callback;
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.eclipse.ui.NotifyingUiUpdater;
 import com.technophobia.eclipse.ui.Renderer;
@@ -108,6 +107,7 @@ import com.technophobia.substeps.model.structure.Status;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
 import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
 import com.technophobia.substeps.preferences.PreferencesConstants;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements UpdateJobManager, Notifier<Runnable>,
         Callback, IPropertyListener {
@@ -475,7 +475,7 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
 
         final Integer l = m.getInteger(TAG_LAYOUT);
         ViewLayout layoutValue = ViewLayout.HIERARCHICAL;
-        if (layout != null)
+        if (layout != null && l != null)
             layoutValue = ViewLayout.forValue(l.intValue());
 
         final String failuresOnly = m.getString(TAG_FAILURES_ONLY);
@@ -532,7 +532,8 @@ public class SubstepsFeatureTestRunnerViewPart extends ViewPart implements Updat
         bottom.setTopLeft(label);
         final ToolBar failureToolBar = new ToolBar(bottom, SWT.FLAT | SWT.WRAP);
         bottom.setTopCenter(failureToolBar);
-        failureTrace = new FailureTrace(bottom, clipboard, failureToolBar, iconProvider);
+        failureTrace = new FailureTrace(bottom, clipboard, failureToolBar, iconProvider, infoMessageUpdater,
+                runSessionSupplier());
         bottom.setContent(failureTrace.getComposite());
 
         sashForm.setWeights(new int[] { 50, 50 });

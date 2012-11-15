@@ -24,7 +24,7 @@
    </plugins>
 
    <features>
-      <feature id="com.technophobia.substeps.feature" version="0.0.1.qualifier"/>
+      <feature id="com.technophobia.substeps.feature" version="0.0.0"/>
    </features>
 
    <configurations>

@@ -13,27 +13,29 @@ import com.technophobia.substeps.supplier.Supplier;
 public class DefineContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
 
     public static final String CONTENT_TYPE_ID = "__substeps_define";
+    public static final String PREFIX_TEXT = "Define:";
 
 
     public DefineContentTypeDefinition() {
-        super(CONTENT_TYPE_ID, false);
+        super(CONTENT_TYPE_ID, PREFIX_TEXT, false);
     }
 
 
     @Override
     public IPredicateRule partitionRule() {
-        return paragraphRule("Define", id());
+        return paragraphRule(PREFIX_TEXT, id(), true, CommentContentTypeDefinition.PREFIX_TEXT,
+                DefineContentTypeDefinition.PREFIX_TEXT);
     }
 
 
     @Override
     public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedWordRule("Define", colourToken(FeatureColour.BLUE, colourManager));
+        return fixedWordRule(PREFIX_TEXT, colourToken(FeatureColour.BLUE, colourManager));
     }
 
 
     @Override
     public IFormattingStrategy formattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
-        return new MultiLineFixedIndentFormattingStrategy("", "\t");
+        return new MultiLineFixedIndentFormattingStrategy("", "\t", formattingContextSupplier);
     }
 }

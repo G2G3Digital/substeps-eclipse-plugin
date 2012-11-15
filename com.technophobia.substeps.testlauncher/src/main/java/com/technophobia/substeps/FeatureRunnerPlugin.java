@@ -114,7 +114,16 @@ public class FeatureRunnerPlugin extends AbstractUIPlugin implements BundleActiv
         final IWorkbench workBench = getWorkbench();
         if (workBench == null)
             return null;
-        return workBench.getActiveWorkbenchWindow();
+        if (workBench.getActiveWorkbenchWindow() != null) {
+            return workBench.getActiveWorkbenchWindow();
+        } else if (workBench.getWorkbenchWindowCount() > 0) {
+            log(IStatus.WARNING,
+                    "Could not find any active workbench window, returning window 1 of "
+                            + workBench.getWorkbenchWindowCount());
+            return workBench.getWorkbenchWindows()[0];
+        }
+        log(IStatus.WARNING, "Could not find workbench window, returning null");
+        return null;
     }
 
 

@@ -16,10 +16,10 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import com.technophobia.eclipse.launcher.config.SubstepsLaunchConfigurationConstants;
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Notifier;
 import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class FailedTestFirstTestRelauncher extends TestRelauncher {
 

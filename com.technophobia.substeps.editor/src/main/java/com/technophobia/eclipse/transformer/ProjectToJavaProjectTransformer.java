@@ -12,16 +12,16 @@ import com.technophobia.substeps.supplier.Transformer;
 public class ProjectToJavaProjectTransformer implements Transformer<IProject, IJavaProject> {
 
     @Override
-    public IJavaProject to(final IProject project) {
+    public IJavaProject from(final IProject project) {
         try {
             if (project.hasNature(JavaCore.NATURE_ID)) {
                 return JavaCore.create(project);
             }
-            FeatureEditorPlugin.log(IStatus.WARNING, "Could not transform project " + project.getName()
-                    + " to a java project");
+            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+                    "Could not transform project " + project.getName() + " to a java project");
         } catch (final CoreException e) {
-            FeatureEditorPlugin.log(IStatus.WARNING, "Could not transform project " + project.getName()
-                    + " to java project: " + e.getMessage());
+            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+                    "Could not transform project " + project.getName() + " to java project: " + e.getMessage());
         }
         return null;
     }

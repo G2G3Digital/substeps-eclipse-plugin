@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SubstepsEclipseEditor
 Bundle-SymbolicName: com.technophobia.substeps.editor;singleton:=true
-Bundle-Version: 0.0.1.qualifier
+Bundle-Version: 0.0.19.qualifier
 Bundle-Activator: com.technophobia.substeps.FeatureEditorPlugin
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -16,12 +16,13 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  org.eclipse.ui.views;bundle-version="3.6.100",
  org.eclipse.jdt.ui;bundle-version="3.8.0",
  org.junit;bundle-version="4.10.0",
- com.technophobia.substeps.core.bundle;bundle-version="0.0.1",
+ com.technophobia.substeps.core.bundle;bundle-version="0.0.0",
  org.eclipse.jdt;bundle-version="3.8.0",
  org.eclipse.jdt.core;bundle-version="3.8.1",
  org.eclipse.swt;bundle-version="3.100.0",
  org.eclipse.jface;bundle-version="3.8.0",
- org.eclipse.jdt.launching;bundle-version="3.6.100"
+ org.eclipse.jdt.launching;bundle-version="3.6.100",
+ org.eclipse.ui.workbench;bundle-version="3.103.0"
 Export-Package: com.technophobia.eclipse.transformer,
  com.technophobia.substeps,
  com.technophobia.substeps.actions,

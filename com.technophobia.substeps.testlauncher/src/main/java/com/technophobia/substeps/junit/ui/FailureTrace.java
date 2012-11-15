@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
 
-import com.technophobia.eclipse.transformer.Supplier;
+import com.technophobia.eclipse.ui.NotifyingUiUpdater;
 import com.technophobia.eclipse.ui.Refreshable;
 import com.technophobia.eclipse.ui.Resettable;
 import com.technophobia.substeps.junit.action.CompareResultsAction;
@@ -27,6 +27,7 @@ import com.technophobia.substeps.junit.action.OpenEditorAtLineAction;
 import com.technophobia.substeps.junit.action.SubstepsCopyAction;
 import com.technophobia.substeps.model.structure.SubstepsTestElement;
 import com.technophobia.substeps.preferences.PreferencesConstants;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class FailureTrace implements IMenuListener, Refreshable, Resettable {
     private static final int MAX_LABEL_LENGTH = 256;
@@ -41,10 +42,17 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
 
     private final Composite parent;
 
+    private final Supplier<SubstepsRunSession> substepsRunSessionSupplier;
+
+    private final NotifyingUiUpdater<String> infoMessageNotifier;
+
 
     public FailureTrace(final Composite parent, final Clipboard clipboard, final ToolBar toolBar,
-            final SubstepsIconProvider iconProvider) {
+            final SubstepsIconProvider iconProvider, final NotifyingUiUpdater<String> infoMessageUpdater,
+            final Supplier<SubstepsRunSession> substepsRunSessionSupplier) {
         Assert.isNotNull(clipboard);
+        this.infoMessageNotifier = infoMessageUpdater;
+        this.substepsRunSessionSupplier = substepsRunSessionSupplier;
 
         // fill the failure trace viewer toolbar
         final ToolBarManager failureToolBarmanager = new ToolBarManager(toolBar);
@@ -125,7 +133,8 @@ public class FailureTrace implements IMenuListener, Refreshable, Resettable {
             String lineNumber = traceLine;
             lineNumber = lineNumber.substring(lineNumber.indexOf(':') + 1, lineNumber.lastIndexOf(')'));
             final int line = Integer.valueOf(lineNumber).intValue();
-            return new OpenEditorAtLineAction(line);
+            return new OpenEditorAtLineAction(substepsRunSessionSupplier, infoMessageNotifier, getShell(), testName,
+                    line);
         } catch (final NumberFormatException e) {
             // No-op
         } catch (final IndexOutOfBoundsException e) {

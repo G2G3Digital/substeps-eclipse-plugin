@@ -13,22 +13,24 @@ import com.technophobia.substeps.supplier.Supplier;
 public class TagContentTypeDefinition extends AbstractFeatureContentTypeDefinition {
 
     public static final String CONTENT_TYPE_ID = "__feature_tag";
+    public static final String PREFIX_TEXT = "Tags:";
+	private static final String[] VALID_PROCEEDING_CONTENT_TYPES = {CommentContentTypeDefinition.PREFIX_TEXT, FeatureContentTypeDefinition.PREFIX_TEXT, ScenarioContentTypeDefinition.PREFIX_TEXT, ScenarioOutlineContentTypeDefinition.PREFIX_TEXT};
 
 
     public TagContentTypeDefinition() {
-        super(CONTENT_TYPE_ID, true);
+        super(CONTENT_TYPE_ID, PREFIX_TEXT, true);
     }
 
 
     @Override
     public IPredicateRule partitionRule() {
-        return singleLineRule("Tags:", id());
+        return paragraphRule(PREFIX_TEXT, id(), false, VALID_PROCEEDING_CONTENT_TYPES);
     }
 
 
     @Override
     public IRule damageRepairerRule(final ColourManager colourManager) {
-        return singleLineRule("Tags:", colourToken(FeatureColour.GREEN, colourManager));
+        return paragraphRule(PREFIX_TEXT, colourToken(FeatureColour.GREEN, colourManager), true, VALID_PROCEEDING_CONTENT_TYPES);
     }
 
 

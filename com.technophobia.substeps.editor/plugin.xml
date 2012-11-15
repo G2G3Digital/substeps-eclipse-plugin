@@ -94,27 +94,22 @@
   </extension>
   <extension
  point="org.eclipse.ui.menus">
- <menuContribution
-     locationURI="menu:org.eclipse.jdt.ui.source.menu">
- </menuContribution>
 </extension>
   <extension
         point="org.eclipse.ui.bindings">
         
   	<key
             sequence="M1+M2+F"
-            contextId="org.eclipse.jdt.ui.javaEditorScope"
-            commandId="org.eclipse.jdt.ui.edit.text.java.format"
+            commandId="com.technophobia.substeps.feature.format"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
   </extension>
   <extension
         point="org.eclipse.ui.commands">
         
     <command
-            name="%ActionDefinition.format.name"
-            description="%ActionDefinition.format.description"
-            categoryId="org.eclipse.jdt.ui.category.source"
-            id="org.eclipse.jdt.ui.edit.text.java.format">
+          defaultHandler="com.technophobia.substeps.document.formatting.FeatureFormatterHandler"
+          id="com.technophobia.substeps.feature.format"
+          name="Format">
       </command>
   </extension>
 </plugin>

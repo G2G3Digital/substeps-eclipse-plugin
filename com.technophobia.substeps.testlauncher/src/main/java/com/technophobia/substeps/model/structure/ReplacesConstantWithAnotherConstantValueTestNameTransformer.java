@@ -1,6 +1,6 @@
 package com.technophobia.substeps.model.structure;
 
-import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.supplier.Transformer;
 
 public class ReplacesConstantWithAnotherConstantValueTestNameTransformer implements Transformer<String, String> {
 
@@ -15,7 +15,7 @@ public class ReplacesConstantWithAnotherConstantValueTestNameTransformer impleme
 
 
     @Override
-    public String to(final String from) {
+    public String from(final String from) {
         return from.equals(replace) ? with : from;
     }
 

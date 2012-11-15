@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>com.technophobia.substeps</groupId>
 		<artifactId>com.technophobia.substeps.parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.19-SNAPSHOT</version>
 		<relativePath>../com.technophobia.substeps.parent/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>com.technophobia.substeps.updatesite</artifactId>
 
-	<packaging>war</packaging>
+	<packaging>pom</packaging>
 
 	<organization>
 		<name>Technophobia Ltd</name>
@@ -33,6 +33,7 @@
 
 
 	<build>
+          	<finalName>${artifactId}</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -60,24 +61,23 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<warSourceDirectory>${basedir}/target/repository/</warSourceDirectory>
-					<webXml>${basedir}/src/main/webapp/WEB-INF/web.xml</webXml>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>tomcat-maven-plugin</artifactId>
-				<version>1.1</version>
-
-				<configuration>
-					<path>/substeps-update-site</path>
-					<port>9999</port>
-					<uriEncoding>utf-8</uriEncoding>
-				</configuration>
-			</plugin>
+        			<groupId>org.apache.maven.plugins</groupId>
+			        <artifactId>maven-assembly-plugin</artifactId>
+			        <configuration>
+			          <descriptors>
+			            <descriptor>src/main/assembly/assembly.xml</descriptor>
+			          </descriptors>
+			        </configuration>
+			        <executions>
+			          <execution>
+			            <id>make-assembly</id>
+			            <phase>package</phase>
+			            <goals>
+			              <goal>single</goal>
+			            </goals>
+			          </execution>
+			        </executions>
+		      </plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>

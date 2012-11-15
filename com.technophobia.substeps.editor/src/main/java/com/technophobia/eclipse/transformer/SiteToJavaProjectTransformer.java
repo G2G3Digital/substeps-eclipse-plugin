@@ -37,10 +37,10 @@ public class SiteToJavaProjectTransformer implements Transformer<IWorkbenchSite,
 
 
     @Override
-    public IJavaProject to(final IWorkbenchSite site) {
+    public IJavaProject from(final IWorkbenchSite site) {
         final IProject project = projectFor(site);
         if (project != null) {
-            return projectToJavaProjectTransformer.to(project);
+            return projectToJavaProjectTransformer.from(project);
         }
         return null;
     }

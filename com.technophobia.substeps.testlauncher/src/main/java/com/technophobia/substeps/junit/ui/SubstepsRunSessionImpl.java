@@ -23,8 +23,6 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
 import com.technophobia.eclipse.launcher.config.SubstepsLaunchConfigurationConstants;
 import com.technophobia.eclipse.transformer.Callback1;
-import com.technophobia.eclipse.transformer.Supplier;
-import com.technophobia.eclipse.transformer.Transformer;
 import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.model.RemoteTestRunnerClient;
 import com.technophobia.substeps.model.SubstepsRunListener;
@@ -41,6 +39,8 @@ import com.technophobia.substeps.model.structure.SubstepsTestElementFactory;
 import com.technophobia.substeps.model.structure.SubstepsTestLeafElement;
 import com.technophobia.substeps.model.structure.SubstepsTestParentElement;
 import com.technophobia.substeps.model.structure.SubstepsTestRootElement;
+import com.technophobia.substeps.supplier.Supplier;
+import com.technophobia.substeps.supplier.Transformer;
 
 public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats {
 
@@ -724,18 +724,18 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
             SubstepsTestElement testElement = getTestElement(testId);
             if (testElement == null) {
                 testElement = createUnrootedTestElement(testId, testName);
-            } else if (!(testElement instanceof SubstepsTestLeafElement)) {
-                logUnexpectedTest(testId, testElement);
-                return;
             }
-            final SubstepsTestLeafElement testCaseElement = (SubstepsTestLeafElement) testElement;
-            setStatus(testCaseElement, Status.RUNNING);
 
-            startedCount++;
+            if (testElement instanceof SubstepsTestLeafElement) {
+                final SubstepsTestLeafElement testCaseElement = (SubstepsTestLeafElement) testElement;
+                setStatus(testCaseElement, Status.RUNNING);
 
-            final Object[] listeners = sessionListeners.getListeners();
-            for (int i = 0; i < listeners.length; ++i) {
-                ((SubstepsSessionListener) listeners[i]).testStarted(testCaseElement);
+                startedCount++;
+
+                final Object[] listeners = sessionListeners.getListeners();
+                for (int i = 0; i < listeners.length; ++i) {
+                    ((SubstepsSessionListener) listeners[i]).testStarted(testCaseElement);
+                }
             }
         }
 
@@ -745,22 +745,21 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
             SubstepsTestElement testElement = getTestElement(testId);
             if (testElement == null) {
                 testElement = createUnrootedTestElement(testId, testName);
-            } else if (!(testElement instanceof SubstepsTestLeafElement)) {
-                logUnexpectedTest(testId, testElement);
-                return;
             }
-            final SubstepsTestLeafElement testCaseElement = (SubstepsTestLeafElement) testElement;
-            if (testName.startsWith("@Ignore: ")) {
-                testCaseElement.setIgnored(true);
-                ignoredCount++;
-            }
+            if (testElement instanceof SubstepsTestLeafElement) {
+                final SubstepsTestLeafElement testCaseElement = (SubstepsTestLeafElement) testElement;
+                if (testName.startsWith("@Ignore: ")) {
+                    testCaseElement.setIgnored(true);
+                    ignoredCount++;
+                }
 
-            if (testCaseElement.getStatus() == Status.RUNNING)
-                setStatus(testCaseElement, Status.OK);
+                if (testCaseElement.getStatus() == Status.RUNNING)
+                    setStatus(testCaseElement, Status.OK);
 
-            final Object[] listeners = sessionListeners.getListeners();
-            for (int i = 0; i < listeners.length; ++i) {
-                ((SubstepsSessionListener) listeners[i]).testEnded(testCaseElement);
+                final Object[] listeners = sessionListeners.getListeners();
+                for (int i = 0; i < listeners.length; ++i) {
+                    ((SubstepsSessionListener) listeners[i]).testEnded(testCaseElement);
+                }
             }
         }
 
@@ -804,26 +803,20 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
             SubstepsTestElement testElement = getTestElement(testId);
             if (testElement == null) {
                 testElement = createUnrootedTestElement(testId, testName);
-            } else if (!(testElement instanceof SubstepsTestLeafElement)) {
-                logUnexpectedTest(testId, testElement);
-                return;
             }
-            final SubstepsTestLeafElement testCaseElement = (SubstepsTestLeafElement) testElement;
 
-            registerTestFailureStatus(testElement, status, trace, expectedResult, actualResult);
+            if (testElement instanceof SubstepsTestLeafElement) {
+                final SubstepsTestLeafElement testCaseElement = (SubstepsTestLeafElement) testElement;
 
-            final Object[] listeners = sessionListeners.getListeners();
-            for (int i = 0; i < listeners.length; ++i) {
-                // TODO: post old & new status?
-                ((SubstepsSessionListener) listeners[i]).testReran(testCaseElement, status, trace, expectedResult,
-                        actualResult);
+                registerTestFailureStatus(testElement, status, trace, expectedResult, actualResult);
+
+                final Object[] listeners = sessionListeners.getListeners();
+                for (int i = 0; i < listeners.length; ++i) {
+                    // TODO: post old & new status?
+                    ((SubstepsSessionListener) listeners[i]).testReran(testCaseElement, status, trace, expectedResult,
+                            actualResult);
+                }
             }
-        }
-
-
-        private void logUnexpectedTest(final String testId, final SubstepsTestElement testElement) {
-            FeatureRunnerPlugin.log(org.eclipse.core.runtime.IStatus.WARNING,
-                    "Unexpected TestElement type for testId '" + testId + "': " + testElement);
         }
 
 
@@ -923,7 +916,7 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
     private Transformer<IncompleteParentItem, Boolean> checkRemainingChildItemsPredicate() {
         return new Transformer<IncompleteParentItem, Boolean>() {
             @Override
-            public Boolean to(final IncompleteParentItem from) {
+            public Boolean from(final IncompleteParentItem from) {
                 return Boolean.valueOf(!from.hasOutstandingChildren());
             }
         };

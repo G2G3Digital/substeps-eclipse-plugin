@@ -36,10 +36,14 @@ public class StartOfUnitFormattingStrategy extends DefaultFormattingStrategy {
 
     private final IFormattingStrategy formattingStrategy;
     private final Supplier<FormattingContext> formattingContextSupplier;
+    private final int numLeadingLines;
+    private final int numTrailingLines;
 
 
-    public StartOfUnitFormattingStrategy(final Supplier<FormattingContext> formattingContextSupplier,
-            final IFormattingStrategy formattingStrategy) {
+    public StartOfUnitFormattingStrategy(final int numLeadingLines, final int numTrailingLines,
+            final Supplier<FormattingContext> formattingContextSupplier, final IFormattingStrategy formattingStrategy) {
+        this.numLeadingLines = numLeadingLines;
+        this.numTrailingLines = numTrailingLines;
         this.formattingContextSupplier = formattingContextSupplier;
         this.formattingStrategy = formattingStrategy;
 
@@ -49,25 +53,57 @@ public class StartOfUnitFormattingStrategy extends DefaultFormattingStrategy {
     @Override
     public String format(final String content, final boolean isLineStart, final String indentation,
             final int[] positions) {
-        FeatureEditorPlugin.log(IStatus.INFO, "Formatting line: " + content + ", isLineStart: " + isLineStart
-                + ", indentation: " + indentation);
-        boolean prefixNewLine = false;
-        if (isLineStart) {
-            final FormattingContext formattingContext = formattingContextSupplier.get();
-            if (formattingContext.hasPreviousContent()) {
-                final FormattingContext previousContext = formattingContext.previousContentContext();
-                if (!previousContext.currentContentType().isOptional()) {
-                    prefixNewLine = true;
-                }
-            }
-        }
-        final String formattedContent = formattingStrategy.format(content, isLineStart, indentation, positions);
+        FeatureEditorPlugin.instance().log(IStatus.INFO,
+                "Formatting line: " + content + ", isLineStart: " + isLineStart + ", indentation: " + indentation);
+        /*
+         * if (isLineStart) { final FormattingContext formattingContext =
+         * formattingContextSupplier.get(); if
+         * (formattingContext.hasPreviousContent()) { final FormattingContext
+         * previousContext = formattingContext.previousContentContext(); if
+         * (!previousContext.currentContentType().isOptional()) { prefixNewLine
+         * = true; } } }
+         */
+        final String formattedContent = removeLeadingNewlines(formattingStrategy.format(content.trim(), isLineStart,
+                indentation, positions));
 
         final StringBuffer sb = new StringBuffer();
-        if (prefixNewLine) {
-            sb.append(NEWLINE);
-        }
+        addNewlinesTo(numLeadingLines, hasPreviousContent(), sb);
         sb.append(formattedContent);
+        addNewlinesTo(numTrailingLines, hasNextContent() && !isOptional(), sb);
         return sb.toString();
+    }
+
+
+    private String removeLeadingNewlines(final String content) {
+        if (content.length() > 0 && content.startsWith(NEWLINE)) {
+            return removeLeadingNewlines(content.substring(NEWLINE.length()));
+        }
+
+        return content;
+    }
+
+
+    private boolean hasPreviousContent() {
+        return formattingContextSupplier.get().hasPreviousContent()
+                && !formattingContextSupplier.get().inspectPreviousContentType().isOptional();
+    }
+
+
+    private boolean hasNextContent() {
+        return formattingContextSupplier.get().hasMoreContent();
+    }
+
+
+    private boolean isOptional() {
+        return formattingContextSupplier.get().currentContentType().isOptional();
+    }
+
+
+    private void addNewlinesTo(final int numLines, final boolean hasOtherContent, final StringBuffer sb) {
+        if (hasOtherContent) {
+            for (int i = 0; i < numLines; i++) {
+                sb.append(NEWLINE);
+            }
+        }
     }
 }

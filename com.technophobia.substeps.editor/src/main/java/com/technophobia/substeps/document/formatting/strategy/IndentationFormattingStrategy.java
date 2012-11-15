@@ -18,6 +18,9 @@
  */
 package com.technophobia.substeps.document.formatting.strategy;
 
+import com.technophobia.substeps.document.formatting.FormattingContext;
+import com.technophobia.substeps.supplier.Supplier;
+
 /**
  * Formatting Strategy that indents the content value
  * 
@@ -25,6 +28,14 @@ package com.technophobia.substeps.document.formatting.strategy;
  * 
  */
 public abstract class IndentationFormattingStrategy extends DefaultFormattingStrategy {
+
+    private final Supplier<FormattingContext> formattingContextSupplier;
+
+
+    public IndentationFormattingStrategy(final Supplier<FormattingContext> formattingContextSupplier) {
+        this.formattingContextSupplier = formattingContextSupplier;
+    }
+
 
     @Override
     public void formatterStarts(final String initialIndentation) {
@@ -35,13 +46,10 @@ public abstract class IndentationFormattingStrategy extends DefaultFormattingStr
     @Override
     public String format(final String content, final boolean isLineStart, final String indentation,
             final int[] positions) {
-        final boolean hasLineBreak = content.endsWith(NEWLINE);
 
-        String indentedContent = isLineStart ? indent() + content.trim() : content.trim();
-        if (hasLineBreak) {
-            indentedContent = indentedContent + NEWLINE;
-        }
-        return indentedContent;
+        final String indentedContent = indent() + content.trim();
+
+        return formattingContextSupplier.get().hasPreviousContent() ? NEWLINE + indentedContent : indentedContent;
     }
 
 

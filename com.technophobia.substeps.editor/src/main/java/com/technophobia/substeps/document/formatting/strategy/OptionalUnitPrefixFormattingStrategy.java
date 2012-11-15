@@ -45,13 +45,31 @@ public class OptionalUnitPrefixFormattingStrategy extends DefaultFormattingStrat
     public String format(final String content, final boolean isLineStart, final String indentation,
             final int[] positions) {
         final FormattingContext formattingContext = formattingContextSupplier.get();
-        if (formattingContext.hasNextContent()) {
-            final FormattingContext nextFormattingContext = formattingContext.nextContentContext();
-            return nextFormattingContext.currentContentType()
-                    .formattingStrategy(formattingContextSupplierFor(nextFormattingContext))
-                    .format(content, isLineStart, indentation, positions);
+        if (formattingContext.hasMoreContent()) {
+            final FormattingContext nextFormattingContext = formattingContext.impersonateNextContentContext();
+            final IFormattingStrategy formattingStrategy = nextFormattingContext.currentContentType()
+                    .formattingStrategy(formattingContextSupplierFor(nextFormattingContext));
+            return formatContent(content, isLineStart, indentation, positions, formattingStrategy);
         }
-        return "";
+        return content;
+    }
+
+
+    private String formatContent(final String content, final boolean isLineStart, final String indentation,
+            final int[] positions, final IFormattingStrategy formattingStrategy) {
+        final String[] contentLines = content.split(NEWLINE);
+        final StringBuilder sb = new StringBuilder();
+
+        for (final String contentLine : contentLines) {
+            if (contentLine.trim().length() > 0) {
+                sb.append(formattingStrategy.format(contentLine, isLineStart, indentation, positions));
+                if (!(formattingStrategy instanceof OptionalUnitPrefixFormattingStrategy)) {
+                    sb.append(NEWLINE);
+                }
+            }
+        }
+
+        return sb.toString();
     }
 
 

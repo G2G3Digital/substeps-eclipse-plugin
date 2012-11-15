@@ -4,11 +4,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.technophobia.eclipse.transformer.Supplier;
 import com.technophobia.eclipse.ui.Resettable;
 import com.technophobia.eclipse.ui.UiUpdater;
 import com.technophobia.eclipse.ui.part.PartMonitor;
 import com.technophobia.substeps.junit.ui.image.ProgressImages;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class ViewTitleUiUpdater implements UiUpdater, Resettable {
 

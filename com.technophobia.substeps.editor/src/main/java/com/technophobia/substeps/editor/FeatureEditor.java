@@ -23,9 +23,11 @@ import java.util.ResourceBundle;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.TextOperationAction;
 
+import com.technophobia.eclipse.editor.FormattableEditorPart;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
@@ -48,7 +50,7 @@ import com.technophobia.substeps.supplier.Supplier;
  * @author sforbes
  * 
  */
-public class FeatureEditor extends TextEditor {
+public class FeatureEditor extends TextEditor implements FormattableEditorPart {
 
     private final ColourManager colourManager;
 
@@ -67,6 +69,12 @@ public class FeatureEditor extends TextEditor {
                 formattingContextFactory, contentAssistantFactory));
         setDocumentProvider(new PartitionScannedDocumentProvider(new ContentTypeRuleBasedPartitionScannerFactory(
                 contentTypeDefinitionFactory)));
+    }
+
+
+    @Override
+    public void doFormat() {
+        ((SourceViewer) getSourceViewer()).doOperation(ISourceViewer.FORMAT);
     }
 
 
@@ -90,7 +98,7 @@ public class FeatureEditor extends TextEditor {
             @Override
             public IContentAssistProcessor get() {
                 return new StepImplementationProcessorSupplier(getSite(), FeatureEditorPlugin.instance()
-                        .getStepImplementationManager()).get();
+                        .getSuggestionManager()).get();
             }
 
         };

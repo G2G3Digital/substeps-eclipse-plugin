@@ -61,42 +61,39 @@ public class PartitionedFormattingContext implements FormattingContext {
 
 
     @Override
-    public FormattingContext previousContentContext() throws InvalidFormatPositionException {
+    public ContentTypeDefinition inspectPreviousContentType() throws InvalidFormatPositionException {
         final PositionalContentTypeDefinitionHolder prevContentType = locatePreviousContentTypeOrNull();
         if (prevContentType == null) {
             throw new InvalidFormatPositionException("No content type exists before current position");
         }
-        return new PartitionedFormattingContext(positions, prevContentType.getPosition(), contentTypeDefinitionFactory);
+        return contentTypeDefinitionFactory.contentTypeDefintionByName(positions[prevContentType.getPosition()]
+                .getType());
     }
 
 
     @Override
-    public boolean hasNextContent() {
+    public boolean hasMoreContent() {
         return locateNextContentTypeOrNull() != null;
     }
 
 
     @Override
-    public FormattingContext nextContentContext() throws InvalidFormatPositionException {
+    public FormattingContext impersonateNextContentContext() throws InvalidFormatPositionException {
         final PositionalContentTypeDefinitionHolder nextContentType = locateNextContentTypeOrNull();
         if (nextContentType == null) {
             throw new InvalidFormatPositionException("No content type exists after current position");
         }
-        return new PartitionedFormattingContext(positions, nextContentType.getPosition(), contentTypeDefinitionFactory);
-    }
-
-
-    private ContentTypeDefinition contentTypeFor(final String contentType) {
-        return contentTypeDefinitionFactory.contentTypeDefintionByName(contentType);
+        return new SkipAheadFormattingContext(positions, currentPosition, nextContentType.getPosition(),
+                contentTypeDefinitionFactory);
     }
 
 
     private PositionalContentTypeDefinitionHolder locatePreviousContentTypeOrNull() {
-        int pos = currentPosition - 1;
+        int pos = previousPosition();
         while (pos >= 0) {
             final String type = positions[pos].getType();
             if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
-                return new PositionalContentTypeDefinitionHolder(pos, contentTypeFor(type));
+                return new PositionalContentTypeDefinitionHolder(pos);
             }
             pos--;
         }
@@ -105,37 +102,38 @@ public class PartitionedFormattingContext implements FormattingContext {
 
 
     private PositionalContentTypeDefinitionHolder locateNextContentTypeOrNull() {
-        int pos = currentPosition + 1;
+        int pos = nextPosition();
         while (pos < positions.length) {
             final String type = positions[pos].getType();
             if (!IDocument.DEFAULT_CONTENT_TYPE.equals(type)) {
-                return new PositionalContentTypeDefinitionHolder(pos, contentTypeFor(type));
+                return new PositionalContentTypeDefinitionHolder(pos);
             }
             pos++;
         }
         return null;
     }
 
+
+    protected int previousPosition() {
+        return currentPosition - 1;
+    }
+
+
+    protected int nextPosition() {
+        return currentPosition + 1;
+    }
+
     private static final class PositionalContentTypeDefinitionHolder {
         private final int position;
-        private final ContentTypeDefinition contentTypeDefinition;
 
 
-        public PositionalContentTypeDefinitionHolder(final int position,
-                final ContentTypeDefinition contentTypeDefinition) {
-            super();
+        public PositionalContentTypeDefinitionHolder(final int position) {
             this.position = position;
-            this.contentTypeDefinition = contentTypeDefinition;
         }
 
 
         public int getPosition() {
             return position;
-        }
-
-
-        public ContentTypeDefinition getContentTypeDefinition() {
-            return contentTypeDefinition;
         }
     }
 }

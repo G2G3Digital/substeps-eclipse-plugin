@@ -4,13 +4,13 @@ import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
-import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.supplier.Transformer;
 
 @SuppressWarnings("restriction")
 public class ImageDescriptorImageLoader implements Transformer<SubstepsIcon, Image> {
 
     @Override
-    public Image to(final SubstepsIcon icon) {
+    public Image from(final SubstepsIcon icon) {
         final ImageDescriptor descriptor = descriptorFor(icon);
 
         Image image = descriptor.createImage();

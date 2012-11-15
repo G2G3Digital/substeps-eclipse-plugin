@@ -10,7 +10,7 @@ import org.eclipse.debug.core.ILaunchManager;
 
 import com.technophobia.eclipse.launcher.exception.ExceptionReporter;
 import com.technophobia.eclipse.transformer.Locator;
-import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.supplier.Transformer;
 
 public class WorkingCopyLaunchConfigLocator implements Locator<ILaunchConfiguration, ILaunchConfigurationWorkingCopy> {
 
@@ -62,7 +62,7 @@ public class WorkingCopyLaunchConfigLocator implements Locator<ILaunchConfigurat
         } else if (all.size() == 1) {
             return all.iterator().next();
         }
-        return multiConfigResolver.to(all);
+        return multiConfigResolver.from(all);
     }
 
 

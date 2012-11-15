@@ -75,6 +75,22 @@ public class ContentTypeRuleBasedPartitionScannerTest {
 
 
     @Test
+    public void canPartitionInlineComments() {
+        final String text = "#This is comment line 1" + NEWLINE + "Background:" + NEWLINE + "Given something # with a following comment" + NEWLINE
+                + "#This is comment line 2";
+        final IDocumentPartitioner partitioner = createPartitionerForDocumentWithText(text);
+
+        final ITypedRegion[] result = partitioner.computePartitioning(0, text.length());
+        assertEquals(5, result.length);
+
+        checkType(result[0], CommentContentTypeDefinition.CONTENT_TYPE_ID, "#This is comment line 1" + NEWLINE);
+        checkType(result[2], GivenContentTypeDefinition.CONTENT_TYPE_ID, "Given something ");
+        checkType(result[3], CommentContentTypeDefinition.CONTENT_TYPE_ID, "# with a following comment" + NEWLINE);
+        checkType(result[4], CommentContentTypeDefinition.CONTENT_TYPE_ID, "#This is comment line 2");
+    }
+
+
+    @Test
     public void canPartitionSingleTagOnLine() {
         final String text = "#This is comment line 1" + NEWLINE + "Background:" + NEWLINE + "Given something" + NEWLINE
                 + NEWLINE + "Tags: tag-1" + NEWLINE + "Scenario:A scenario";

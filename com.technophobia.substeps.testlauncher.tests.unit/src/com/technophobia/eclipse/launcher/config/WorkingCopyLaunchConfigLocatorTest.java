@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
 
 import com.technophobia.eclipse.launcher.exception.ExceptionReporter;
 import com.technophobia.eclipse.transformer.Locator;
-import com.technophobia.eclipse.transformer.Transformer;
+import com.technophobia.substeps.supplier.Transformer;
 
 @RunWith(JMock.class)
 public class WorkingCopyLaunchConfigLocatorTest {
@@ -101,7 +101,7 @@ public class WorkingCopyLaunchConfigLocatorTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(multiConfigResolver).to(with(any(Collection.class)));
+                oneOf(multiConfigResolver).from(with(any(Collection.class)));
                 will(returnValue(item2));
             }
         });
