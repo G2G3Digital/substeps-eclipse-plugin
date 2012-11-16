@@ -76,8 +76,9 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
             for (final StepDescriptor step : stepImplementation.getExpressions()) {
                 if (isPattern(step)) {
                     suggestions.add(findPatternIn(step));
+                } else {
+                    suggestions.add(new Suggestion(step.getExpression()));
                 }
-                suggestions.add(new Suggestion(step.getExpression()));
             }
         }
 

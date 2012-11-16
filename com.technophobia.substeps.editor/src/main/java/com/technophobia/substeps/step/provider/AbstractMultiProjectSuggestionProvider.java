@@ -55,6 +55,8 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
     protected void loadProject(final IProject project) {
         if (!stepImplementationMap.containsKey(project)) {
             stepImplementationMap.put(project, new ArrayList<Suggestion>());
+        } else {
+            stepImplementationMap.get(project).clear();
         }
 
         stepImplementationMap.get(project).addAll(findStepImplementationsFor(project));

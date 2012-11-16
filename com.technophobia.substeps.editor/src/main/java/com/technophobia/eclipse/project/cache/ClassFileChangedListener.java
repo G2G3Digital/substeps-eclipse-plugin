@@ -100,7 +100,8 @@ public class ClassFileChangedListener implements IElementChangedListener {
 
             @Override
             public boolean visit(final IResourceDelta delta) throws CoreException {
-                if (delta.getKind() == IResourceDelta.CHANGED) {
+                if (delta.getKind() == IResourceDelta.CHANGED || delta.getKind() == IResourceDelta.ADDED
+                        || delta.getKind() == IResourceDelta.REMOVED) {
                     if (delta.getResource().getFileExtension() != null
                             && CLASS_FILE_SUFFIX.equals(delta.getResource().getFileExtension().toLowerCase())) {
                         changedResources.add(delta.getResource());
