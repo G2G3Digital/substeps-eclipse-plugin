@@ -10,12 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspace;
 
+import com.technophobia.eclipse.project.ProjectChangedListener;
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
 import com.technophobia.substeps.step.PatternSuggestion;
@@ -24,7 +21,7 @@ import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class ExternalStepImplementationProvider extends AbstractMultiProjectSuggestionProvider implements
-        ProjectStepImplementationProvider {
+        ProjectStepImplementationProvider, ProjectChangedListener {
 
     private static final String REGEX = "([^\"]*)\"";
 
@@ -43,19 +40,6 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
     @Override
     public void load(final IWorkspace workspace) {
         super.load(workspace);
-
-        workspace.addResourceChangeListener(new IResourceChangeListener() {
-            @Override
-            public void resourceChanged(final IResourceChangeEvent event) {
-                if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-                    final Set<IProject> projects = findProjectsInChangeset(event);
-                    for (final IProject project : projects) {
-                        markAsStale(project);
-                    }
-
-                }
-            }
-        });
     }
 
 
@@ -64,6 +48,12 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
         clean(project);
         return externalStepClassesForProject.containsKey(project) ? externalStepClassesForProject.get(project)
                 : Collections.<String> emptyList();
+    }
+
+
+    @Override
+    public void projectChanged(final IProject project) {
+        markAsStale(project);
     }
 
 
@@ -123,24 +113,5 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
         sb.append(currentExpression);
 
         return new PatternSuggestion(sb.toString(), step.getExpression());
-    }
-
-
-    private Set<IProject> findProjectsInChangeset(final IResourceChangeEvent event) {
-        final Set<IProject> changedProjects = new HashSet<IProject>();
-        final IResourceDelta[] projectDeltas = event.getDelta().getAffectedChildren();
-        for (final IResourceDelta projectDelta : projectDeltas) {
-            final IProject project = toProject(projectDelta);
-            if (externalStepClassesForProject.containsKey(project)) {
-                changedProjects.add(project);
-            }
-        }
-        return changedProjects;
-    }
-
-
-    private IProject toProject(final IResourceDelta projectDelta) {
-        final IResource resource = projectDelta.getResource();
-        return (IProject) (resource instanceof IProject ? resource : null);
     }
 }

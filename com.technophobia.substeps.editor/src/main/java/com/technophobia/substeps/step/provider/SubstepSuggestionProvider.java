@@ -7,15 +7,16 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 
+import com.technophobia.eclipse.project.ProjectFileChangedListener;
 import com.technophobia.substeps.model.ParentStep;
 import com.technophobia.substeps.model.Step;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.step.PatternSuggestion;
 import com.technophobia.substeps.step.Suggestion;
-import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Transformer;
 
-public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionProvider implements Callback1<IFile> {
+public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionProvider implements
+        ProjectFileChangedListener {
 
     private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
 
@@ -26,8 +27,7 @@ public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionPro
 
 
     @Override
-    public void doCallback(final IFile file) {
-        final IProject project = file.getProject();
+    public void projectFileChange(final IProject project, final IFile file) {
         markAsStale(project);
     }
 

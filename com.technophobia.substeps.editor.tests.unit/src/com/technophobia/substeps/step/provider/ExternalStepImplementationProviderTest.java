@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.jdt.core.JavaCore;
@@ -248,8 +247,6 @@ public class ExternalStepImplementationProviderTest {
 
                 oneOf(root).getProjects();
                 will(returnValue(projects));
-
-                oneOf(workspace).addResourceChangeListener(with(any(IResourceChangeListener.class)));
             }
         });
 

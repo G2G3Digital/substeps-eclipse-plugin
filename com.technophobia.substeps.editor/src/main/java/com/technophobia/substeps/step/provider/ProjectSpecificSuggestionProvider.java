@@ -7,18 +7,17 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.jdt.core.JavaCore;
 
+import com.technophobia.eclipse.project.ProjectChangedListener;
 import com.technophobia.substeps.model.StepImplementation;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.render.StepImplementationToSuggestionRenderer;
 import com.technophobia.substeps.step.ProjectStepImplementationProvider;
 import com.technophobia.substeps.step.Suggestion;
-import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class ProjectSpecificSuggestionProvider extends AbstractMultiProjectSuggestionProvider implements
-        ProjectStepImplementationProvider {
+        ProjectStepImplementationProvider, ProjectChangedListener {
 
     private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
     private final StepImplementationToSuggestionRenderer stepRenderer;
@@ -35,14 +34,6 @@ public class ProjectSpecificSuggestionProvider extends AbstractMultiProjectSugge
     @Override
     public void load(final IWorkspace workspace) {
         super.load(workspace);
-
-        JavaCore.addElementChangedListener(new StepImplementationClassChangedListener(new Callback1<IProject>() {
-            @Override
-            public void doCallback(final IProject project) {
-                clearStepImplementationsFor(project);
-                markAsStale(project);
-            }
-        }));
     }
 
 
@@ -58,6 +49,12 @@ public class ProjectSpecificSuggestionProvider extends AbstractMultiProjectSugge
             classes.add(stepImplementation.getImplementedIn().getName());
         }
         return classes;
+    }
+
+
+    @Override
+    public void projectChanged(final IProject project) {
+        markAsStale(project);
     }
 
 

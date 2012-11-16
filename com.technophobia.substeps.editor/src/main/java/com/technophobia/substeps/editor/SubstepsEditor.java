@@ -48,6 +48,6 @@ public class SubstepsEditor extends FeatureEditor {
 
         final IFile file = ((FileEditorInput) getEditorInput()).getFile();
         final IProject project = file.getProject();
-        projectManager.projectFileChanged(project, file);
+        projectManager.projectFileChange(project, file);
     }
 }

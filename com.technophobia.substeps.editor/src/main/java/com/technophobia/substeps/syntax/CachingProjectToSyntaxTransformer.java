@@ -49,7 +49,7 @@ public class CachingProjectToSyntaxTransformer implements CachingResultTransform
     public void refreshCacheFor(final IProject project) {
         pluginLogger.info("Clearing cache for project " + project);
         if (cache.containsKey(project)) {
-            cache.put(project, delegate.from(project));
+            cache.remove(project);
         } else {
             pluginLogger.warn("Trying to refresh cache for project " + project.getName()
                     + ", but it does not yet exist");

@@ -10,7 +10,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 
 import com.technophobia.eclipse.transformer.FileToIFileTransformer;
 import com.technophobia.substeps.FeatureEditorPlugin;
@@ -29,15 +34,24 @@ public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorRe
 
     @Override
     public void applyChanges() {
-        clearErrorsFor(project);
+        final Job job = new Job("Update problems view") {
 
-        for (final Map.Entry<IResource, Set<Problem>> entry : resourceToProblemMap.entrySet()) {
-            final IResource resource = entry.getKey();
-            final Set<Problem> problems = entry.getValue();
-            for (final Problem problem : problems) {
-                problem.mark(resource);
+            @Override
+            protected IStatus run(final IProgressMonitor monitor) {
+                clearErrorsFor(project);
+
+                for (final Map.Entry<IResource, Set<Problem>> entry : resourceToProblemMap.entrySet()) {
+                    final IResource resource = entry.getKey();
+                    final Set<Problem> problems = entry.getValue();
+                    for (final Problem problem : problems) {
+                        problem.mark(resource);
+                    }
+                }
+                return Status.OK_STATUS;
             }
-        }
+        };
+        job.setRule(ResourcesPlugin.getWorkspace().getRoot());
+        job.schedule();
     }
 
 

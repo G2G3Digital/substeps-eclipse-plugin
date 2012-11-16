@@ -34,8 +34,9 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import com.technophobia.eclipse.log.PluginLogger;
-import com.technophobia.eclipse.project.CacheAwareProjectManager;
+import com.technophobia.eclipse.project.ProjectEventType;
 import com.technophobia.eclipse.project.ProjectManager;
+import com.technophobia.eclipse.project.cache.CacheAwareProjectManager;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
@@ -68,10 +69,10 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     private ResourceBundle resourceBundle;
     private ILog log;
 
-    private final ProvidedSuggestionManager suggestionManager;
-    private final CachingResultTransformer<IProject, Syntax> projectToSyntaxTransformer;
+    private ProvidedSuggestionManager suggestionManager;
+    private CachingResultTransformer<IProject, Syntax> projectToSyntaxTransformer;
 
-    private final ProjectManager projectManager;
+    private ProjectManager projectManager;
 
 
     @SuppressWarnings("unchecked")
@@ -94,13 +95,17 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
             resourceBundle = null;
         }
 
-        projectManager.registerProjectListeners();
+        projectManager.registerFrameworkListeners();
         addSuggestionProviders();
     }
 
 
     @Override
     public void stop(final BundleContext bundleContext) throws Exception {
+        projectManager.unregisterFrameworkListeners();
+        projectManager = null;
+        suggestionManager = null;
+        projectToSyntaxTransformer = null;
         resourceBundle = null;
         log = null;
     }
@@ -187,18 +192,22 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     private void addSuggestionProviders() {
-        suggestionManager.addProvider(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION,
-                new ExternalStepImplementationProvider(new ProjectStepImplementationLoader()));
+        final ExternalStepImplementationProvider externalSuggestionProvider = new ExternalStepImplementationProvider(
+                new ProjectStepImplementationLoader());
+        suggestionManager.addProvider(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION, externalSuggestionProvider);
 
-        suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION,
-                new ProjectSpecificSuggestionProvider(projectToSyntaxTransformer,
-                        new ParameterisedStepImplementationRenderer()));
+        final ProjectSpecificSuggestionProvider projectSpecificSuggestionProvider = new ProjectSpecificSuggestionProvider(
+                projectToSyntaxTransformer, new ParameterisedStepImplementationRenderer());
+        suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, projectSpecificSuggestionProvider);
 
         final SubstepSuggestionProvider substepSuggestionProvider = new SubstepSuggestionProvider(
                 projectToSyntaxTransformer);
         suggestionManager.addProvider(SuggestionSource.SUBSTEP_DEFINITION, substepSuggestionProvider);
-        projectManager.addSubstepsFileListener(substepSuggestionProvider);
 
+        projectManager.addProjectListener(ProjectEventType.ProjectDependenciesChanged, externalSuggestionProvider);
+        projectManager.addProjectListener(ProjectEventType.SourceFileAnnotationsChanged,
+                projectSpecificSuggestionProvider);
+        projectManager.addSubstepsFileListener(substepSuggestionProvider);
         suggestionManager.load(ResourcesPlugin.getWorkspace());
     }
 
