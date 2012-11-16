@@ -99,11 +99,13 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     public void setFocus() {
         super.setFocus();
 
-        try {
-            this.getDocumentProvider().resetDocument(getEditorInput());
-        } catch (final CoreException ex) {
-            FeatureEditorPlugin.instance().error(
-                    "Could not reset document " + ((FileEditorInput) editorInput).getFile().getLocation(), ex);
+        if (!isDirty()) {
+            try {
+                this.getDocumentProvider().resetDocument(getEditorInput());
+            } catch (final CoreException ex) {
+                FeatureEditorPlugin.instance().error(
+                        "Could not reset document " + ((FileEditorInput) editorInput).getFile().getLocation(), ex);
+            }
         }
     }
 
