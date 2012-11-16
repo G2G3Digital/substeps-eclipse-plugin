@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspace;
 
 import com.technophobia.substeps.model.ParentStep;
 import com.technophobia.substeps.model.Step;
@@ -16,7 +15,7 @@ import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Transformer;
 
-public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionProvider {
+public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionProvider implements Callback1<IFile> {
 
     private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
 
@@ -27,17 +26,9 @@ public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionPro
 
 
     @Override
-    public void load(final IWorkspace workspace) {
-        super.load(workspace);
-
-        workspace.addResourceChangeListener(new FileChangedListener("substeps", new Callback1<IFile>() {
-
-            @Override
-            public void doCallback(final IFile file) {
-                final IProject project = file.getProject();
-                markAsStale(project);
-            }
-        }));
+    public void doCallback(final IFile file) {
+        final IProject project = file.getProject();
+        markAsStale(project);
     }
 
 

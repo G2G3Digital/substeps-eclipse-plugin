@@ -3,14 +3,14 @@ package com.technophobia.substeps.editor.outline.substeps;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.eclipse.jface.text.Position;
+import org.jmock.integration.junit4.JMock;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import com.technophobia.eclipse.supplier.CurrentProjectSupplier;
 import com.technophobia.substeps.editor.outline.AbstractFileToElementTransformerIntegrationTest;
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
 import com.technophobia.substeps.editor.outline.model.StepElement;
@@ -18,6 +18,7 @@ import com.technophobia.substeps.editor.outline.model.SubstepsDefinitionElement;
 import com.technophobia.substeps.editor.outline.model.SubstepsRootElement;
 import com.technophobia.substeps.supplier.Transformer;
 
+@RunWith(JMock.class)
 public class FileToSubstepDefinitionElementTransformerIntegrationTest extends
         AbstractFileToElementTransformerIntegrationTest<SubstepsRootElement> {
 
@@ -42,10 +43,9 @@ public class FileToSubstepDefinitionElementTransformerIntegrationTest extends
 
 
     @Override
-    protected Transformer<File, AbstractModelElement> createTransformer(
+    protected Transformer<ProjectFile, AbstractModelElement> createTransformer(
             final Transformer<Integer, Position> lineNumberToPositionTransformer) {
-        return new FileToSubstepDefinitionElementTransformer(lineNumberToPositionTransformer,
-                new CurrentProjectSupplier());
+        return new FileToSubstepDefinitionElementTransformer(lineNumberToPositionTransformer);
     }
 
 

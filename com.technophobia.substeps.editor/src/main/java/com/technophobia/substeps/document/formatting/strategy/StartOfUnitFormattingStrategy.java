@@ -18,7 +18,6 @@
  */
 package com.technophobia.substeps.document.formatting.strategy;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.text.formatter.IFormattingStrategy;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
@@ -53,7 +52,7 @@ public class StartOfUnitFormattingStrategy extends DefaultFormattingStrategy {
     @Override
     public String format(final String content, final boolean isLineStart, final String indentation,
             final int[] positions) {
-        FeatureEditorPlugin.instance().log(IStatus.INFO,
+        FeatureEditorPlugin.instance().info(
                 "Formatting line: " + content + ", isLineStart: " + isLineStart + ", indentation: " + indentation);
         /*
          * if (isLineStart) { final FormattingContext formattingContext =

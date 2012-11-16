@@ -3,11 +3,12 @@ package com.technophobia.substeps.editor.outline.feature;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import java.io.File;
 import java.util.Collection;
 
 import org.eclipse.jface.text.Position;
+import org.jmock.integration.junit4.JMock;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.technophobia.substeps.editor.outline.AbstractFileToElementTransformerIntegrationTest;
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
@@ -18,8 +19,10 @@ import com.technophobia.substeps.editor.outline.model.FeatureElement;
 import com.technophobia.substeps.editor.outline.model.ScenarioElement;
 import com.technophobia.substeps.editor.outline.model.ScenarioOutlineElement;
 import com.technophobia.substeps.editor.outline.model.StepElement;
+import com.technophobia.substeps.editor.outline.substeps.ProjectFile;
 import com.technophobia.substeps.supplier.Transformer;
 
+@RunWith(JMock.class)
 public class FileToFeatureElementTransformerIntegrationTest extends
         AbstractFileToElementTransformerIntegrationTest<FeatureElement> {
 
@@ -47,7 +50,7 @@ public class FileToFeatureElementTransformerIntegrationTest extends
 
 
     @Override
-    protected Transformer<File, AbstractModelElement> createTransformer(
+    protected Transformer<ProjectFile, AbstractModelElement> createTransformer(
             final Transformer<Integer, Position> lineNumberToPositionTransformer) {
         return new FileToFeatureElementTransformer(lineNumberToPositionTransformer);
     }

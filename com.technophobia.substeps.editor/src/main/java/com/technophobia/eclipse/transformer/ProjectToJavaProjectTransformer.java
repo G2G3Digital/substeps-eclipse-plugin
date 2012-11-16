@@ -2,7 +2,6 @@ package com.technophobia.eclipse.transformer;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
@@ -17,10 +16,10 @@ public class ProjectToJavaProjectTransformer implements Transformer<IProject, IJ
             if (project.hasNature(JavaCore.NATURE_ID)) {
                 return JavaCore.create(project);
             }
-            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+            FeatureEditorPlugin.instance().warn(
                     "Could not transform project " + project.getName() + " to a java project");
         } catch (final CoreException e) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+            FeatureEditorPlugin.instance().warn(
                     "Could not transform project " + project.getName() + " to java project: " + e.getMessage());
         }
         return null;

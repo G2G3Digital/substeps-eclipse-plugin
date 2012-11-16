@@ -1,0 +1,89 @@
+package com.technophobia.substeps.syntax;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+
+import com.technophobia.eclipse.transformer.FileToIFileTransformer;
+import com.technophobia.substeps.FeatureEditorPlugin;
+
+public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorReporter {
+
+    private final IProject project;
+    private final Map<IResource, Set<Problem>> resourceToProblemMap;
+
+
+    public MarkerSyntaxErrorReporter(final IProject project) {
+        this.project = project;
+        this.resourceToProblemMap = new HashMap<IResource, Set<Problem>>();
+    }
+
+
+    @Override
+    public void applyChanges() {
+        clearErrorsFor(project);
+
+        for (final Map.Entry<IResource, Set<Problem>> entry : resourceToProblemMap.entrySet()) {
+            final IResource resource = entry.getKey();
+            final Set<Problem> problems = entry.getValue();
+            for (final Problem problem : problems) {
+                problem.mark(resource);
+            }
+        }
+    }
+
+
+    @Override
+    public void reportFeatureError(final File file, final String line, final int lineNumber, final String description)
+            throws RuntimeException {
+        addMarker(file, line, lineNumber, description);
+    }
+
+
+    @Override
+    public void reportFeatureError(final File file, final String line, final int lineNumber, final String description,
+            final RuntimeException ex) throws RuntimeException {
+        addMarker(file, line, lineNumber, description);
+    }
+
+
+    @Override
+    public void reportSubstepsError(final File file, final String line, final int lineNumber, final String description)
+            throws RuntimeException {
+        addMarker(file, line, lineNumber, description);
+    }
+
+
+    @Override
+    public void reportSubstepsError(final File file, final String line, final int lineNumber, final String description,
+            final RuntimeException ex) throws RuntimeException {
+        addMarker(file, line, lineNumber, description);
+    }
+
+
+    private void addMarker(final File file, final String line, final int lineNumber, final String description) {
+        final IFile f = new FileToIFileTransformer(project).from(file);
+
+        if (!resourceToProblemMap.containsKey(f)) {
+            resourceToProblemMap.put(f, new HashSet<Problem>());
+        }
+        resourceToProblemMap.get(f).add(Problem.createError(description, line, lineNumber));
+    }
+
+
+    protected void clearErrorsFor(final IResource resource) {
+        try {
+            resource.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+        } catch (final CoreException ex) {
+            FeatureEditorPlugin.instance().error("Could not clear problems for resource " + resource.getFullPath(), ex);
+        }
+    }
+}

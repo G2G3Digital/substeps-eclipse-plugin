@@ -18,7 +18,6 @@
  */
 package com.technophobia.substeps.editor;
 
-import java.io.File;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.CoreException;
@@ -58,6 +57,7 @@ import com.technophobia.substeps.editor.outline.OutlineLabelProvider;
 import com.technophobia.substeps.editor.outline.SubstepsContentOutlinePage;
 import com.technophobia.substeps.editor.outline.feature.FileToFeatureElementTransformer;
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
+import com.technophobia.substeps.editor.outline.substeps.ProjectFile;
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Supplier;
 import com.technophobia.substeps.supplier.Transformer;
@@ -91,8 +91,6 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                 formattingContextFactory, contentAssistantFactory));
         setDocumentProvider(new PartitionScannedDocumentProvider(new ContentTypeRuleBasedPartitionScannerFactory(
                 contentTypeDefinitionFactory)));
-
-        FeatureEditorPlugin.info("ctor");
     }
 
 
@@ -136,7 +134,7 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     }
 
 
-    protected Transformer<File, AbstractModelElement> fileToModelTransformer() {
+    protected Transformer<ProjectFile, AbstractModelElement> fileToModelTransformer() {
         return new FileToFeatureElementTransformer(lineNumberToDocumentOffset());
     }
 
@@ -317,7 +315,8 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                         final IDocument document = getDocumentProvider().getDocument(editorInput);
                         return new Position(document.getLineOffset(lineNumber.intValue()));
                     } catch (final BadLocationException e) {
-                        FeatureEditorPlugin.info("Couldn't get offset for line " + lineNumber + " in document");
+                        FeatureEditorPlugin.instance().info(
+                                "Couldn't get offset for line " + lineNumber + " in document");
                     }
                 }
                 return new Position(0);
@@ -335,7 +334,8 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                         final IDocument document = getDocumentProvider().getDocument(editorInput);
                         return Integer.valueOf(document.getLineOfOffset(offset.getOffset()));
                     } catch (final BadLocationException e) {
-                        FeatureEditorPlugin.info("Couldn't get line number for offset " + offset + " in document");
+                        FeatureEditorPlugin.instance().info(
+                                "Couldn't get line number for offset " + offset + " in document");
                     }
                 }
                 return Integer.valueOf(-1);

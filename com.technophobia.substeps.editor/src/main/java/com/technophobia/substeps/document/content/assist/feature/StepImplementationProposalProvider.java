@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -137,7 +136,7 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
             return removeLeadingSpace(line);
 
         } catch (final BadLocationException e) {
-            FeatureEditorPlugin.instance().log(IStatus.ERROR, "Could not get last word");
+            FeatureEditorPlugin.instance().error("Could not get last word");
             // ... log the exception ...
         }
         return null;

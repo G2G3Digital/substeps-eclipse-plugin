@@ -15,6 +15,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
+import com.technophobia.substeps.editor.outline.substeps.ProjectFile;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class OutlineContentProvider implements ITreeContentProvider {
@@ -23,13 +24,13 @@ public class OutlineContentProvider implements ITreeContentProvider {
     private IEditorInput input;
     private final IDocumentProvider documentProvider;
 
-    private final Transformer<File, AbstractModelElement> fileToElementTransformer;
+    private final Transformer<ProjectFile, AbstractModelElement> fileToElementTransformer;
 
     protected final static String TAG_POSITIONS = "__tag_positions";
     protected IPositionUpdater positionUpdater = new DefaultPositionUpdater(TAG_POSITIONS);
 
 
-    public OutlineContentProvider(final Transformer<File, AbstractModelElement> fileToElementTransformer,
+    public OutlineContentProvider(final Transformer<ProjectFile, AbstractModelElement> fileToElementTransformer,
             final IDocumentProvider provider) {
         this.fileToElementTransformer = fileToElementTransformer;
         this.documentProvider = provider;
@@ -128,15 +129,14 @@ public class OutlineContentProvider implements ITreeContentProvider {
 
 
     private AbstractModelElement parseEditor(final IEditorInput editorInput) {
-        final File file = asFile(editorInput);
-
-        final AbstractModelElement element = fileToElementTransformer.from(file);
+        final IFile iFile = ((FileEditorInput) editorInput).getFile();
+        final File file = asFile(iFile);
+        final AbstractModelElement element = fileToElementTransformer.from(new ProjectFile(iFile.getProject(), file));
         return element;
     }
 
 
-    private File asFile(final IEditorInput editorInput) {
-        final IFile file = ((FileEditorInput) editorInput).getFile();
-        return new File(file.getLocation().makeAbsolute().toOSString());
+    private File asFile(final IFile iFile) {
+        return new File(iFile.getLocation().makeAbsolute().toOSString());
     }
 }

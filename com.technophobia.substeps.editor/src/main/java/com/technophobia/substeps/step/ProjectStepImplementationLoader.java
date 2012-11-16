@@ -12,7 +12,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
@@ -53,7 +52,7 @@ public class ProjectStepImplementationLoader implements Transformer<IProject, Li
         try {
             return project.hasNature(JavaCore.NATURE_ID);
         } catch (final CoreException e) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+            FeatureEditorPlugin.instance().warn(
                     "Could not determine if project " + project.getName() + " is a java project");
             return false;
         }
@@ -77,7 +76,7 @@ public class ProjectStepImplementationLoader implements Transformer<IProject, Li
             }
             return rootPaths.toArray(new String[rootPaths.size()]);
         } catch (final JavaModelException ex) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+            FeatureEditorPlugin.instance().warn(
                     "Could not get package fragment roots for project " + javaProject.getProject().getName());
             return new String[0];
         }
@@ -114,14 +113,14 @@ public class ProjectStepImplementationLoader implements Transformer<IProject, Li
             return stepImplementationDescriptors != null ? stepImplementationDescriptors : Collections
                     .<StepImplementationsDescriptor> emptyList();
         } catch (final IOException ex) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING, "Could not open jar file " + path);
+            FeatureEditorPlugin.instance().warn("Could not open jar file " + path);
         } finally {
             try {
                 if (jarFile != null) {
                     jarFile.close();
                 }
             } catch (final IOException e) {
-                FeatureEditorPlugin.instance().log(IStatus.WARNING, "Could not close jar file " + path);
+                FeatureEditorPlugin.instance().warn("Could not close jar file " + path);
             }
         }
 

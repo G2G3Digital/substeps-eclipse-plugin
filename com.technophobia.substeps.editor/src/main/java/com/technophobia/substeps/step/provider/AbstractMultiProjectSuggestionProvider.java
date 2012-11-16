@@ -12,7 +12,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.JavaCore;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
@@ -46,7 +45,7 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
         try {
             return project.hasNature(JavaCore.NATURE_ID);
         } catch (final CoreException e) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+            FeatureEditorPlugin.instance().warn(
                     "Could not determine if project " + project.getName() + " is a java project, returning false");
             return false;
         }

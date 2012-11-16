@@ -1,6 +1,5 @@
 package com.technophobia.substeps.editor.outline;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +17,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
+import com.technophobia.substeps.editor.outline.substeps.ProjectFile;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class SubstepsContentOutlinePage extends ContentOutlinePage {
@@ -28,13 +28,13 @@ public class SubstepsContentOutlinePage extends ContentOutlinePage {
     private OutlineContentProvider outlineContentProvider = null;
     private IEditorInput input = null;
 
-    private final Transformer<File, AbstractModelElement> fileToModelTransformer;
+    private final Transformer<ProjectFile, AbstractModelElement> fileToModelTransformer;
 
     private final Transformer<Position, Integer> positionToLineNumberTransformer;
 
 
     public SubstepsContentOutlinePage(final ITextEditor textEditor, final ILabelProvider outlineLabelProvider,
-            final Transformer<File, AbstractModelElement> fileToModelTransformer,
+            final Transformer<ProjectFile, AbstractModelElement> fileToModelTransformer,
             final Transformer<Position, Integer> positionToLineNumberTransformer) {
         this.textEditor = textEditor;
         this.outlineLabelProvider = outlineLabelProvider;

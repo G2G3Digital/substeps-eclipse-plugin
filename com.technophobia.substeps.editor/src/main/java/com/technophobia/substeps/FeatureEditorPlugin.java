@@ -21,6 +21,7 @@ package com.technophobia.substeps;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.ILog;
@@ -32,9 +33,11 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
-import com.technophobia.eclipse.log.Logger;
+import com.technophobia.eclipse.log.PluginLogger;
+import com.technophobia.eclipse.project.CacheAwareProjectManager;
+import com.technophobia.eclipse.project.ProjectManager;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
-import com.technophobia.substeps.document.content.assist.feature.ProjectToSyntaxTransformer;
+import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
@@ -44,7 +47,9 @@ import com.technophobia.substeps.step.SuggestionSource;
 import com.technophobia.substeps.step.provider.ExternalStepImplementationProvider;
 import com.technophobia.substeps.step.provider.ProjectSpecificSuggestionProvider;
 import com.technophobia.substeps.step.provider.SubstepSuggestionProvider;
+import com.technophobia.substeps.supplier.CachingResultTransformer;
 import com.technophobia.substeps.supplier.Supplier;
+import com.technophobia.substeps.syntax.CachingProjectToSyntaxTransformer;
 
 /**
  * BundleActivator/general bundle aware class for managing things such as
@@ -53,7 +58,7 @@ import com.technophobia.substeps.supplier.Supplier;
  * @author sforbes
  * 
  */
-public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, Logger {
+public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, PluginLogger {
 
     private static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
@@ -64,12 +69,18 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     private ILog log;
 
     private final ProvidedSuggestionManager suggestionManager;
+    private final CachingResultTransformer<IProject, Syntax> projectToSyntaxTransformer;
+
+    private final ProjectManager projectManager;
 
 
+    @SuppressWarnings("unchecked")
     public FeatureEditorPlugin() {
         super();
         FeatureEditorPlugin.pluginInstance = this;
         this.suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
+        this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer();
+        this.projectManager = new CacheAwareProjectManager(projectToSyntaxTransformer);
     }
 
 
@@ -83,6 +94,7 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
             resourceBundle = null;
         }
 
+        projectManager.registerProjectListeners();
         addSuggestionProviders();
     }
 
@@ -109,13 +121,20 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     }
 
 
+    public ProjectManager getProjectManager() {
+        return projectManager;
+    }
+
+
+    public Syntax syntaxFor(final IProject project) {
+        return projectToSyntaxTransformer.from(project);
+    }
+
+
     public ProjectStepImplementationProvider getStepImplementationProvider() {
         return suggestionManager;
     }
 
-    public static void info(final String msg){
-    	instance().log.log(new Status(IStatus.INFO, PLUGIN_ID, msg));
-	}
 
     public Supplier<IResource> currentResourceSupplier() {
         return new Supplier<IResource>() {
@@ -133,21 +152,33 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     @Override
-    public void log(final int status, final String message) {
-        instance().log.log(new Status(status, PLUGIN_ID, message));
+    public void info(final String msg) {
+        instance().log.log(new Status(IStatus.INFO, PLUGIN_ID, msg));
     }
 
-    public static void log(final Throwable ex) {
-        instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Error", ex));
+
+    @Override
+    public void warn(final String msg) {
+        instance().log.log(new Status(IStatus.WARNING, PLUGIN_ID, msg));
     }
 
-	public static void error(final String msg){
-		instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg));
-	}
 
-	public static void error(final String msg, final Throwable t){
-		instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg, t));
-	}
+    @Override
+    public void warn(final String msg, final Throwable ex) {
+        instance().log.log(new Status(IStatus.WARNING, PLUGIN_ID, msg, ex));
+    }
+
+
+    @Override
+    public void error(final String msg) {
+        instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg));
+    }
+
+
+    @Override
+    public void error(final String msg, final Throwable t) {
+        instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg, t));
+    }
 
 
     public static FeatureEditorPlugin instance() {
@@ -156,8 +187,6 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     private void addSuggestionProviders() {
-        final ProjectToSyntaxTransformer projectToSyntaxTransformer = new ProjectToSyntaxTransformer();
-
         suggestionManager.addProvider(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION,
                 new ExternalStepImplementationProvider(new ProjectStepImplementationLoader()));
 
@@ -165,12 +194,12 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
                 new ProjectSpecificSuggestionProvider(projectToSyntaxTransformer,
                         new ParameterisedStepImplementationRenderer()));
 
-        suggestionManager.addProvider(SuggestionSource.SUBSTEP_DEFINITION, new SubstepSuggestionProvider(
-                projectToSyntaxTransformer));
+        final SubstepSuggestionProvider substepSuggestionProvider = new SubstepSuggestionProvider(
+                projectToSyntaxTransformer);
+        suggestionManager.addProvider(SuggestionSource.SUBSTEP_DEFINITION, substepSuggestionProvider);
+        projectManager.addSubstepsFileListener(substepSuggestionProvider);
 
         suggestionManager.load(ResourcesPlugin.getWorkspace());
     }
-    
-   
 
 }
