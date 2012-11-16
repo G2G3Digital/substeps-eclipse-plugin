@@ -36,6 +36,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
@@ -91,6 +92,19 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                 formattingContextFactory, contentAssistantFactory));
         setDocumentProvider(new PartitionScannedDocumentProvider(new ContentTypeRuleBasedPartitionScannerFactory(
                 contentTypeDefinitionFactory)));
+    }
+
+
+    @Override
+    public void setFocus() {
+        super.setFocus();
+
+        try {
+            this.getDocumentProvider().resetDocument(getEditorInput());
+        } catch (final CoreException ex) {
+            FeatureEditorPlugin.instance().error(
+                    "Could not reset document " + ((FileEditorInput) editorInput).getFile().getLocation(), ex);
+        }
     }
 
 

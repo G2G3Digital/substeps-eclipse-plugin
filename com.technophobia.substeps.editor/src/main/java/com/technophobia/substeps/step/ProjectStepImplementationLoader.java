@@ -69,9 +69,11 @@ public class ProjectStepImplementationLoader implements Transformer<IProject, Li
             final IPackageFragmentRoot[] fragmentRoots = javaProject.getPackageFragmentRoots();
             final Collection<String> rootPaths = new ArrayList<String>(fragmentRoots.length);
             for (int i = 0; i < fragmentRoots.length; i++) {
-                final String path = getPathFor(fragmentRoots[i]);
-                if (path != null) {
-                    rootPaths.add(path);
+                if (fragmentRoots[i].getKind() == IPackageFragmentRoot.K_BINARY) {
+                    final String path = getPathFor(fragmentRoots[i]);
+                    if (path != null) {
+                        rootPaths.add(path);
+                    }
                 }
             }
             return rootPaths.toArray(new String[rootPaths.size()]);

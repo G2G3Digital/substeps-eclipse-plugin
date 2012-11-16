@@ -8,8 +8,6 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -52,16 +50,6 @@ public class CacheAwareProjectManager implements ProjectManager {
     public void registerFrameworkListeners() {
         JavaCore.addElementChangedListener(sourceFileChangedListener);
         JavaCore.addElementChangedListener(classpathDependencyListener);
-
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(new IResourceChangeListener() {
-
-            @Override
-            public void resourceChanged(final IResourceChangeEvent event) {
-                if (event.getType() == IResourceChangeEvent.POST_BUILD) {
-                    System.out.println("**************Build complete");
-                }
-            }
-        });
     }
 
 
@@ -183,7 +171,7 @@ public class CacheAwareProjectManager implements ProjectManager {
                 };
                 job.setRule(ResourcesPlugin.getWorkspace().getRoot());
                 job.setPriority(Job.DECORATE);
-                job.schedule(3000);
+                job.schedule(200);
             }
         };
     }
