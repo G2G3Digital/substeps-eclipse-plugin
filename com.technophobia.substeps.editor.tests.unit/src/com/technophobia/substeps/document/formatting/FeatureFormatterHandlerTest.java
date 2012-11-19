@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.technophobia.eclipse.editor.FormattableEditorPart;
-import com.technophobia.eclipse.log.Logger;
+import com.technophobia.eclipse.log.PluginLogger;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.supplier.Transformer;
 
@@ -21,7 +21,7 @@ public class FeatureFormatterHandlerTest {
     private Mockery context;
 
     private Transformer<ExecutionEvent, IEditorPart> editorSupplier;
-    private Logger logger;
+    private PluginLogger logger;
 
     private IHandler handler;
 
@@ -32,7 +32,7 @@ public class FeatureFormatterHandlerTest {
         this.context = new Mockery();
 
         this.editorSupplier = context.mock(Transformer.class);
-        this.logger = context.mock(Logger.class);
+        this.logger = context.mock(PluginLogger.class);
 
         this.handler = new FeatureFormatterHandler(editorSupplier, logger);
 
@@ -68,7 +68,7 @@ public class FeatureFormatterHandlerTest {
                 oneOf(editorSupplier).from(event);
                 will(returnValue(editor));
 
-                allowing(logger).log(with(any(int.class)), with(any(String.class)));
+                allowing(logger).warn(with(any(String.class)));
             }
         });
         handler.execute(event);
@@ -84,7 +84,7 @@ public class FeatureFormatterHandlerTest {
                 oneOf(editorSupplier).from(event);
                 will(returnValue(null));
 
-                allowing(logger).log(with(any(int.class)), with(any(String.class)));
+                allowing(logger).warn(with(any(String.class)));
             }
         });
         handler.execute(event);

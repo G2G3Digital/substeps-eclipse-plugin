@@ -18,7 +18,6 @@
  */
 package com.technophobia.substeps.editor;
 
-import java.io.File;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.CoreException;
@@ -37,6 +36,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
@@ -53,11 +53,14 @@ import com.technophobia.substeps.document.content.partition.ContentTypeRuleBased
 import com.technophobia.substeps.document.content.view.ContentTypeViewConfiguration;
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
 import com.technophobia.substeps.document.formatting.partition.PartitionedFormattingContextFactory;
+import com.technophobia.substeps.document.partition.EditorInputPartitionContext;
+import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.document.partition.PartitionScannedDocumentProvider;
 import com.technophobia.substeps.editor.outline.OutlineLabelProvider;
 import com.technophobia.substeps.editor.outline.SubstepsContentOutlinePage;
 import com.technophobia.substeps.editor.outline.feature.FileToFeatureElementTransformer;
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
+import com.technophobia.substeps.editor.outline.substeps.ProjectFile;
 import com.technophobia.substeps.supplier.Callback1;
 import com.technophobia.substeps.supplier.Supplier;
 import com.technophobia.substeps.supplier.Transformer;
@@ -87,12 +90,26 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                 processorSupplier(), (Callback1<IContentAssistant>) new AutoActivatingContentAssistantDecorator());
         colourManager = new ColourManager();
 
+        final Supplier<PartitionContext> partitionContextSupplier = partitionContextSupplier();
         setSourceViewerConfiguration(new ContentTypeViewConfiguration(colourManager, contentTypeDefinitionFactory,
-                formattingContextFactory, contentAssistantFactory));
+                formattingContextFactory, contentAssistantFactory, partitionContextSupplier));
         setDocumentProvider(new PartitionScannedDocumentProvider(new ContentTypeRuleBasedPartitionScannerFactory(
-                contentTypeDefinitionFactory)));
+                contentTypeDefinitionFactory), partitionContextSupplier));
+    }
 
-        FeatureEditorPlugin.info("ctor");
+
+    @Override
+    public void setFocus() {
+        super.setFocus();
+
+        if (!isDirty()) {
+            try {
+                this.getDocumentProvider().resetDocument(getEditorInput());
+            } catch (final CoreException ex) {
+                FeatureEditorPlugin.instance().error(
+                        "Could not reset document " + ((FileEditorInput) editorInput).getFile().getLocation(), ex);
+            }
+        }
     }
 
 
@@ -107,7 +124,8 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     public Object getAdapter(final Class required) {
         if (IContentOutlinePage.class.equals(required)) {
             if (outlinePage == null) {
-                outlinePage = new SubstepsContentOutlinePage(this, new OutlineLabelProvider(), fileToModelTransformer());
+                outlinePage = new SubstepsContentOutlinePage(this, new OutlineLabelProvider(),
+                        fileToModelTransformer(), documentOffsetToLineNumber());
                 if (getEditorInput() != null)
                     outlinePage.setInput(getEditorInput());
             }
@@ -135,7 +153,7 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     }
 
 
-    protected Transformer<File, AbstractModelElement> fileToModelTransformer() {
+    protected Transformer<ProjectFile, AbstractModelElement> fileToModelTransformer() {
         return new FileToFeatureElementTransformer(lineNumberToDocumentOffset());
     }
 
@@ -153,6 +171,19 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                         .getSuggestionManager()).get();
             }
 
+        };
+    }
+
+
+    private Supplier<PartitionContext> partitionContextSupplier() {
+        return new Supplier<PartitionContext>() {
+
+            @Override
+            public PartitionContext get() {
+                return new EditorInputPartitionContext(getEditorInput(), FeatureEditorPlugin.instance()
+                        .getSuggestionManager());
+
+            }
         };
     }
 
@@ -201,6 +232,17 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
         setAction("ContentFormatProposal", action);
         getEditorSite().getActionBars().setGlobalActionHandler("ContentFormatProposal", action);
     }
+
+    // @Override
+    // protected void handleCursorPositionChanged() {
+    // super.handleCursorPositionChanged();
+    //
+    // final ISelection selection =
+    // getEditorSite().getSelectionProvider().getSelection();
+    // if (selection != null && outlinePage != null) {
+    // outlinePage.setSelection(selection);
+    // }
+    // }
 
     private static final String SUBSTEPS_CONTEXT = "com.technophobia.substeps.editor.SubstepsContext";
 
@@ -305,10 +347,30 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                         final IDocument document = getDocumentProvider().getDocument(editorInput);
                         return new Position(document.getLineOffset(lineNumber.intValue()));
                     } catch (final BadLocationException e) {
-                        FeatureEditorPlugin.info("Couldn't get offset for line " + lineNumber + " in document");
+                        FeatureEditorPlugin.instance().info(
+                                "Couldn't get offset for line " + lineNumber + " in document");
                     }
                 }
                 return new Position(0);
+            }
+        };
+    }
+
+
+    protected Transformer<Position, Integer> documentOffsetToLineNumber() {
+        return new Transformer<Position, Integer>() {
+            @Override
+            public Integer from(final Position offset) {
+                if (editorInput != null) {
+                    try {
+                        final IDocument document = getDocumentProvider().getDocument(editorInput);
+                        return Integer.valueOf(document.getLineOfOffset(offset.getOffset()));
+                    } catch (final BadLocationException e) {
+                        FeatureEditorPlugin.instance().info(
+                                "Couldn't get line number for offset " + offset + " in document");
+                    }
+                }
+                return Integer.valueOf(-1);
             }
         };
     }

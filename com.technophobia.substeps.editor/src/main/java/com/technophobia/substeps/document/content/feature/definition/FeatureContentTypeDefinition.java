@@ -31,8 +31,9 @@ public class FeatureContentTypeDefinition extends AbstractFeatureContentTypeDefi
 
 
     @Override
-    public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedWordRule(PREFIX_TEXT, colourToken(FeatureColour.BLUE, colourManager));
+    public IRule damageRepairerRule(final ColourManager colourManager,
+            final Supplier<PartitionContext> partitionContextSupplier) {
+        return fixedWordRule(PREFIX_TEXT, boldColourToken(FeatureColour.LIGHT_BLUE, colourManager));
     }
 
 

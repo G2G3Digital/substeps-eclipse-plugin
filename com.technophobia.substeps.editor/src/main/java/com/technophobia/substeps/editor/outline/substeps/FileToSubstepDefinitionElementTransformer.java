@@ -1,6 +1,5 @@
 package com.technophobia.substeps.editor.outline.substeps;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,23 +16,23 @@ import com.technophobia.substeps.model.PatternMap;
 import com.technophobia.substeps.model.Step;
 import com.technophobia.substeps.runner.syntax.SubStepDefinitionParser;
 import com.technophobia.substeps.supplier.Transformer;
+import com.technophobia.substeps.syntax.NullSyntaxErrorReporter;
 
-public class FileToSubstepDefinitionElementTransformer implements Transformer<File, AbstractModelElement> {
+public class FileToSubstepDefinitionElementTransformer implements Transformer<ProjectFile, AbstractModelElement> {
 
     private final Transformer<Integer, Position> lineNumberToPositionTransformer;
-    private final SubStepDefinitionParser parser;
 
 
     public FileToSubstepDefinitionElementTransformer(
             final Transformer<Integer, Position> lineNumberToPositionTransformer) {
         this.lineNumberToPositionTransformer = lineNumberToPositionTransformer;
-        this.parser = new SubStepDefinitionParser();
     }
 
 
     @Override
-    public AbstractModelElement from(final File from) {
-        final PatternMap<ParentStep> stepMap = parser.loadSubSteps(from);
+    public AbstractModelElement from(final ProjectFile from) {
+        final SubStepDefinitionParser parser = new SubStepDefinitionParser(new NullSyntaxErrorReporter());
+        final PatternMap<ParentStep> stepMap = parser.loadSubSteps(from.getFile());
 
         final SubstepsRootElement root = new SubstepsRootElement("Substep", new Position(0));
 

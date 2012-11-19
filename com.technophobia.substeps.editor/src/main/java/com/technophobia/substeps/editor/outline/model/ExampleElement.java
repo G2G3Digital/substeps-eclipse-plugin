@@ -17,11 +17,6 @@ public class ExampleElement extends AbstractModelElement {
     }
 
 
-    public Collection<ExampleRowElement> getExampleRows() {
-        return exampleRows;
-    }
-
-
     public void addExampleRow(final ExampleRowElement exampleRowElement) {
         exampleRowElement.setParent(this);
         this.exampleRows.add(exampleRowElement);
@@ -30,6 +25,12 @@ public class ExampleElement extends AbstractModelElement {
 
     @Override
     public Collection<AbstractModelElement> getChildren() {
-        return Collections.<AbstractModelElement> unmodifiableCollection(getExampleRows());
+        return Collections.<AbstractModelElement> unmodifiableCollection(exampleRows);
+    }
+
+
+    @Override
+    public String toString() {
+        return "Example:" + getText() + "(" + getPosition() + ")";
     }
 }

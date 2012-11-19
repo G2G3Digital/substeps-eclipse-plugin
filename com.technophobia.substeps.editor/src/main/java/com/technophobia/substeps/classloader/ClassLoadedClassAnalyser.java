@@ -3,8 +3,6 @@ package com.technophobia.substeps.classloader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import org.eclipse.core.runtime.IStatus;
-
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.model.SubSteps.AdditionalStepImplementations;
 import com.technophobia.substeps.model.SubSteps.Step;
@@ -87,8 +85,7 @@ public class ClassLoadedClassAnalyser extends ClassAnalyser {
         try {
             return (T) ob.getClass().getMethod(methodName).invoke(ob);
         } catch (final Exception e) {
-            FeatureEditorPlugin.instance().log(IStatus.ERROR,
-                    "Could not invoke method " + methodName + " on object " + ob);
+            FeatureEditorPlugin.instance().error("Could not invoke method " + methodName + " on object " + ob);
             return null;
         }
     }

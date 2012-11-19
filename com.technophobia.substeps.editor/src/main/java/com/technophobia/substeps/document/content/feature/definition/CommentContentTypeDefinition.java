@@ -30,7 +30,8 @@ public class CommentContentTypeDefinition extends AbstractFeatureContentTypeDefi
 
 
     @Override
-    public IRule damageRepairerRule(final ColourManager colourManager) {
+    public IRule damageRepairerRule(final ColourManager colourManager,
+            final Supplier<PartitionContext> partitionContextSupplier) {
         return singleLineRule(PREFIX_TEXT, colourToken(FeatureColour.SLATE, colourManager));
     }
 

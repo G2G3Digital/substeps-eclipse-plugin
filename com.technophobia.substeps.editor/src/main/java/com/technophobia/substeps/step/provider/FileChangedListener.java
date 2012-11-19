@@ -8,7 +8,6 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.supplier.Callback1;
@@ -50,7 +49,7 @@ public class FileChangedListener implements IResourceChangeListener {
                 }
             });
         } catch (final CoreException ex) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING, "Could not handle file change for event " + event);
+            FeatureEditorPlugin.instance().warn("Could not handle file change for event " + event);
         }
         System.out.println(event);
     }

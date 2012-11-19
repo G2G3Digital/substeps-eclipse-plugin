@@ -66,8 +66,9 @@ public class SkipAheadFormattingContext extends PartitionedFormattingContext {
 
 
             @Override
-            public IRule damageRepairerRule(final ColourManager colourManager) {
-                return currentTypeDefinition.damageRepairerRule(colourManager);
+            public IRule damageRepairerRule(final ColourManager colourManager,
+                    final Supplier<PartitionContext> partitionContextSupplier) {
+                return currentTypeDefinition.damageRepairerRule(colourManager, partitionContextSupplier);
             }
         };
     }

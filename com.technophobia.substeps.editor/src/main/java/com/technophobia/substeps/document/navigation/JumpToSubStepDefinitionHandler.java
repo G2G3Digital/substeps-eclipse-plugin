@@ -8,10 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.imageio.stream.FileImageOutputStream;
-
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.eclipse.core.commands.AbstractHandler;
@@ -42,7 +39,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.part.FileEditorInput;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
-import com.technophobia.substeps.document.content.assist.feature.ProjectToSyntaxTransformer;
 import com.technophobia.substeps.editor.FeatureEditor;
 import com.technophobia.substeps.editor.SubstepsEditor;
 import com.technophobia.substeps.model.ParentStep;
@@ -110,18 +106,17 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
 
         if (currentLine != null) {
 
-            FeatureEditorPlugin.info("F3 lookup on line: " + currentLine);
+            FeatureEditorPlugin.instance().info("F3 lookup on line: " + currentLine);
 
             // find this in the corresponding substeps file
 
             // from SubstepSuggestionProvider
-            final ProjectToSyntaxTransformer projectToSyntaxTransformer = new ProjectToSyntaxTransformer();
-            final Syntax syntax = projectToSyntaxTransformer.from(project);
+            final Syntax syntax = FeatureEditorPlugin.instance().syntaxFor(project);
 
             final List<ParentStep> substeps = syntax.getSortedRootSubSteps();
 
             ParentStep substepDefinition = null;
-            
+
             for (final ParentStep rootSubStep : substeps) {
                 // match on the pattern - take into account any
                 // parameters
@@ -131,17 +126,18 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
                     break;
                 }
             }
-            
+
             IFile substepsIFile = null;
-            
+
             if (substepDefinition != null) {
 
                 substepsIFile = getSubstepIFile(project, substepDefinition.getParent().getSource());
 
-                int lineNumber = substepDefinition.getSourceLineNumber();
+                final int lineNumber = substepDefinition.getSourceLineNumber();
 
-                FeatureEditorPlugin.info("rootSubStep.getSourceLineNumber: " + lineNumber + " for line: "
-                        + substepDefinition.getParent().getLine());
+                FeatureEditorPlugin.instance().info(
+                        "rootSubStep.getSourceLineNumber: " + lineNumber + " for line: "
+                                + substepDefinition.getParent().getLine());
 
                 final IEditorInput input = new FileEditorInput(substepsIFile);
 
@@ -152,14 +148,14 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
                     selectLineInEditor(lineNumber, substepsEditor);
 
                 } catch (final PartInitException e) {
-                    FeatureEditorPlugin.error("exception opening substep", e);
+                    FeatureEditorPlugin.instance().error("exception opening substep", e);
                 }
             }
         }
     }
 
 
-    private void selectLineInEditor(int lineNumber, final IEditorPart newEditor) {
+    private void selectLineInEditor(final int lineNumber, final IEditorPart newEditor) {
         final ISelectionProvider newSelectionProvider = newEditor.getEditorSite().getSelectionProvider();
 
         final SubstepsEditor newStepEditor = (SubstepsEditor) newEditor.getAdapter(SubstepsEditor.class);
@@ -175,7 +171,7 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
 
         try {
             // this is zero based
-            IRegion lineInformation = newDocument.getLineInformation(lineNumber - 1);
+            final IRegion lineInformation = newDocument.getLineInformation(lineNumber - 1);
 
             final int newOffset = lineInformation.getOffset();
 
@@ -183,27 +179,27 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
 
             newSelectionProvider.setSelection(new TextSelection(newDocument, newOffset, selectionLength));
 
-        } catch (BadLocationException e) {
-            FeatureEditorPlugin.error("BadLocationException@ " + lineNumber, e);
+        } catch (final BadLocationException e) {
+            FeatureEditorPlugin.instance().error("BadLocationException@ " + lineNumber, e);
         }
     }
 
 
-    private IFile getSubstepIFile(final IProject project, File substepDefinitionFile) {
-       
+    private IFile getSubstepIFile(final IProject project, final File substepDefinitionFile) {
+
         IFile substepsIFile = null;
         // this file will be on the output path
-        String substepOutputFile = substepDefinitionFile.getAbsolutePath();
+        final String substepOutputFile = substepDefinitionFile.getAbsolutePath();
 
         // we're only interested in the bit after the project
 
-        IJavaProject javaProject = JavaCore.create(project);
+        final IJavaProject javaProject = JavaCore.create(project);
         final Set<IPath> exclusionSet = new HashSet<IPath>();
 
         try {
-            IClasspathEntry[] rawClasspath = javaProject.getRawClasspath();
+            final IClasspathEntry[] rawClasspath = javaProject.getRawClasspath();
 
-            for (IClasspathEntry classpathEntry : rawClasspath) {
+            for (final IClasspathEntry classpathEntry : rawClasspath) {
 
                 if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
 
@@ -217,34 +213,35 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
                     exclusionSet.add(outputLocation);
                     // We will have searched here.
 
-                    IPath projPath = project.getFullPath();
+                    final IPath projPath = project.getFullPath();
 
-                    int matchSegs = outputLocation.matchingFirstSegments(projPath);
+                    final int matchSegs = outputLocation.matchingFirstSegments(projPath);
 
-                    IPath removeFirstSegments = outputLocation.removeFirstSegments(matchSegs);
+                    final IPath removeFirstSegments = outputLocation.removeFirstSegments(matchSegs);
 
-                    IFile outputFile = project.getFile(removeFirstSegments);
+                    final IFile outputFile = project.getFile(removeFirstSegments);
 
-                    URI locationURI = outputFile.getLocationURI();
+                    final URI locationURI = outputFile.getLocationURI();
 
                     if (substepOutputFile.startsWith(locationURI.getPath())) {
 
                         // this is the ice we're interested in
-                        String classpathRelativePath = substepOutputFile.substring(locationURI.getPath()
-                                .length());
+                        final String classpathRelativePath = substepOutputFile
+                                .substring(locationURI.getPath().length());
 
-                        IFolder sourceIFolder = project.getFolder(classpathEntry.getPath().removeFirstSegments(1));
+                        final IFolder sourceIFolder = project
+                                .getFolder(classpathEntry.getPath().removeFirstSegments(1));
                         substepsIFile = sourceIFolder.getFile(classpathRelativePath);
                         if (substepsIFile.exists()) {
                             // Might not get a file
-                           
+
                             break;
                         }
                     }
                 }
             }
-        } catch (JavaModelException e1) {
-            FeatureEditorPlugin.error("JavaModelException", e1);
+        } catch (final JavaModelException e1) {
+            FeatureEditorPlugin.instance().error("JavaModelException", e1);
         }
 
         if (substepsIFile == null || !substepsIFile.exists()) {
@@ -255,18 +252,18 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
     }
 
 
-    private IFile searchForFile(final IProject project, String filename, IFile substepsIFile,
+    private IFile searchForFile(final IProject project, final String filename, IFile substepsIFile,
             final Set<IPath> exclusionSet) {
         final File file = new File(project.getLocationURI());
-        IOFileFilter nameFileFilter = FileFilterUtils.nameFileFilter(filename);
+        final IOFileFilter nameFileFilter = FileFilterUtils.nameFileFilter(filename);
 
         IOFileFilter dirnameFilter = FileFilterUtils.directoryFileFilter();
-        for (IPath path : exclusionSet) {
+        for (final IPath path : exclusionSet) {
             dirnameFilter = FileFilterUtils.and(dirnameFilter,
                     FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter(path.lastSegment())));
         }
 
-        Collection<File> listFiles = FileUtils.listFiles(file, nameFileFilter, dirnameFilter);
+        final Collection<File> listFiles = FileUtils.listFiles(file, nameFileFilter, dirnameFilter);
         if (listFiles.size() > 1) {
             throw new IllegalStateException("more than one file found"); // TODO
                                                                          // something
@@ -278,6 +275,7 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
         }
         return substepsIFile;
     }
+
 
     /**
      * @param currentDocument
@@ -303,7 +301,7 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
             rtn = line.trim();
 
         } catch (final BadLocationException e) {
-            FeatureEditorPlugin.error("BadLocationException getting current line @offset: " + offset, e);
+            FeatureEditorPlugin.instance().error("BadLocationException getting current line @offset: " + offset, e);
         }
 
         return rtn;

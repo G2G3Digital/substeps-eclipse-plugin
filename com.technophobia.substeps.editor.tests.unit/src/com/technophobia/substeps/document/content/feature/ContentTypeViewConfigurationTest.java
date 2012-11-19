@@ -36,6 +36,8 @@ import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.assist.ContentAssistantFactory;
 import com.technophobia.substeps.document.content.view.ContentTypeViewConfiguration;
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
+import com.technophobia.substeps.document.partition.PartitionContext;
+import com.technophobia.substeps.supplier.Supplier;
 
 @RunWith(JMock.class)
 public class ContentTypeViewConfigurationTest {
@@ -46,10 +48,12 @@ public class ContentTypeViewConfigurationTest {
     private ContentTypeDefinitionFactory contentTypeDefinitionFactory;
     private FormattingContextFactory formattingContextFactory;
     private ContentAssistantFactory contentAssistantFactory;
+    private Supplier<PartitionContext> partitionContextSupplier;
 
     private ContentTypeViewConfiguration viewConfiguration;
 
 
+    @SuppressWarnings("unchecked")
     @Before
     public void initialise() {
         this.context = new Mockery();
@@ -58,9 +62,10 @@ public class ContentTypeViewConfigurationTest {
         this.contentTypeDefinitionFactory = context.mock(ContentTypeDefinitionFactory.class);
         this.formattingContextFactory = context.mock(FormattingContextFactory.class);
         this.contentAssistantFactory = context.mock(ContentAssistantFactory.class);
+        this.partitionContextSupplier = context.mock(Supplier.class);
 
         this.viewConfiguration = new ContentTypeViewConfiguration(colourManager, contentTypeDefinitionFactory,
-                formattingContextFactory, contentAssistantFactory);
+                formattingContextFactory, contentAssistantFactory, partitionContextSupplier);
     }
 
 

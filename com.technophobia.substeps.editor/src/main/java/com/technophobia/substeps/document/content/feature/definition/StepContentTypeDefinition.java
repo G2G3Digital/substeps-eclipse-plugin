@@ -51,9 +51,15 @@ public class StepContentTypeDefinition extends AbstractFeatureContentTypeDefinit
 
 
     @Override
-    public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedWordSetRule(new String[] { "Given", "When", "Then", "And" },
-                colourToken(FeatureColour.PINK, colourManager));
+    public IRule damageRepairerRule(final ColourManager colourManager,
+            final Supplier<PartitionContext> partitionContextSupplier) {
+        final IToken token = colourToken(FeatureColour.BLUE, colourManager);
+        final TextProcessor<IToken> textProcessor = new SuggestionManagerTextProcessor(token,
+                projectSupplier(partitionContextSupplier), suggestionManagerSupplier(partitionContextSupplier));
+        final TextExtractor<ICharacterScanner, IToken> textExtractor = new CharacterScannerToProcessedTextExtractor(
+                textProcessor);
+
+        return new SuggestionManagerPredicateRule(token, textExtractor);
     }
 
 

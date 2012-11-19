@@ -46,7 +46,9 @@ import com.technophobia.substeps.document.content.feature.FeatureColour;
 import com.technophobia.substeps.document.formatting.ContextAwareContentFormatter;
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
 import com.technophobia.substeps.document.formatting.strategy.NullFormattingStrategy;
+import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.document.text.rule.word.AnySingleWordDetector;
+import com.technophobia.substeps.supplier.Supplier;
 
 /**
  * SourceViewerConfiguration for rendering {@link TextEditor}s using a
@@ -63,16 +65,19 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
     private Map<String, ContentTypeDefinition> contentTypeDefinitionMap = null;
     private final ContentTypeDefinitionFactory contentTypeDefinitionFactory;
     private final ContentAssistantFactory contentAssistantFactory;
+    private final Supplier<PartitionContext> partitionContextSupplier;
 
 
     public ContentTypeViewConfiguration(final ColourManager colourManager,
             final ContentTypeDefinitionFactory contentTypeDefinitionFactory,
             final FormattingContextFactory formattingContextFactory,
-            final ContentAssistantFactory contentAssistantFactory) {
+            final ContentAssistantFactory contentAssistantFactory,
+            final Supplier<PartitionContext> partitionContextSupplier) {
         this.colourManager = colourManager;
         this.contentTypeDefinitionFactory = contentTypeDefinitionFactory;
         this.formattingContextFactory = formattingContextFactory;
         this.contentAssistantFactory = contentAssistantFactory;
+        this.partitionContextSupplier = partitionContextSupplier;
     }
 
 
@@ -89,7 +94,8 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
 
         for (final Map.Entry<String, ContentTypeDefinition> entry : definitionMap().entrySet()) {
             if (entry.getValue() != null) {
-                setDamagerRepairer(entry.getKey(), entry.getValue().damageRepairerRule(colourManager), reconciler);
+                setDamagerRepairer(entry.getKey(),
+                        entry.getValue().damageRepairerRule(colourManager, partitionContextSupplier), reconciler);
             }
         }
 

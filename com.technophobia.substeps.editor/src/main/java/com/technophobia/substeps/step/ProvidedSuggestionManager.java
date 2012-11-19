@@ -2,6 +2,7 @@ package com.technophobia.substeps.step;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,9 +46,9 @@ public class ProvidedSuggestionManager implements ContextualSuggestionManager, P
 
 
     @Override
-    public List<String> suggestionsFor(final IResource resource) {
+    public List<Suggestion> suggestionsFor(final IResource resource) {
 
-        final Set<String> suggestions = new HashSet<String>();
+        final Set<Suggestion> suggestions = new HashSet<Suggestion>();
 
         final IProject project = resourceToProjectTransformer.from(resource);
 
@@ -57,7 +58,9 @@ public class ProvidedSuggestionManager implements ContextualSuggestionManager, P
                 suggestions.addAll(provider.suggestionsFor(project));
             }
         }
-        return new ArrayList<String>(suggestions);
+        final List<Suggestion> suggestionsList = new ArrayList<Suggestion>(suggestions);
+        Collections.sort(suggestionsList);
+        return suggestionsList;
     }
 
 

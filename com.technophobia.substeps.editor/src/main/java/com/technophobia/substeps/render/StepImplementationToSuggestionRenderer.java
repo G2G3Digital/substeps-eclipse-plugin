@@ -1,6 +1,7 @@
 package com.technophobia.substeps.render;
 
 import com.technophobia.substeps.model.StepImplementation;
+import com.technophobia.substeps.step.Suggestion;
 
 /**
  * Get a string representation of a {@link StepImplementation}
@@ -8,14 +9,14 @@ import com.technophobia.substeps.model.StepImplementation;
  * @author sforbes
  * 
  */
-public interface StepImplementationRenderer {
+public interface StepImplementationToSuggestionRenderer {
 
     /**
-     * Convert stepImplementation to string
+     * Convert stepImplementation to Suggestion
      * 
      * @param stepImplementation
      *            the step to be rendered
-     * @return the rendered step
+     * @return the rendered Suggestion
      */
-    String render(StepImplementation stepImplementation);
+    Suggestion render(StepImplementation stepImplementation);
 }

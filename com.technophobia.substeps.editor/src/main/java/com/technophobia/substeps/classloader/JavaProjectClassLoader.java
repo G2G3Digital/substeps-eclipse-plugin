@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.launching.JavaRuntime;
@@ -71,8 +70,7 @@ public class JavaProjectClassLoader extends ClassLoader {
         try {
             return JavaRuntime.computeDefaultRuntimeClassPath(project);
         } catch (final CoreException e) {
-            FeatureEditorPlugin.instance().log(
-                    IStatus.ERROR,
+            FeatureEditorPlugin.instance().error(
                     "Could not get classpath entries for project " + project.getProject().getName()
                             + ", returning empty array");
             return new String[0];
@@ -93,8 +91,7 @@ public class JavaProjectClassLoader extends ClassLoader {
             final URL url = path.toFile().toURI().toURL();
             return url;
         } catch (final MalformedURLException ex) {
-            FeatureEditorPlugin.instance().log(IStatus.ERROR,
-                    "classpath entry " + entry + " could not be mapped to a url");
+            FeatureEditorPlugin.instance().error("classpath entry " + entry + " could not be mapped to a url");
             return null;
         }
     }
