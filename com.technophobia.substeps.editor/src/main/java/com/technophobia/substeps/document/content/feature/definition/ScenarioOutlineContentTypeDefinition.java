@@ -30,8 +30,9 @@ public class ScenarioOutlineContentTypeDefinition extends AbstractFeatureContent
 
 
     @Override
-    public IRule damageRepairerRule(final ColourManager colourManager) {
-        return fixedMultiWordRule(PREFIX_TEXT, colourToken(FeatureColour.BLUE, colourManager));
+    public IRule damageRepairerRule(final ColourManager colourManager,
+            final Supplier<PartitionContext> partitionContextSupplier) {
+        return fixedMultiWordRule(PREFIX_TEXT, boldColourToken(FeatureColour.LIGHT_BLUE, colourManager));
     }
 
 

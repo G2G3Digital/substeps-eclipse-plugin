@@ -26,7 +26,8 @@ public abstract class AbstractKeywordContentTypeDefinition extends AbstractFeatu
 
 
     @Override
-    public IRule damageRepairerRule(final ColourManager colourManager) {
+    public IRule damageRepairerRule(final ColourManager colourManager,
+            final Supplier<PartitionContext> partitionContextSupplier) {
         return fixedWordRule(prefixText, colourToken(FeatureColour.PINK, colourManager));
     }
 

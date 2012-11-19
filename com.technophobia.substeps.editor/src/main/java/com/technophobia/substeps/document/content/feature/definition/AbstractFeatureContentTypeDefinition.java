@@ -8,6 +8,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
+import org.eclipse.swt.SWT;
 
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
@@ -52,6 +53,11 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
 
     protected IToken colourToken(final FeatureColour colour, final ColourManager colourManager) {
         return new Token(new TextAttribute(colourManager.getColor(colour.colour())));
+    }
+
+
+    protected IToken boldColourToken(final FeatureColour colour, final ColourManager colourManager) {
+        return new Token(new TextAttribute(colourManager.getColor(colour.colour()), null, SWT.BOLD));
     }
 
 

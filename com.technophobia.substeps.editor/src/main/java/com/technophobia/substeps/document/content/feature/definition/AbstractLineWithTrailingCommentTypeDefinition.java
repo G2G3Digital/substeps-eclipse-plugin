@@ -29,7 +29,8 @@ public abstract class AbstractLineWithTrailingCommentTypeDefinition extends Abst
 
 
     @Override
-    public IRule damageRepairerRule(final ColourManager colourManager) {
+    public IRule damageRepairerRule(final ColourManager colourManager,
+            final Supplier<PartitionContext> partitionContextSupplier) {
         return fixedWordRule(prefixText, colourToken(featureColour, colourManager));
     }
 }

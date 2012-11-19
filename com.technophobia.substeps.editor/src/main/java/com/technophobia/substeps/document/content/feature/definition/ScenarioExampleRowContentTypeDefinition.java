@@ -29,7 +29,8 @@ public class ScenarioExampleRowContentTypeDefinition extends AbstractFeatureCont
 
 
     @Override
-    public IRule damageRepairerRule(final ColourManager colourManager) {
+    public IRule damageRepairerRule(final ColourManager colourManager,
+            final Supplier<PartitionContext> partitionContextSupplier) {
         return fixedWordRule(PREFIX_TEXT, colourToken(FeatureColour.BLACK, colourManager));
     }
 

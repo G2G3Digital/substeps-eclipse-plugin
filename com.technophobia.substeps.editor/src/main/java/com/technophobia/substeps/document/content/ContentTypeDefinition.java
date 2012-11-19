@@ -74,7 +74,7 @@ public interface ContentTypeDefinition {
      * 
      * @return DamageRepairer Rule
      */
-    IRule damageRepairerRule(ColourManager colourManager);
+    IRule damageRepairerRule(ColourManager colourManager, final Supplier<PartitionContext> partitionContextSupplier);
 
 
     /**

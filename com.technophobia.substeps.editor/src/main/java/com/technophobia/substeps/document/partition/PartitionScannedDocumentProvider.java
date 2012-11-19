@@ -22,10 +22,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
 
-import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.supplier.Supplier;
 
 /**
@@ -41,9 +39,13 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
 
     private IDocument thisDocument = null;
 
+    private final Supplier<PartitionContext> partitionContextSupplier;
 
-    public PartitionScannedDocumentProvider(final PartitionScannerFactory partitionScannerFactory) {
+
+    public PartitionScannedDocumentProvider(final PartitionScannerFactory partitionScannerFactory,
+            final Supplier<PartitionContext> partitionContextSupplier) {
         this.partitionScannerFactory = partitionScannerFactory;
+        this.partitionContextSupplier = partitionContextSupplier;
     }
 
 
@@ -51,7 +53,7 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
     protected IDocument createDocument(final Object element) throws CoreException {
         thisDocument = super.createDocument(element);
         if (thisDocument != null) {
-            attachPartitionerTo(thisDocument, partitionerContextFrom(element));
+            attachPartitionerTo(thisDocument, partitionContextSupplier);
         }
 
         return thisDocument;
@@ -75,20 +77,5 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
                 partitionScannerFactory.legalContentTypes());
         partitioner.connect(document);
         document.setDocumentPartitioner(partitioner);
-    }
-
-
-    private Supplier<PartitionContext> partitionerContextFrom(final Object element) {
-        return new Supplier<PartitionContext>() {
-
-            @Override
-            public PartitionContext get() {
-                if (element instanceof IEditorInput) {
-                    return new EditorInputPartitionContext((IEditorInput) element, FeatureEditorPlugin.instance()
-                            .getSuggestionManager());
-                }
-                return new CurrentSelectionPartitionContext();
-            }
-        };
     }
 }

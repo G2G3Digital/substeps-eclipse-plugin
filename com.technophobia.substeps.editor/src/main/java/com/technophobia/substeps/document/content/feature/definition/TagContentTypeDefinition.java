@@ -32,8 +32,9 @@ public class TagContentTypeDefinition extends AbstractFeatureContentTypeDefiniti
 
 
     @Override
-    public IRule damageRepairerRule(final ColourManager colourManager) {
-        return paragraphRule(PREFIX_TEXT, colourToken(FeatureColour.GREEN, colourManager), true,
+    public IRule damageRepairerRule(final ColourManager colourManager,
+            final Supplier<PartitionContext> partitionContextSupplier) {
+        return paragraphRule(PREFIX_TEXT, boldColourToken(FeatureColour.GREEN, colourManager), true,
                 VALID_PROCEEDING_CONTENT_TYPES);
     }
 

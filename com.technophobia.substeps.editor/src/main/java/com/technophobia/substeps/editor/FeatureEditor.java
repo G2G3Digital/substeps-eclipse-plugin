@@ -53,6 +53,8 @@ import com.technophobia.substeps.document.content.partition.ContentTypeRuleBased
 import com.technophobia.substeps.document.content.view.ContentTypeViewConfiguration;
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
 import com.technophobia.substeps.document.formatting.partition.PartitionedFormattingContextFactory;
+import com.technophobia.substeps.document.partition.EditorInputPartitionContext;
+import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.document.partition.PartitionScannedDocumentProvider;
 import com.technophobia.substeps.editor.outline.OutlineLabelProvider;
 import com.technophobia.substeps.editor.outline.SubstepsContentOutlinePage;
@@ -88,10 +90,11 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                 processorSupplier(), (Callback1<IContentAssistant>) new AutoActivatingContentAssistantDecorator());
         colourManager = new ColourManager();
 
+        final Supplier<PartitionContext> partitionContextSupplier = partitionContextSupplier();
         setSourceViewerConfiguration(new ContentTypeViewConfiguration(colourManager, contentTypeDefinitionFactory,
-                formattingContextFactory, contentAssistantFactory));
+                formattingContextFactory, contentAssistantFactory, partitionContextSupplier));
         setDocumentProvider(new PartitionScannedDocumentProvider(new ContentTypeRuleBasedPartitionScannerFactory(
-                contentTypeDefinitionFactory)));
+                contentTypeDefinitionFactory), partitionContextSupplier));
     }
 
 
@@ -168,6 +171,19 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                         .getSuggestionManager()).get();
             }
 
+        };
+    }
+
+
+    private Supplier<PartitionContext> partitionContextSupplier() {
+        return new Supplier<PartitionContext>() {
+
+            @Override
+            public PartitionContext get() {
+                return new EditorInputPartitionContext(getEditorInput(), FeatureEditorPlugin.instance()
+                        .getSuggestionManager());
+
+            }
         };
     }
 

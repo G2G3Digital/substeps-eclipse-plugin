@@ -43,7 +43,8 @@ public class NullContentTypeDefinition implements ContentTypeDefinition {
 
 
     @Override
-    public IRule damageRepairerRule(final ColourManager colourManager) {
+    public IRule damageRepairerRule(final ColourManager colourManager,
+            final Supplier<PartitionContext> partitionContextSupplier) {
         return null;
     }
 
