@@ -23,7 +23,7 @@ import com.technophobia.substeps.supplier.Transformer;
 public class ExternalStepImplementationProvider extends AbstractMultiProjectSuggestionProvider implements
         ProjectStepImplementationProvider, ProjectChangedListener {
 
-    private static final String REGEX = "([^\"]*)\"";
+    private static final String REGEX = "([^\"]*)";
 
     private final Transformer<IProject, List<StepImplementationsDescriptor>> stepImplementationLoader;
     private final Map<IProject, Set<String>> externalStepClassesForProject;
