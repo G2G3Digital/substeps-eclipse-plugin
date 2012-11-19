@@ -15,11 +15,6 @@ public class ScenarioOutlineElement extends AbstractStepContainerElement {
     }
 
 
-    public ExampleElement getExample() {
-        return example;
-    }
-
-
     public void setExample(final ExampleElement example) {
         this.example = example;
         this.example.setParent(this);
@@ -35,5 +30,11 @@ public class ScenarioOutlineElement extends AbstractStepContainerElement {
             return updated;
         }
         return children;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Scenario Outline:" + getText() + "(" + getPosition() + ")";
     }
 }

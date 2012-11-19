@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.technophobia.substeps.step.ContextualSuggestionManager;
+import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Supplier;
 
 @RunWith(JMock.class)
@@ -25,8 +26,8 @@ public class SuggestionManagerTextProcessorTest {
 
     private static final IToken token = new Token("Test");
 
-    private static final Collection<String> suggestions = Arrays.asList("suggestion-1", "suggestion-2", "suggestion-3",
-            "valid-suggestion");
+    private static final Collection<Suggestion> suggestions = Arrays.asList(new Suggestion("suggestion-1"),
+            new Suggestion("suggestion-2"), new Suggestion("suggestion-3"), new Suggestion("valid-suggestion"));
 
     private Mockery context;
 

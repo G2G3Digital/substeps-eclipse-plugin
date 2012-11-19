@@ -6,5 +6,5 @@ import org.eclipse.core.resources.IResource;
 
 public interface ContextualSuggestionManager {
 
-    List<String> suggestionsFor(IResource resource);
+    List<Suggestion> suggestionsFor(IResource resource);
 }

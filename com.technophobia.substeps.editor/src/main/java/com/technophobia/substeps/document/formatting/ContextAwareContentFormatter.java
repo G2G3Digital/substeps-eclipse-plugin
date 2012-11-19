@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DefaultPositionUpdater;
@@ -362,7 +361,7 @@ public class ContextAwareContentFormatter implements IContentFormatter, Supplier
             }
             return positions;
         } catch (final BadLocationException ex) {
-            FeatureEditorPlugin.instance().log(IStatus.ERROR,
+            FeatureEditorPlugin.instance().error(
                     "Could not get all typed positions for document, message was " + ex.getMessage());
         }
         return new TypedPosition[0];

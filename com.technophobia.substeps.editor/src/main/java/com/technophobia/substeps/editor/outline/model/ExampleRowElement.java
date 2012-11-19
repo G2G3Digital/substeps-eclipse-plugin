@@ -7,4 +7,10 @@ public class ExampleRowElement extends AbstractModelElement {
     public ExampleRowElement(final String text, final Position position) {
         super(text, position);
     }
+
+
+    @Override
+    public String toString() {
+        return "Example Row:" + getText() + "(" + getPosition() + ")";
+    }
 }

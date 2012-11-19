@@ -57,7 +57,8 @@ public class ProvidedSuggestionManagerTest {
     public void singleProviderFindsSuggestions() {
         final ProjectSuggestionProvider provider = context.mock(ProjectSuggestionProvider.class);
         final IProject project = context.mock(IProject.class);
-        final Collection<String> suggestions = Arrays.asList("suggestion-1", "suggestion-2", "suggestion-3");
+        final Collection<Suggestion> suggestions = Arrays.asList(new Suggestion("suggestion-1"), new Suggestion(
+                "suggestion-2"), new Suggestion("suggestion-3"));
 
         context.checking(new Expectations() {
             {
@@ -73,7 +74,7 @@ public class ProvidedSuggestionManagerTest {
         suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, provider);
 
         assertThat(suggestionManager.suggestionsFor(resource),
-                hasItems(suggestions.toArray(new String[suggestions.size()])));
+                hasItems(suggestions.toArray(new Suggestion[suggestions.size()])));
     }
 
 
@@ -82,8 +83,10 @@ public class ProvidedSuggestionManagerTest {
         final ProjectSuggestionProvider provider1 = context.mock(ProjectSuggestionProvider.class, "provider1");
         final ProjectSuggestionProvider provider2 = context.mock(ProjectSuggestionProvider.class, "provider2");
         final IProject project = context.mock(IProject.class);
-        final Collection<String> suggestions1 = Arrays.asList("suggestion-11", "suggestion-12", "suggestion-13");
-        final Collection<String> suggestions2 = Arrays.asList("suggestion-21", "suggestion-22", "suggestion-23");
+        final Collection<Suggestion> suggestions1 = Arrays.asList(new Suggestion("suggestion-11"), new Suggestion(
+                "suggestion-12"), new Suggestion("suggestion-13"));
+        final Collection<Suggestion> suggestions2 = Arrays.asList(new Suggestion("suggestion-21"), new Suggestion(
+                "suggestion-22"), new Suggestion("suggestion-23"));
 
         context.checking(new Expectations() {
             {
@@ -101,10 +104,11 @@ public class ProvidedSuggestionManagerTest {
         suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, provider1);
         suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, provider2);
 
-        final Collection<String> expectedSuggestions = Arrays.asList("suggestion-11", "suggestion-12", "suggestion-13",
-                "suggestion-21", "suggestion-22", "suggestion-23");
+        final Collection<Suggestion> expectedSuggestions = Arrays.asList(new Suggestion("suggestion-11"),
+                new Suggestion("suggestion-12"), new Suggestion("suggestion-13"), new Suggestion("suggestion-21"),
+                new Suggestion("suggestion-22"), new Suggestion("suggestion-23"));
         assertThat(suggestionManager.suggestionsFor(resource),
-                hasItems(expectedSuggestions.toArray(new String[expectedSuggestions.size()])));
+                hasItems(expectedSuggestions.toArray(new Suggestion[expectedSuggestions.size()])));
     }
 
 
@@ -113,8 +117,10 @@ public class ProvidedSuggestionManagerTest {
         final ProjectSuggestionProvider provider1 = context.mock(ProjectSuggestionProvider.class, "provider1");
         final ProjectSuggestionProvider provider2 = context.mock(ProjectSuggestionProvider.class, "provider2");
         final IProject project = context.mock(IProject.class);
-        final Collection<String> suggestions1 = Arrays.asList("suggestion-1", "suggestion-2", "suggestion-3");
-        final Collection<String> suggestions2 = Arrays.asList("suggestion-1", "suggestion-4", "suggestion-3");
+        final Collection<Suggestion> suggestions1 = Arrays.asList(new Suggestion("suggestion-1"), new Suggestion(
+                "suggestion-2"), new Suggestion("suggestion-3"));
+        final Collection<Suggestion> suggestions2 = Arrays.asList(new Suggestion("suggestion-1"), new Suggestion(
+                "suggestion-4"), new Suggestion("suggestion-3"));
 
         context.checking(new Expectations() {
             {
@@ -132,10 +138,9 @@ public class ProvidedSuggestionManagerTest {
         suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, provider1);
         suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, provider2);
 
-        final Collection<String> expectedSuggestions = Arrays.asList("suggestion-1", "suggestion-2", "suggestion-3",
-                "suggestion-4");
+        final Collection<Suggestion> expectedSuggestions = Arrays.asList(new Suggestion("suggestion-1"),
+                new Suggestion("suggestion-2"), new Suggestion("suggestion-3"), new Suggestion("suggestion-4"));
         assertThat(suggestionManager.suggestionsFor(resource),
-                hasItems(expectedSuggestions.toArray(new String[expectedSuggestions.size()])));
+                hasItems(expectedSuggestions.toArray(new Suggestion[expectedSuggestions.size()])));
     }
-    
 }

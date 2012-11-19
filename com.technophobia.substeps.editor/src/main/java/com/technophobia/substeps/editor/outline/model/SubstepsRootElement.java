@@ -23,13 +23,14 @@ public class SubstepsRootElement extends AbstractModelElement {
     }
 
 
-    public Collection<SubstepsDefinitionElement> getSubstepsDefinitions() {
-        return substepsDefinitions;
+    @Override
+    public Collection<AbstractModelElement> getChildren() {
+        return Collections.<AbstractModelElement> unmodifiableCollection(substepsDefinitions);
     }
 
 
     @Override
-    public Collection<AbstractModelElement> getChildren() {
-        return Collections.<AbstractModelElement> unmodifiableCollection(getSubstepsDefinitions());
+    public String toString() {
+        return "Substeps Root:" + getText() + "(" + getPosition() + ")";
     }
 }

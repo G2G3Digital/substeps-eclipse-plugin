@@ -22,7 +22,7 @@ import com.technophobia.substeps.supplier.Transformer;
 
 public class FeatureFileToElementTransformer implements Transformer<FeatureFile, FeatureElement> {
 
-    private final static String TAG_POSITIONS = "__tag_positions";
+    // private final static String TAG_POSITIONS = "__tag_positions";
     private final Transformer<Integer, Position> lineNumberToPositionTransformer;
 
 
@@ -34,7 +34,7 @@ public class FeatureFileToElementTransformer implements Transformer<FeatureFile,
     @Override
     public FeatureElement from(final FeatureFile file) {
 
-        final FeatureElement element = new FeatureElement(file.getDescription(), asOffsetPosition(0));
+        final FeatureElement element = new FeatureElement(file.getName(), asOffsetPosition(0));
 
         addBackground(element, file);
 
@@ -102,10 +102,11 @@ public class FeatureFileToElementTransformer implements Transformer<FeatureFile,
     private String exampleRowFrom(final Map<String, String> examples) {
         final StringBuilder sb = new StringBuilder();
         for (final String example : examples.values()) {
-            if (sb.length() > 0) {
+            if (sb.length() == 0) {
                 sb.append("|");
             }
             sb.append(example);
+            sb.append("|");
         }
         return sb.toString();
     }

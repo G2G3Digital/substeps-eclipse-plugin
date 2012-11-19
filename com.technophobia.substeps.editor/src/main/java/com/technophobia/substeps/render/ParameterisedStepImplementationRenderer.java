@@ -1,6 +1,8 @@
 package com.technophobia.substeps.render;
 
 import com.technophobia.substeps.model.StepImplementation;
+import com.technophobia.substeps.step.PatternSuggestion;
+import com.technophobia.substeps.step.Suggestion;
 
 /**
  * For rendering during content assist - render the {@link StepImplementation},
@@ -9,18 +11,25 @@ import com.technophobia.substeps.model.StepImplementation;
  * @author sforbes
  * 
  */
-public class ParameterisedStepImplementationRenderer implements StepImplementationRenderer {
+public class ParameterisedStepImplementationRenderer implements StepImplementationToSuggestionRenderer {
 
     @Override
-    public String render(final StepImplementation stepImplementation) {
+    public Suggestion render(final StepImplementation stepImplementation) {
         // replace any regex's with parameter names
+
         if (stepImplementation.getMethod().getParameterTypes() != null
                 && stepImplementation.getMethod().getParameterTypes().length > 0) {
             // tokens to be replaced
-            return replaceRegExParams(stepImplementation.getValue(), "value");
+            return patternSuggestion(stepImplementation);
         }
 
-        return stepImplementation.getValue();
+        return new Suggestion(stepImplementation.getValue());
+    }
+
+
+    public Suggestion patternSuggestion(final StepImplementation stepImplementation) {
+        return new PatternSuggestion(stepImplementation.getValue(), replaceRegExParams(stepImplementation.getValue(),
+                "value"));
     }
 
 

@@ -1,4 +1,4 @@
-package com.technophobia.substeps.document.content.assist.feature;
+package com.technophobia.substeps.syntax;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
@@ -28,6 +27,12 @@ import com.technophobia.substeps.supplier.Transformer;
 
 public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax> {
 
+    ProjectToSyntaxTransformer() {
+        // package scope constructor to encourage use of the
+        // CachingProjectToSyntaxTransformer
+    }
+
+
     @Override
     public Syntax from(final IProject project) {
 
@@ -40,11 +45,15 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
             final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
             stepClasses.addAll(stepClasses(outputFolder, classLocator));
         }
+
         try {
-            return SyntaxBuilder.buildSyntax(stepClasses, new File(projectLocationPath(javaProject).toOSString()),
-                    true, null, new ClassLoadedClassAnalyser(classLoader), false);
+            final DeferredReportingSyntaxErrorReporter syntaxErrorReporter = new MarkerSyntaxErrorReporter(project);
+            final Syntax syntax = SyntaxBuilder.buildSyntax(stepClasses, new File(projectLocationPath(javaProject)
+                    .toOSString()), true, null, new ClassLoadedClassAnalyser(classLoader), true, syntaxErrorReporter);
+            syntaxErrorReporter.applyChanges();
+            return syntax;
         } catch (final RuntimeException ex) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+            FeatureEditorPlugin.instance().warn(
                     "Error when building syntax for project " + project + ": " + ex.getMessage());
             final Syntax nullSyntax = new Syntax();
             nullSyntax.setSubStepsMap(new PatternMap<ParentStep>());
@@ -77,7 +86,7 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
                 }
             }
         } catch (final JavaModelException ex) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+            FeatureEditorPlugin.instance().warn(
                     "Could not get output folder location for project " + project.getElementName());
         }
 
@@ -96,7 +105,7 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
 
 
     private List<Class<?>> stepClasses(final String outputFolder, final ClassLocator classLocator) {
-        FeatureEditorPlugin.instance().log(IStatus.INFO, "output folder " + outputFolder);
+        FeatureEditorPlugin.instance().info("output folder " + outputFolder);
         return toList(classLocator.fromPath(outputFolder));
     }
 

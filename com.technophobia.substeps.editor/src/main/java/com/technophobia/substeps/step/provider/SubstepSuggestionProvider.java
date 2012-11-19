@@ -6,14 +6,17 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspace;
 
+import com.technophobia.eclipse.project.ProjectFileChangedListener;
 import com.technophobia.substeps.model.ParentStep;
+import com.technophobia.substeps.model.Step;
 import com.technophobia.substeps.model.Syntax;
-import com.technophobia.substeps.supplier.Callback1;
+import com.technophobia.substeps.step.PatternSuggestion;
+import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Transformer;
 
-public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionProvider {
+public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionProvider implements
+        ProjectFileChangedListener {
 
     private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
 
@@ -24,28 +27,20 @@ public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionPro
 
 
     @Override
-    public void load(final IWorkspace workspace) {
-        super.load(workspace);
-
-        workspace.addResourceChangeListener(new FileChangedListener("substeps", new Callback1<IFile>() {
-
-            @Override
-            public void doCallback(final IFile file) {
-                final IProject project = file.getProject();
-                markAsStale(project);
-            }
-        }));
+    public void projectFileChange(final IProject project, final IFile file) {
+        markAsStale(project);
     }
 
 
     @Override
-    protected Collection<String> findStepImplementationsFor(final IProject project) {
+    protected Collection<Suggestion> findStepImplementationsFor(final IProject project) {
         final Syntax syntax = projectToSyntaxTransformer.from(project);
 
         final List<ParentStep> substeps = syntax.getSortedRootSubSteps();
-        final List<String> suggestions = new ArrayList<String>();
+        final List<Suggestion> suggestions = new ArrayList<Suggestion>(substeps.size());
         for (final ParentStep substep : substeps) {
-            suggestions.add(substep.getParent().getLine());
+            final Step parentStep = substep.getParent();
+            suggestions.add(new PatternSuggestion(parentStep.getPattern(), parentStep.getLine()));
         }
         return suggestions;
     }
