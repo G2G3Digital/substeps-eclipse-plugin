@@ -21,6 +21,7 @@ package com.technophobia.substeps.editor;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
@@ -116,6 +117,14 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     @Override
     public void doFormat() {
         ((SourceViewer) getSourceViewer()).doOperation(ISourceViewer.FORMAT);
+    }
+
+
+    @Override
+    public void doSave(final IProgressMonitor progressMonitor) {
+        super.doSave(progressMonitor);
+
+        outlinePage.update();
     }
 
 
