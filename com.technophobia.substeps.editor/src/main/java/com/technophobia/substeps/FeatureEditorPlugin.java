@@ -18,6 +18,10 @@
  */
 package com.technophobia.substeps;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -43,6 +47,7 @@ import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
 import com.technophobia.substeps.step.ProjectStepImplementationProvider;
+import com.technophobia.substeps.step.ProjectSuggestionProvider;
 import com.technophobia.substeps.step.ProvidedSuggestionManager;
 import com.technophobia.substeps.step.SuggestionSource;
 import com.technophobia.substeps.step.provider.ExternalStepImplementationProvider;
@@ -138,6 +143,21 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
     public ProjectStepImplementationProvider getStepImplementationProvider() {
         return suggestionManager;
+    }
+
+
+    public List<String> externalDependencyStepClasses(final IProject project) {
+        final Collection<ProjectSuggestionProvider> providers = suggestionManager
+                .providersOfSource(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION);
+        final List<String> stepClasses = new ArrayList<String>();
+        for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
+            if (projectSuggestionProvider instanceof ProjectStepImplementationProvider) {
+                stepClasses.addAll(((ProjectStepImplementationProvider) projectSuggestionProvider)
+                        .stepImplementationClasses(project));
+            }
+        }
+
+        return Collections.unmodifiableList(stepClasses);
     }
 
 

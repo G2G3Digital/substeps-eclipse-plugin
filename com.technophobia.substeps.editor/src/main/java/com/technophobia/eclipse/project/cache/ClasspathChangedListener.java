@@ -39,7 +39,9 @@ public class ClasspathChangedListener implements IElementChangedListener {
             if (isDeltaChangeMatchForEvent(delta, FLAGS)) {
                 try {
                     for (final IJavaProject javaProject : delta.getElement().getJavaModel().getJavaProjects()) {
-                        projectChangedNotifier.doCallback(javaProject.getProject());
+                        final IProject project = javaProject.getProject();
+                        FeatureEditorPlugin.instance().info("Classpath has changed for project " + project);
+                        projectChangedNotifier.doCallback(project);
                     }
                 } catch (final JavaModelException ex) {
                     FeatureEditorPlugin.instance().error(
