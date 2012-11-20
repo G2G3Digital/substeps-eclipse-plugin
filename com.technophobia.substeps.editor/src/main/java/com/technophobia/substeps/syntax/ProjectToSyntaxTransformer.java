@@ -49,9 +49,9 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
         for (final String outputFolder : outputFolders) {
             final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
             stepClasses.addAll(stepClasses(outputFolder, classLocator));
-            // augment step classes with externally dependent classes
 
         }
+        // augment step classes with externally dependent classes
         stepClasses.addAll(externalDependenciesFor(project, classLoader));
 
         try {

@@ -86,6 +86,13 @@ public class CacheAwareProjectManager implements ProjectManager {
 
 
     @Override
+    public void preferencesChanged(final IProject project) {
+        FeatureEditorPlugin.instance().info("Preferences changed for project " + project);
+        updateCaches(project);
+    }
+
+
+    @Override
     public void addFeatureFileListener(final ProjectFileChangedListener listener) {
         this.featureChangeListeners.add(listener);
     }

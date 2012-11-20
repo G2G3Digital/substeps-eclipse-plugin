@@ -160,4 +160,12 @@
            value="true">
      </persistent>
   </extension>
+  <extension
+        point="org.eclipse.ui.preferencePages">
+     <page
+           class="com.technophobia.substeps.editor.preferences.page.SubstepsPreferencePage"
+           id="com.technophobia.substeps.editor.preferences"
+           name="Substeps">
+     </page>
+  </extension>
 </plugin>

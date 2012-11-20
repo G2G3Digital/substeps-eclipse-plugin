@@ -38,11 +38,13 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import com.technophobia.eclipse.log.PluginLogger;
+import com.technophobia.eclipse.lookup.PreferenceLookup;
 import com.technophobia.eclipse.project.ProjectEventType;
 import com.technophobia.eclipse.project.ProjectManager;
 import com.technophobia.eclipse.project.cache.CacheAwareProjectManager;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
 import com.technophobia.substeps.model.Syntax;
+import com.technophobia.substeps.preferences.SubstepsPreferences;
 import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
@@ -79,13 +81,16 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
     private ProjectManager projectManager;
 
+    private final PluginScopePreferenceLookup preferenceLookup;
+
 
     @SuppressWarnings("unchecked")
     public FeatureEditorPlugin() {
         super();
         FeatureEditorPlugin.pluginInstance = this;
         this.suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
-        this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer();
+        this.preferenceLookup = new PluginScopePreferenceLookup(PLUGIN_ID, getPreferenceStore());
+        this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer(preferenceLookup);
         this.projectManager = new CacheAwareProjectManager(projectToSyntaxTransformer);
     }
 
@@ -100,6 +105,7 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
             resourceBundle = null;
         }
 
+        SubstepsPreferences.setDefaults(preferenceLookup);
         projectManager.registerFrameworkListeners();
         addSuggestionProviders();
     }
@@ -143,6 +149,11 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
     public ProjectStepImplementationProvider getStepImplementationProvider() {
         return suggestionManager;
+    }
+
+
+    public PreferenceLookup preferenceLookup() {
+        return preferenceLookup;
     }
 
 
@@ -230,5 +241,4 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         projectManager.addSubstepsFileListener(substepSuggestionProvider);
         suggestionManager.load(ResourcesPlugin.getWorkspace());
     }
-
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IProject;
 
 import com.technophobia.eclipse.log.PluginLogger;
+import com.technophobia.eclipse.lookup.PreferenceLookup;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.observer.CacheMonitor;
@@ -20,9 +21,9 @@ public class CachingProjectToSyntaxTransformer implements CachingResultTransform
     private final PluginLogger pluginLogger;
 
 
-    public CachingProjectToSyntaxTransformer() {
+    public CachingProjectToSyntaxTransformer(final PreferenceLookup preferenceLookup) {
         // Default constructor using 'real' project to syntax transformer
-        this(new ProblemValidatingProjectToSyntaxTransformer(), FeatureEditorPlugin.instance());
+        this(new ProblemValidatingProjectToSyntaxTransformer(preferenceLookup), FeatureEditorPlugin.instance());
     }
 
 

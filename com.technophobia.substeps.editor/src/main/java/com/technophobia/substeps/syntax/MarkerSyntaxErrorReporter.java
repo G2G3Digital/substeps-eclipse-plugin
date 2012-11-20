@@ -17,17 +17,21 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.technophobia.eclipse.lookup.PreferenceLookup;
 import com.technophobia.eclipse.transformer.FileToIFileTransformer;
 import com.technophobia.substeps.FeatureEditorPlugin;
+import com.technophobia.substeps.preferences.SubstepsPreferences;
 
 public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorReporter {
 
     private final IProject project;
     private final Map<IResource, Set<Problem>> resourceToProblemMap;
+    private final PreferenceLookup preferenceLookup;
 
 
-    public MarkerSyntaxErrorReporter(final IProject project) {
+    public MarkerSyntaxErrorReporter(final IProject project, final PreferenceLookup preferenceLookup) {
         this.project = project;
+        this.preferenceLookup = preferenceLookup;
         this.resourceToProblemMap = new HashMap<IResource, Set<Problem>>();
     }
 
@@ -40,11 +44,13 @@ public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorRe
             protected IStatus run(final IProgressMonitor monitor) {
                 clearErrorsFor(project);
 
-                for (final Map.Entry<IResource, Set<Problem>> entry : resourceToProblemMap.entrySet()) {
-                    final IResource resource = entry.getKey();
-                    final Set<Problem> problems = entry.getValue();
-                    for (final Problem problem : problems) {
-                        problem.mark(resource);
+                if (preferenceLookup.booleanFor(SubstepsPreferences.ENABLE_PROBLEMS.key())) {
+                    for (final Map.Entry<IResource, Set<Problem>> entry : resourceToProblemMap.entrySet()) {
+                        final IResource resource = entry.getKey();
+                        final Set<Problem> problems = entry.getValue();
+                        for (final Problem problem : problems) {
+                            problem.mark(resource);
+                        }
                     }
                 }
                 return Status.OK_STATUS;

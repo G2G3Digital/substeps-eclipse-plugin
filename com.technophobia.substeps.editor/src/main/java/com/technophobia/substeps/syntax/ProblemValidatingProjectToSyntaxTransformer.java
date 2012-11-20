@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 
+import com.technophobia.eclipse.lookup.PreferenceLookup;
 import com.technophobia.substeps.model.FeatureFile;
 import com.technophobia.substeps.model.ParentStep;
 import com.technophobia.substeps.model.Syntax;
@@ -17,16 +18,20 @@ import com.technophobia.substeps.runner.syntax.validation.SyntaxAwareStepValidat
 
 public class ProblemValidatingProjectToSyntaxTransformer extends ProjectToSyntaxTransformer {
 
-    ProblemValidatingProjectToSyntaxTransformer() {
+    private final PreferenceLookup preferenceLookup;
+
+
+    ProblemValidatingProjectToSyntaxTransformer(final PreferenceLookup preferenceLookup) {
         // package scope constructor to encourage use of the
         // CachingProjectToSyntaxTransformer
         super();
+        this.preferenceLookup = preferenceLookup;
     }
 
 
     @Override
     protected SyntaxErrorReporter syntaxErrorReporterFor(final IProject project) {
-        return new MarkerSyntaxErrorReporter(project);
+        return new MarkerSyntaxErrorReporter(project, preferenceLookup);
     }
 
 
