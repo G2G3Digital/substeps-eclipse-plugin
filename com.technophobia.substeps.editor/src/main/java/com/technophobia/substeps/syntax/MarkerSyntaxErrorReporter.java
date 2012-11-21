@@ -64,22 +64,22 @@ public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorRe
 
 
     @Override
-    public void reportFeatureError(final File file, final String line, final int lineNumber, final String description)
-            throws RuntimeException {
-        addMarker(file, line, lineNumber, description);
+    public void reportFeatureError(final File file, final String line, final int lineNumber, final int offset,
+            final String description) throws RuntimeException {
+        addMarker(file, line, lineNumber, offset, description);
     }
 
 
     @Override
-    public void reportFeatureError(final File file, final String line, final int lineNumber, final String description,
-            final RuntimeException ex) throws RuntimeException {
-        addMarker(file, line, lineNumber, description);
+    public void reportFeatureError(final File file, final String line, final int lineNumber, final int offset,
+            final String description, final RuntimeException ex) throws RuntimeException {
+        addMarker(file, line, lineNumber, offset, description);
     }
 
 
     @Override
     public void reportSubstepsError(final SubstepsParsingException ex) throws RuntimeException {
-        addMarker(ex.getFile(), ex.getLine(), ex.getLineNumber(), ex.getMessage());
+        addMarker(ex.getFile(), ex.getLine(), ex.getLineNumber(), (int) ex.getOffset(), ex.getMessage());
     }
 
 
@@ -89,13 +89,14 @@ public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorRe
     }
 
 
-    private void addMarker(final File file, final String line, final int lineNumber, final String description) {
+    private void addMarker(final File file, final String line, final int lineNumber, final int offset,
+            final String description) {
         final IFile f = new FileToIFileTransformer(project).from(file);
 
         if (!resourceToProblemMap.containsKey(f)) {
             resourceToProblemMap.put(f, new HashSet<Problem>());
         }
-        resourceToProblemMap.get(f).add(Problem.createError(description, line, lineNumber));
+        resourceToProblemMap.get(f).add(Problem.createError(description, line, lineNumber, offset));
     }
 
 

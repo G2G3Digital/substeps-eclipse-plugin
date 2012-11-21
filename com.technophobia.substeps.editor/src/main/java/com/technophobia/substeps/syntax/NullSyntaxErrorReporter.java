@@ -9,15 +9,15 @@ import com.technophobia.substeps.runner.syntax.SyntaxErrorReporter;
 public class NullSyntaxErrorReporter implements SyntaxErrorReporter {
 
     @Override
-    public void reportFeatureError(final File file, final String line, final int lineNumber, final String description)
-            throws RuntimeException {
+    public void reportFeatureError(final File file, final String line, final int lineNumber, final int offset,
+            final String description) throws RuntimeException {
         // No-op
     }
 
 
     @Override
-    public void reportFeatureError(final File file, final String line, final int lineNumber, final String description,
-            final RuntimeException ex) throws RuntimeException {
+    public void reportFeatureError(final File file, final String line, final int lineNumber, final int offset,
+            final String description, final RuntimeException ex) throws RuntimeException {
         // No-op
     }
 

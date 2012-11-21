@@ -12,23 +12,28 @@ public class Problem {
     private final String description;
     private final String offendingLine;
     private final int lineNumber;
+    private final int offset;
 
 
-    public static Problem createError(final String description, final String line, final int lineNumber) {
-        return new Problem(IMarker.SEVERITY_ERROR, description, line, lineNumber);
+    public static Problem createError(final String description, final String line, final int lineNumber,
+            final int offset) {
+        return new Problem(IMarker.SEVERITY_ERROR, description, line, lineNumber, offset);
     }
 
 
-    public static Problem createWarning(final String description, final String line, final int lineNumber) {
-        return new Problem(IMarker.SEVERITY_WARNING, description, line, lineNumber);
+    public static Problem createWarning(final String description, final String line, final int lineNumber,
+            final int offset) {
+        return new Problem(IMarker.SEVERITY_WARNING, description, line, lineNumber, offset);
     }
 
 
-    private Problem(final int severity, final String description, final String offendingLine, final int lineNumber) {
+    private Problem(final int severity, final String description, final String offendingLine, final int lineNumber,
+            final int offset) {
         this.severity = severity;
         this.description = description;
         this.offendingLine = offendingLine;
         this.lineNumber = lineNumber;
+        this.offset = offset;
     }
 
 
@@ -39,26 +44,12 @@ public class Problem {
             marker.setAttribute(IMarker.MESSAGE, description);
             marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
             marker.setAttribute(IMarker.LINE_NUMBER, lineNumber + 1);
-            marker.setAttribute(IMarker.CHAR_START, charStart(offendingLine));
-            marker.setAttribute(IMarker.CHAR_END, charEnd(offendingLine));
+            marker.setAttribute(IMarker.CHAR_START, offset);
+            marker.setAttribute(IMarker.CHAR_END, (offset + offendingLine.trim().length()));
             return true;
         } catch (final CoreException ex) {
             FeatureEditorPlugin.instance().error("Could not mark resource " + resource, ex);
             return false;
         }
-    }
-
-
-    private int charStart(final String line) {
-        final String trimmed = line.trim();
-        return Math.max(line.indexOf(trimmed), 0);
-    }
-
-
-    private int charEnd(final String line) {
-        final String trimmed = line.trim();
-
-        final int index = line.indexOf(trimmed);
-        return index > -1 ? index + trimmed.length() : line.length();
     }
 }
