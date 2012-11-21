@@ -89,6 +89,19 @@ public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorRe
     }
 
 
+    @Override
+    public void reportStepImplError(final Class<?> stepImplClass, final String method, final String description) {
+        // TODO: Currently don't deal with errors in step impl classes
+    }
+
+
+    @Override
+    public void reportStepImplError(final Class<?> stepImplClass, final String method, final String description,
+            final RuntimeException ex) {
+        // TODO: Currently don't deal with errors in step impl classes
+    }
+
+
     private void addMarker(final File file, final String line, final int lineNumber, final String description) {
         final IFile f = new FileToIFileTransformer(project).from(file);
 

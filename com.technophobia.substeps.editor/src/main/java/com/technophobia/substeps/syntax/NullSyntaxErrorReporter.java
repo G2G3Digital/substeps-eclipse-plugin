@@ -33,4 +33,16 @@ public class NullSyntaxErrorReporter implements SyntaxErrorReporter {
         // No-op
     }
 
+
+    @Override
+    public void reportStepImplError(final Class<?> stepImplClass, final String method, final String description) {
+        // No-op
+    }
+
+
+    @Override
+    public void reportStepImplError(final Class<?> stepImplClass, final String method, final String description,
+            final RuntimeException ex) {
+        // No-op
+    }
 }

@@ -168,4 +168,21 @@
            name="Substeps">
      </page>
   </extension>
+  <extension
+        point="org.eclipse.ui.propertyPages">
+     <page
+           class="com.technophobia.substeps.editor.preferences.page.SubstepsPropertyPage"
+           id="com.technophobia.substeps.editor.propertyPage"
+           name="Substeps">
+           
+           <enabledWhen>
+           	<adapt
+                  type="org.eclipse.core.resources.IResource">
+                  <instanceof
+                        value="org.eclipse.core.resources.IProject">
+                  </instanceof>
+           	</adapt>
+           </enabledWhen>
+     </page>
+  </extension>
 </plugin>
