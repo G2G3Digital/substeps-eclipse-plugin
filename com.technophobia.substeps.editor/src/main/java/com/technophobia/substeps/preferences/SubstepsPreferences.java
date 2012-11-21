@@ -1,6 +1,6 @@
 package com.technophobia.substeps.preferences;
 
-import com.technophobia.eclipse.lookup.PreferenceLookup;
+import com.technophobia.eclipse.preference.PreferenceLookup;
 
 public enum SubstepsPreferences {
 
@@ -8,6 +8,12 @@ public enum SubstepsPreferences {
         @Override
         protected void setDefault(final PreferenceLookup lookup) {
             lookup.setDefault(key(), true);
+        }
+    },
+    PROJECT_OVERRIDE("project.override") {
+        @Override
+        protected void setDefault(final PreferenceLookup lookup) {
+            lookup.setDefault(key(), false);
         }
     };
 

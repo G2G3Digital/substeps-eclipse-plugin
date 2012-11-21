@@ -89,7 +89,6 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
     }
 
 
-    @SuppressWarnings("unused")
     protected SyntaxErrorReporter syntaxErrorReporterFor(final IProject project) {
         return new DefaultSyntaxErrorReporter();
     }
@@ -98,7 +97,7 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
     protected Syntax buildSyntaxFor(final File projectFile, final List<Class<?>> stepClasses,
             final ClassLoader classLoader, final SyntaxErrorReporter syntaxErrorReporter) {
         return SyntaxBuilder.buildSyntax(stepClasses, projectFile, true, null,
-                new ClassLoadedClassAnalyser(classLoader), true, syntaxErrorReporter);
+                new ClassLoadedClassAnalyser(classLoader), false, syntaxErrorReporter);
     }
 
 

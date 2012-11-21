@@ -32,19 +32,21 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import com.technophobia.eclipse.log.PluginLogger;
-import com.technophobia.eclipse.lookup.PreferenceLookup;
+import com.technophobia.eclipse.preference.PreferenceLookup;
+import com.technophobia.eclipse.preference.PreferenceLookupFactory;
 import com.technophobia.eclipse.project.ProjectEventType;
 import com.technophobia.eclipse.project.ProjectManager;
 import com.technophobia.eclipse.project.cache.CacheAwareProjectManager;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
 import com.technophobia.substeps.model.Syntax;
-import com.technophobia.substeps.preferences.SubstepsPreferences;
+import com.technophobia.substeps.preferences.SubstepsProjectPreferenceLookupFactory;
 import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
@@ -68,7 +70,7 @@ import com.technophobia.substeps.syntax.CachingProjectToSyntaxTransformer;
  */
 public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, PluginLogger {
 
-    private static final String PLUGIN_ID = "com.technophobia.substeps.editor";
+    public static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
     private static FeatureEditorPlugin pluginInstance;
 
@@ -81,7 +83,7 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
     private ProjectManager projectManager;
 
-    private final PluginScopePreferenceLookup preferenceLookup;
+    private final PreferenceLookupFactory<IProject> preferenceLookupFactory;
 
 
     @SuppressWarnings("unchecked")
@@ -89,8 +91,9 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         super();
         FeatureEditorPlugin.pluginInstance = this;
         this.suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
-        this.preferenceLookup = new PluginScopePreferenceLookup(PLUGIN_ID, getPreferenceStore());
-        this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer(preferenceLookup);
+        this.preferenceLookupFactory = new SubstepsProjectPreferenceLookupFactory(PLUGIN_ID,
+                (IPersistentPreferenceStore) getPreferenceStore());
+        this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer(preferenceLookupFactory);
         this.projectManager = new CacheAwareProjectManager(projectToSyntaxTransformer);
     }
 
@@ -105,7 +108,6 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
             resourceBundle = null;
         }
 
-        SubstepsPreferences.setDefaults(preferenceLookup);
         projectManager.registerFrameworkListeners();
         addSuggestionProviders();
     }
@@ -152,8 +154,8 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     }
 
 
-    public PreferenceLookup preferenceLookup() {
-        return preferenceLookup;
+    public PreferenceLookup preferenceLookupFor(final IProject project) {
+        return preferenceLookupFactory.preferencesFor(project);
     }
 
 

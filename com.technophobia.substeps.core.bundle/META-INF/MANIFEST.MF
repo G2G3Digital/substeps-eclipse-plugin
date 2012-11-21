@@ -15,6 +15,7 @@ Bundle-ClassPath: velocity-1.5.jar,
 Require-Bundle: org.junit;bundle-version="4.10.0"
 Export-Package: com.technophobia.substeps.glossary,
  com.technophobia.substeps.model,
+ com.technophobia.substeps.model.exception,
  com.technophobia.substeps.runner,
  com.technophobia.substeps.runner.runtime,
  com.technophobia.substeps.runner.setupteardown,

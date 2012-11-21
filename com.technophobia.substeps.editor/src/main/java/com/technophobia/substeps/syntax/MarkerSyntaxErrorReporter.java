@@ -17,9 +17,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.technophobia.eclipse.lookup.PreferenceLookup;
+import com.technophobia.eclipse.preference.PreferenceLookup;
 import com.technophobia.eclipse.transformer.FileToIFileTransformer;
 import com.technophobia.substeps.FeatureEditorPlugin;
+import com.technophobia.substeps.model.exception.StepImplementationException;
+import com.technophobia.substeps.model.exception.SubstepsParsingException;
 import com.technophobia.substeps.preferences.SubstepsPreferences;
 
 public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorReporter {
@@ -76,28 +78,13 @@ public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorRe
 
 
     @Override
-    public void reportSubstepsError(final File file, final String line, final int lineNumber, final String description)
-            throws RuntimeException {
-        addMarker(file, line, lineNumber, description);
+    public void reportSubstepsError(final SubstepsParsingException ex) throws RuntimeException {
+        addMarker(ex.getFile(), ex.getLine(), ex.getLineNumber(), ex.getMessage());
     }
 
 
     @Override
-    public void reportSubstepsError(final File file, final String line, final int lineNumber, final String description,
-            final RuntimeException ex) throws RuntimeException {
-        addMarker(file, line, lineNumber, description);
-    }
-
-
-    @Override
-    public void reportStepImplError(final Class<?> stepImplClass, final String method, final String description) {
-        // TODO: Currently don't deal with errors in step impl classes
-    }
-
-
-    @Override
-    public void reportStepImplError(final Class<?> stepImplClass, final String method, final String description,
-            final RuntimeException ex) {
+    public void reportStepImplError(final StepImplementationException ex) {
         // TODO: Currently don't deal with errors in step impl classes
     }
 
