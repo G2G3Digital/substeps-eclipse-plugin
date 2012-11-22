@@ -21,6 +21,7 @@ package com.technophobia.substeps.editor;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
@@ -73,6 +74,8 @@ import com.technophobia.substeps.supplier.Transformer;
  */
 public class FeatureEditor extends TextEditor implements FormattableEditorPart, IPartListener2 {
 
+    private static final String SUBSTEPS_CONTEXT = "com.technophobia.substeps.editor.SubstepsContext";
+
     private final ColourManager colourManager;
     private IContextActivation currentActivateContext;
     private SubstepsContentOutlinePage outlinePage;
@@ -103,12 +106,7 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
         super.setFocus();
 
         if (!isDirty()) {
-            try {
-                this.getDocumentProvider().resetDocument(getEditorInput());
-            } catch (final CoreException ex) {
-                FeatureEditorPlugin.instance().error(
-                        "Could not reset document " + ((FileEditorInput) editorInput).getFile().getLocation(), ex);
-            }
+            resetDocument();
         }
     }
 
@@ -116,6 +114,17 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     @Override
     public void doFormat() {
         ((SourceViewer) getSourceViewer()).doOperation(ISourceViewer.FORMAT);
+    }
+
+
+    @Override
+    public void doSave(final IProgressMonitor progressMonitor) {
+        super.doSave(progressMonitor);
+
+        FeatureEditorPlugin.instance().info("Saving file " + ((FileEditorInput) editorInput).getFile().getLocation());
+
+        outlinePage.update();
+        resetDocument();
     }
 
 
@@ -132,135 +141,6 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
             return outlinePage;
         }
         return super.getAdapter(required);
-    }
-
-
-    @Override
-    protected void doSetInput(final IEditorInput input) throws CoreException {
-        super.doSetInput(input);
-
-        this.editorInput = input;
-    }
-
-
-    /**
-     * Return a new {@link ContentTypeDefinitionFactory}
-     * 
-     * @return
-     */
-    protected ContentTypeDefinitionFactory contentTypeDefinitionFactory() {
-        return new FeatureContentTypeDefinitionFactory();
-    }
-
-
-    protected Transformer<ProjectFile, AbstractModelElement> fileToModelTransformer() {
-        return new FileToFeatureElementTransformer(lineNumberToDocumentOffset());
-    }
-
-
-    /**
-     * Return a new {@link Supplier} of type {@link IContentAssistProcessor}
-     * 
-     * @return
-     */
-    private Supplier<IContentAssistProcessor> processorSupplier() {
-        return new Supplier<IContentAssistProcessor>() {
-            @Override
-            public IContentAssistProcessor get() {
-                return new StepImplementationProcessorSupplier(getSite(), FeatureEditorPlugin.instance()
-                        .getSuggestionManager()).get();
-            }
-
-        };
-    }
-
-
-    private Supplier<PartitionContext> partitionContextSupplier() {
-        return new Supplier<PartitionContext>() {
-
-            @Override
-            public PartitionContext get() {
-                return new EditorInputPartitionContext(getEditorInput(), FeatureEditorPlugin.instance()
-                        .getSuggestionManager());
-
-            }
-        };
-    }
-
-
-    private void activateContext() {
-        if (currentActivateContext == null) {
-            final IContextService contextService = (IContextService) this.getSite().getWorkbenchWindow()
-                    .getService(IContextService.class);
-            currentActivateContext = contextService.activateContext(SUBSTEPS_CONTEXT);
-        }
-        // else we're already active
-    }
-
-
-    private void deactivateContext() {
-        if (currentActivateContext != null) {
-            final IContextService contextService = (IContextService) this.getSite().getWorkbenchWindow()
-                    .getService(IContextService.class);
-
-            contextService.deactivateContext(currentActivateContext);
-            currentActivateContext = null;
-        }
-    }
-
-
-    @Override
-    public void dispose() {
-        colourManager.dispose();
-        outlinePage.setInput(null);
-
-        final IPartService partService = (IPartService) this.getSite().getService(IPartService.class);
-
-        partService.removePartListener(this);
-
-        super.dispose();
-    }
-
-
-    @Override
-    protected void createActions() {
-        super.createActions();
-
-        final ResourceBundle resourceBundle = FeatureEditorPlugin.instance().getResourceBundle();
-        final TextOperationAction action = new TextOperationAction(resourceBundle, "ContentFormatProposal.", this,
-                ISourceViewer.FORMAT);
-        setAction("ContentFormatProposal", action);
-        getEditorSite().getActionBars().setGlobalActionHandler("ContentFormatProposal", action);
-    }
-
-    // @Override
-    // protected void handleCursorPositionChanged() {
-    // super.handleCursorPositionChanged();
-    //
-    // final ISelection selection =
-    // getEditorSite().getSelectionProvider().getSelection();
-    // if (selection != null && outlinePage != null) {
-    // outlinePage.setSelection(selection);
-    // }
-    // }
-
-    private static final String SUBSTEPS_CONTEXT = "com.technophobia.substeps.editor.SubstepsContext";
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setSite(final IWorkbenchPartSite site) {
-
-        super.setSite(site);
-
-        // add an activation listener
-
-        final IPartService partService = (IPartService) site.getService(IPartService.class);
-
-        partService.addPartListener(this);
-
     }
 
 
@@ -338,6 +218,71 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     }
 
 
+    @Override
+    public void dispose() {
+        colourManager.dispose();
+        outlinePage.setInput(null);
+
+        final IPartService partService = (IPartService) this.getSite().getService(IPartService.class);
+
+        partService.removePartListener(this);
+
+        super.dispose();
+    }
+
+
+    @Override
+    protected void createActions() {
+        super.createActions();
+
+        final ResourceBundle resourceBundle = FeatureEditorPlugin.instance().getResourceBundle();
+        final TextOperationAction action = new TextOperationAction(resourceBundle, "ContentFormatProposal.", this,
+                ISourceViewer.FORMAT);
+        setAction("ContentFormatProposal", action);
+        getEditorSite().getActionBars().setGlobalActionHandler("ContentFormatProposal", action);
+    }
+
+
+    @Override
+    protected void doSetInput(final IEditorInput input) throws CoreException {
+        super.doSetInput(input);
+
+        this.editorInput = input;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setSite(final IWorkbenchPartSite site) {
+
+        super.setSite(site);
+
+        // add an activation listener
+
+        final IPartService partService = (IPartService) site.getService(IPartService.class);
+
+        partService.addPartListener(this);
+
+    }
+
+
+    /**
+     * Return a new {@link ContentTypeDefinitionFactory}
+     * 
+     * @return
+     */
+    protected ContentTypeDefinitionFactory contentTypeDefinitionFactory() {
+        return new FeatureContentTypeDefinitionFactory();
+    }
+
+
+    protected Transformer<ProjectFile, AbstractModelElement> fileToModelTransformer() {
+        return new FileToFeatureElementTransformer(lineNumberToDocumentOffset());
+    }
+
+
     protected Transformer<Integer, Position> lineNumberToDocumentOffset() {
         return new Transformer<Integer, Position>() {
             @Override
@@ -373,5 +318,66 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
                 return Integer.valueOf(-1);
             }
         };
+    }
+
+
+    /**
+     * Return a new {@link Supplier} of type {@link IContentAssistProcessor}
+     * 
+     * @return
+     */
+    private Supplier<IContentAssistProcessor> processorSupplier() {
+        return new Supplier<IContentAssistProcessor>() {
+            @Override
+            public IContentAssistProcessor get() {
+                return new StepImplementationProcessorSupplier(getSite(), FeatureEditorPlugin.instance()
+                        .getSuggestionManager()).get();
+            }
+
+        };
+    }
+
+
+    private Supplier<PartitionContext> partitionContextSupplier() {
+        return new Supplier<PartitionContext>() {
+
+            @Override
+            public PartitionContext get() {
+                return new EditorInputPartitionContext(getEditorInput(), FeatureEditorPlugin.instance()
+                        .getSuggestionManager());
+
+            }
+        };
+    }
+
+
+    private void activateContext() {
+        if (currentActivateContext == null) {
+            final IContextService contextService = (IContextService) this.getSite().getWorkbenchWindow()
+                    .getService(IContextService.class);
+            currentActivateContext = contextService.activateContext(SUBSTEPS_CONTEXT);
+        }
+        // else we're already active
+    }
+
+
+    private void deactivateContext() {
+        if (currentActivateContext != null) {
+            final IContextService contextService = (IContextService) this.getSite().getWorkbenchWindow()
+                    .getService(IContextService.class);
+
+            contextService.deactivateContext(currentActivateContext);
+            currentActivateContext = null;
+        }
+    }
+
+
+    private void resetDocument() {
+        try {
+            this.getDocumentProvider().resetDocument(getEditorInput());
+        } catch (final CoreException ex) {
+            FeatureEditorPlugin.instance().error(
+                    "Could not reset document " + ((FileEditorInput) editorInput).getFile().getLocation(), ex);
+        }
     }
 }

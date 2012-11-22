@@ -39,7 +39,9 @@ public class ClassFileChangedListener implements IElementChangedListener {
             for (final IJavaElementDelta changeNode : changeNodes) {
                 final IJavaProject javaProject = changeNode.getElement().getJavaProject();
                 if (isClassFileChange(changeNode, javaProject)) {
-                    projectChangedNotifier.doCallback(javaProject.getProject());
+                    final IProject project = javaProject.getProject();
+                    FeatureEditorPlugin.instance().info("Class files have changed for project " + project);
+                    projectChangedNotifier.doCallback(project);
                 }
             }
         }

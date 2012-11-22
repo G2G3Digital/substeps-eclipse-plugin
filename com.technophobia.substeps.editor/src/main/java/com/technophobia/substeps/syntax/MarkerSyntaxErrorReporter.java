@@ -17,17 +17,23 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.technophobia.eclipse.preference.PreferenceLookup;
 import com.technophobia.eclipse.transformer.FileToIFileTransformer;
 import com.technophobia.substeps.FeatureEditorPlugin;
+import com.technophobia.substeps.model.exception.StepImplementationException;
+import com.technophobia.substeps.model.exception.SubstepsParsingException;
+import com.technophobia.substeps.preferences.SubstepsPreferences;
 
 public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorReporter {
 
     private final IProject project;
     private final Map<IResource, Set<Problem>> resourceToProblemMap;
+    private final PreferenceLookup preferenceLookup;
 
 
-    public MarkerSyntaxErrorReporter(final IProject project) {
+    public MarkerSyntaxErrorReporter(final IProject project, final PreferenceLookup preferenceLookup) {
         this.project = project;
+        this.preferenceLookup = preferenceLookup;
         this.resourceToProblemMap = new HashMap<IResource, Set<Problem>>();
     }
 
@@ -40,11 +46,13 @@ public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorRe
             protected IStatus run(final IProgressMonitor monitor) {
                 clearErrorsFor(project);
 
-                for (final Map.Entry<IResource, Set<Problem>> entry : resourceToProblemMap.entrySet()) {
-                    final IResource resource = entry.getKey();
-                    final Set<Problem> problems = entry.getValue();
-                    for (final Problem problem : problems) {
-                        problem.mark(resource);
+                if (preferenceLookup.booleanFor(SubstepsPreferences.ENABLE_PROBLEMS.key())) {
+                    for (final Map.Entry<IResource, Set<Problem>> entry : resourceToProblemMap.entrySet()) {
+                        final IResource resource = entry.getKey();
+                        final Set<Problem> problems = entry.getValue();
+                        for (final Problem problem : problems) {
+                            problem.mark(resource);
+                        }
                     }
                 }
                 return Status.OK_STATUS;
@@ -56,40 +64,39 @@ public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorRe
 
 
     @Override
-    public void reportFeatureError(final File file, final String line, final int lineNumber, final String description)
-            throws RuntimeException {
-        addMarker(file, line, lineNumber, description);
+    public void reportFeatureError(final File file, final String line, final int lineNumber, final int offset,
+            final String description) throws RuntimeException {
+        addMarker(file, line, lineNumber, offset, description);
     }
 
 
     @Override
-    public void reportFeatureError(final File file, final String line, final int lineNumber, final String description,
-            final RuntimeException ex) throws RuntimeException {
-        addMarker(file, line, lineNumber, description);
+    public void reportFeatureError(final File file, final String line, final int lineNumber, final int offset,
+            final String description, final RuntimeException ex) throws RuntimeException {
+        addMarker(file, line, lineNumber, offset, description);
     }
 
 
     @Override
-    public void reportSubstepsError(final File file, final String line, final int lineNumber, final String description)
-            throws RuntimeException {
-        addMarker(file, line, lineNumber, description);
+    public void reportSubstepsError(final SubstepsParsingException ex) throws RuntimeException {
+        addMarker(ex.getFile(), ex.getLine(), ex.getLineNumber(), (int) ex.getOffset(), ex.getMessage());
     }
 
 
     @Override
-    public void reportSubstepsError(final File file, final String line, final int lineNumber, final String description,
-            final RuntimeException ex) throws RuntimeException {
-        addMarker(file, line, lineNumber, description);
+    public void reportStepImplError(final StepImplementationException ex) {
+        // TODO: Currently don't deal with errors in step impl classes
     }
 
 
-    private void addMarker(final File file, final String line, final int lineNumber, final String description) {
+    private void addMarker(final File file, final String line, final int lineNumber, final int offset,
+            final String description) {
         final IFile f = new FileToIFileTransformer(project).from(file);
 
         if (!resourceToProblemMap.containsKey(f)) {
             resourceToProblemMap.put(f, new HashSet<Problem>());
         }
-        resourceToProblemMap.get(f).add(Problem.createError(description, line, lineNumber));
+        resourceToProblemMap.get(f).add(Problem.createError(description, line, lineNumber, offset));
     }
 
 

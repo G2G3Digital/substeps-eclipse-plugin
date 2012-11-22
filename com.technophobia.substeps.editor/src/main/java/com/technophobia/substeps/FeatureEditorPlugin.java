@@ -18,6 +18,10 @@
  */
 package com.technophobia.substeps;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -28,21 +32,26 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import com.technophobia.eclipse.log.PluginLogger;
+import com.technophobia.eclipse.preference.PreferenceLookup;
+import com.technophobia.eclipse.preference.PreferenceLookupFactory;
 import com.technophobia.eclipse.project.ProjectEventType;
 import com.technophobia.eclipse.project.ProjectManager;
 import com.technophobia.eclipse.project.cache.CacheAwareProjectManager;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
 import com.technophobia.substeps.model.Syntax;
+import com.technophobia.substeps.preferences.SubstepsProjectPreferenceLookupFactory;
 import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
 import com.technophobia.substeps.step.ProjectStepImplementationProvider;
+import com.technophobia.substeps.step.ProjectSuggestionProvider;
 import com.technophobia.substeps.step.ProvidedSuggestionManager;
 import com.technophobia.substeps.step.SuggestionSource;
 import com.technophobia.substeps.step.provider.ExternalStepImplementationProvider;
@@ -61,7 +70,7 @@ import com.technophobia.substeps.syntax.CachingProjectToSyntaxTransformer;
  */
 public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, PluginLogger {
 
-    private static final String PLUGIN_ID = "com.technophobia.substeps.editor";
+    public static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
     private static FeatureEditorPlugin pluginInstance;
 
@@ -74,13 +83,17 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
     private ProjectManager projectManager;
 
+    private final PreferenceLookupFactory<IProject> preferenceLookupFactory;
+
 
     @SuppressWarnings("unchecked")
     public FeatureEditorPlugin() {
         super();
         FeatureEditorPlugin.pluginInstance = this;
         this.suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
-        this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer();
+        this.preferenceLookupFactory = new SubstepsProjectPreferenceLookupFactory(PLUGIN_ID,
+                (IPersistentPreferenceStore) getPreferenceStore());
+        this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer(preferenceLookupFactory);
         this.projectManager = new CacheAwareProjectManager(projectToSyntaxTransformer);
     }
 
@@ -138,6 +151,26 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
     public ProjectStepImplementationProvider getStepImplementationProvider() {
         return suggestionManager;
+    }
+
+
+    public PreferenceLookup preferenceLookupFor(final IProject project) {
+        return preferenceLookupFactory.preferencesFor(project);
+    }
+
+
+    public List<String> externalDependencyStepClasses(final IProject project) {
+        final Collection<ProjectSuggestionProvider> providers = suggestionManager
+                .providersOfSource(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION);
+        final List<String> stepClasses = new ArrayList<String>();
+        for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
+            if (projectSuggestionProvider instanceof ProjectStepImplementationProvider) {
+                stepClasses.addAll(((ProjectStepImplementationProvider) projectSuggestionProvider)
+                        .stepImplementationClasses(project));
+            }
+        }
+
+        return Collections.unmodifiableList(stepClasses);
     }
 
 
@@ -210,5 +243,4 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         projectManager.addSubstepsFileListener(substepSuggestionProvider);
         suggestionManager.load(ResourcesPlugin.getWorkspace());
     }
-
 }

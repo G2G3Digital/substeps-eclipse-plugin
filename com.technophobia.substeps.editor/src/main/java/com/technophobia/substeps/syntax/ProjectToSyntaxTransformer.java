@@ -2,6 +2,8 @@ package com.technophobia.substeps.syntax;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +24,9 @@ import com.technophobia.substeps.model.PatternMap;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.runner.runtime.ClassLocator;
 import com.technophobia.substeps.runner.runtime.StepClassLocator;
+import com.technophobia.substeps.runner.syntax.DefaultSyntaxErrorReporter;
 import com.technophobia.substeps.runner.syntax.SyntaxBuilder;
+import com.technophobia.substeps.runner.syntax.SyntaxErrorReporter;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax> {
@@ -39,26 +43,61 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
         final IJavaProject javaProject = new ProjectToJavaProjectTransformer().from(project);
         final ClassLoader classLoader = new JavaProjectClassLoader(javaProject);
         final Set<String> outputFolders = outputFoldersForProject(javaProject);
+        final File projectFile = new File(projectLocationPath(javaProject).toOSString());
 
         final List<Class<?>> stepClasses = new ArrayList<Class<?>>();
         for (final String outputFolder : outputFolders) {
             final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
             stepClasses.addAll(stepClasses(outputFolder, classLocator));
+
         }
+        // augment step classes with externally dependent classes
+        stepClasses.addAll(externalDependenciesFor(project, classLoader));
 
         try {
-            final DeferredReportingSyntaxErrorReporter syntaxErrorReporter = new MarkerSyntaxErrorReporter(project);
-            final Syntax syntax = SyntaxBuilder.buildSyntax(stepClasses, new File(projectLocationPath(javaProject)
-                    .toOSString()), true, null, new ClassLoadedClassAnalyser(classLoader), true, syntaxErrorReporter);
-            syntaxErrorReporter.applyChanges();
-            return syntax;
+            return buildSyntaxFor(projectFile, stepClasses, classLoader, syntaxErrorReporterFor(project));
         } catch (final RuntimeException ex) {
             FeatureEditorPlugin.instance().warn(
-                    "Error when building syntax for project " + project + ": " + ex.getMessage());
+                    "Error when building syntax for project " + project + ": " + ex.getMessage(), ex);
             final Syntax nullSyntax = new Syntax();
             nullSyntax.setSubStepsMap(new PatternMap<ParentStep>());
             return nullSyntax;
         }
+    }
+
+
+    private Collection<Class<?>> externalDependenciesFor(final IProject project, final ClassLoader classLoader) {
+        final List<String> externalDependencies = FeatureEditorPlugin.instance().externalDependencyStepClasses(project);
+        final Collection<Class<?>> classes = new ArrayList<Class<?>>(externalDependencies.size());
+        for (final String className : externalDependencies) {
+            final Class<?> clazz = loadClass(className, classLoader);
+            if (clazz != null) {
+                classes.add(clazz);
+            }
+        }
+        return Collections.unmodifiableCollection(classes);
+    }
+
+
+    private Class<?> loadClass(final String stepClassName, final ClassLoader classLoader) {
+        try {
+            return classLoader.loadClass(stepClassName);
+        } catch (final ClassNotFoundException ex) {
+            FeatureEditorPlugin.instance().error("Could not load class " + stepClassName, ex);
+            return null;
+        }
+    }
+
+
+    protected SyntaxErrorReporter syntaxErrorReporterFor(final IProject project) {
+        return new DefaultSyntaxErrorReporter();
+    }
+
+
+    protected Syntax buildSyntaxFor(final File projectFile, final List<Class<?>> stepClasses,
+            final ClassLoader classLoader, final SyntaxErrorReporter syntaxErrorReporter) {
+        return SyntaxBuilder.buildSyntax(stepClasses, projectFile, true, null,
+                new ClassLoadedClassAnalyser(classLoader), false, syntaxErrorReporter);
     }
 
 
@@ -105,7 +144,6 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
 
 
     private List<Class<?>> stepClasses(final String outputFolder, final ClassLocator classLocator) {
-        FeatureEditorPlugin.instance().info("output folder " + outputFolder);
         return toList(classLocator.fromPath(outputFolder));
     }
 

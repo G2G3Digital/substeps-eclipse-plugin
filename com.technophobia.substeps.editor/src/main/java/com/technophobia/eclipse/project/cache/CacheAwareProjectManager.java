@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -20,6 +22,7 @@ import com.technophobia.eclipse.project.ProjectChangedListener;
 import com.technophobia.eclipse.project.ProjectEventType;
 import com.technophobia.eclipse.project.ProjectFileChangedListener;
 import com.technophobia.eclipse.project.ProjectManager;
+import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.observer.CacheMonitor;
 import com.technophobia.substeps.supplier.Callback1;
 
@@ -34,6 +37,8 @@ public class CacheAwareProjectManager implements ProjectManager {
     private final IElementChangedListener classpathDependencyListener;
     private final IElementChangedListener sourceFileChangedListener;
 
+    private final IResourceChangeListener featureSubstepFileChangeListener;
+
 
     public CacheAwareProjectManager(final CacheMonitor<IProject>... cacheMonitors) {
         this.cacheMonitors = cacheMonitors;
@@ -43,6 +48,7 @@ public class CacheAwareProjectManager implements ProjectManager {
 
         this.sourceFileChangedListener = createClassFilesChangedListener();
         this.classpathDependencyListener = createClasspathChangedListener();
+        this.featureSubstepFileChangeListener = createSubstepsFileChangedListener();
     }
 
 
@@ -50,6 +56,9 @@ public class CacheAwareProjectManager implements ProjectManager {
     public void registerFrameworkListeners() {
         JavaCore.addElementChangedListener(sourceFileChangedListener);
         JavaCore.addElementChangedListener(classpathDependencyListener);
+
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(featureSubstepFileChangeListener,
+                IResourceChangeEvent.POST_CHANGE);
     }
 
 
@@ -63,12 +72,23 @@ public class CacheAwareProjectManager implements ProjectManager {
     @Override
     public void projectFileChange(final IProject project, final IFile file) {
         if (isSubstepsFile(file)) {
+            FeatureEditorPlugin.instance().info(
+                    "Substeps file " + file.getLocation() + " has changed in project " + project);
             updateCaches(project);
             updateFileChangeListeners(file, substepsChangeListeners);
         } else if (isFeatureFile(file)) {
+            FeatureEditorPlugin.instance().info(
+                    "Feature file " + file.getLocation() + " has changed in project " + project);
             updateCaches(project);
             updateFileChangeListeners(file, featureChangeListeners);
         }
+    }
+
+
+    @Override
+    public void preferencesChanged(final IProject project) {
+        FeatureEditorPlugin.instance().info("Preferences changed for project " + project);
+        updateCaches(project);
     }
 
 
@@ -127,6 +147,12 @@ public class CacheAwareProjectManager implements ProjectManager {
 
     protected IElementChangedListener createClasspathChangedListener() {
         return new ClasspathChangedListener(updateProjectCachesCallback(ProjectEventType.ProjectDependenciesChanged));
+    }
+
+
+    private IResourceChangeListener createSubstepsFileChangedListener() {
+        return new FileWithExtensionChangedListener(updateProjectCachesCallback(ProjectEventType.FeatureFileChanged),
+                "feature", "substeps");
     }
 
 

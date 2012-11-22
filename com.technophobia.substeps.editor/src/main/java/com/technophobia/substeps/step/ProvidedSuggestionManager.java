@@ -36,6 +36,11 @@ public class ProvidedSuggestionManager implements ContextualSuggestionManager, P
     }
 
 
+    public Collection<ProjectSuggestionProvider> providersOfSource(final SuggestionSource source) {
+        return projectSuggestionProviders.get(source);
+    }
+
+
     public void load(final IWorkspace workspace) {
         for (final Set<ProjectSuggestionProvider> providers : projectSuggestionProviders.values()) {
             for (final ProjectSuggestionProvider provider : providers) {

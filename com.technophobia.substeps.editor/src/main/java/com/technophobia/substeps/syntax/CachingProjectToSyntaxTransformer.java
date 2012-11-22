@@ -6,6 +6,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IProject;
 
 import com.technophobia.eclipse.log.PluginLogger;
+import com.technophobia.eclipse.preference.PreferenceLookupFactory;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.observer.CacheMonitor;
@@ -20,9 +21,10 @@ public class CachingProjectToSyntaxTransformer implements CachingResultTransform
     private final PluginLogger pluginLogger;
 
 
-    public CachingProjectToSyntaxTransformer() {
+    public CachingProjectToSyntaxTransformer(final PreferenceLookupFactory<IProject> projectPreferenceLookupFactory) {
         // Default constructor using 'real' project to syntax transformer
-        this(new ProjectToSyntaxTransformer(), FeatureEditorPlugin.instance());
+        this(new ProblemValidatingProjectToSyntaxTransformer(projectPreferenceLookupFactory), FeatureEditorPlugin
+                .instance());
     }
 
 
@@ -49,10 +51,7 @@ public class CachingProjectToSyntaxTransformer implements CachingResultTransform
     public void refreshCacheFor(final IProject project) {
         pluginLogger.info("Clearing cache for project " + project);
         if (cache.containsKey(project)) {
-            cache.remove(project);
-        } else {
-            pluginLogger.warn("Trying to refresh cache for project " + project.getName()
-                    + ", but it does not yet exist");
+            cache.put(project, delegate.from(project));
         }
     }
 }
