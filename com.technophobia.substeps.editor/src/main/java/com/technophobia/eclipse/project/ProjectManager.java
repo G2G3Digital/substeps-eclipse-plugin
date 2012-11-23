@@ -2,6 +2,9 @@ package com.technophobia.eclipse.project;
 
 public interface ProjectManager extends ProjectFileChangedListener, ProjectPreferencesChangedListener {
 
+    void workspaceLoaded();
+
+
     void registerFrameworkListeners();
 
 

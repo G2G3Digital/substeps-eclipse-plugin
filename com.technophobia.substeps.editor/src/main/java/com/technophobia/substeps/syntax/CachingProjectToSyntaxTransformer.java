@@ -50,8 +50,13 @@ public class CachingProjectToSyntaxTransformer implements CachingResultTransform
     @Override
     public void refreshCacheFor(final IProject project) {
         pluginLogger.info("Clearing cache for project " + project);
-        if (cache.containsKey(project)) {
-            cache.put(project, delegate.from(project));
-        }
+        cache.put(project, delegate.from(project));
+    }
+
+
+    @Override
+    public void evictFrom(final IProject project) {
+        pluginLogger.info("Evicting project " + project + " from cache");
+        cache.remove(project);
     }
 }

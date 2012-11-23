@@ -123,7 +123,9 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
 
         FeatureEditorPlugin.instance().info("Saving file " + ((FileEditorInput) editorInput).getFile().getLocation());
 
-        outlinePage.update();
+        if (outlinePage != null) {
+            outlinePage.update();
+        }
         resetDocument();
     }
 
@@ -221,7 +223,9 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     @Override
     public void dispose() {
         colourManager.dispose();
-        outlinePage.setInput(null);
+        if (outlinePage != null) {
+            outlinePage.setInput(null);
+        }
 
         final IPartService partService = (IPartService) this.getSite().getService(IPartService.class);
 

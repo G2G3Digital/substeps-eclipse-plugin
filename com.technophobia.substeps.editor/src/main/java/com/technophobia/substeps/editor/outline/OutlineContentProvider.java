@@ -130,9 +130,13 @@ public class OutlineContentProvider implements ITreeContentProvider {
 
     private AbstractModelElement parseEditor(final IEditorInput editorInput) {
         final IFile iFile = ((FileEditorInput) editorInput).getFile();
-        final File file = asFile(iFile);
-        final AbstractModelElement element = fileToElementTransformer.from(new ProjectFile(iFile.getProject(), file));
-        return element;
+        if (iFile != null) {
+            final File file = asFile(iFile);
+            final AbstractModelElement element = fileToElementTransformer
+                    .from(new ProjectFile(iFile.getProject(), file));
+            return element;
+        }
+        return null;
     }
 
 
