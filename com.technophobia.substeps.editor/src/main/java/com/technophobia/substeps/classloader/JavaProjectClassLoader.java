@@ -81,8 +81,8 @@ public class JavaProjectClassLoader extends ClassLoader {
     /**
      * Converts a classpath entry to a url
      * 
-     * @param entry
-     *            The classpath entry
+     * @param The
+     *            classpath entry
      * @return url representation of the entry
      */
     private URL entryToUrl(final String entry) {

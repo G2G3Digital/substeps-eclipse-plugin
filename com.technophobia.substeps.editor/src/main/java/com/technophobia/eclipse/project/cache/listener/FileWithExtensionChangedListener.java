@@ -63,7 +63,8 @@ public class FileWithExtensionChangedListener implements IResourceChangeListener
             public boolean visit(final IResourceDelta delta) throws CoreException {
                 if (delta.getKind() == IResourceDelta.CHANGED) {
                     if ((delta.getFlags() & IResourceDelta.CONTENT) == IResourceDelta.CONTENT) {
-                        if (fileExtensions.contains(delta.getResource().getFileExtension().toLowerCase())) {
+                        final String fileExtension = delta.getResource().getFileExtension();
+                        if (fileExtension != null && fileExtensions.contains(fileExtension.toLowerCase())) {
                             changedProjects.add(delta.getResource().getProject());
                         }
                     }
