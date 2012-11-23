@@ -64,7 +64,7 @@ public class ProblemValidatingProjectToSyntaxTransformer extends ProjectToSyntax
             final SyntaxErrorReporter syntaxErrorReporter) {
         final TestParameters testParameters = new TestParameters(new TagManager(""), syntax,
                 projectFile.getAbsolutePath());
-        testParameters.init();
+        testParameters.init(false);
 
         for (final FeatureFile featureFile : testParameters.getFeatureFileList()) {
             validator.validateFeatureFile(featureFile, syntaxErrorReporter);
