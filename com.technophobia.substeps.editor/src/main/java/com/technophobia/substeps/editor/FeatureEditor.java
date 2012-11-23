@@ -223,7 +223,9 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
     @Override
     public void dispose() {
         colourManager.dispose();
-        outlinePage.setInput(null);
+        if (outlinePage != null) {
+            outlinePage.setInput(null);
+        }
 
         final IPartService partService = (IPartService) this.getSite().getService(IPartService.class);
 
