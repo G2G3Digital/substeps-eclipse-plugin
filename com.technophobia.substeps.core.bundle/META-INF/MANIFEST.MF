@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Testingtools
 Bundle-SymbolicName: com.technophobia.substeps.core.bundle
-Bundle-Version: 0.2.1.qualifier
+Bundle-Version: 0.2.3.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: velocity-1.5.jar,
  commons-io-2.1.jar,

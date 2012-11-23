@@ -1,5 +1,22 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.eclipse.project.cache;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +39,11 @@ import com.technophobia.eclipse.project.ProjectChangedListener;
 import com.technophobia.eclipse.project.ProjectEventType;
 import com.technophobia.eclipse.project.ProjectFileChangedListener;
 import com.technophobia.eclipse.project.ProjectManager;
+import com.technophobia.eclipse.project.cache.listener.ClassFileChangedListener;
+import com.technophobia.eclipse.project.cache.listener.ClasspathChangedListener;
+import com.technophobia.eclipse.project.cache.listener.FileWithExtensionChangedListener;
+import com.technophobia.eclipse.project.cache.listener.ProjectCreatedListener;
+import com.technophobia.eclipse.project.cache.listener.ProjectDeletedListener;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.observer.CacheMonitor;
 import com.technophobia.substeps.supplier.Callback1;
@@ -34,8 +56,7 @@ public class CacheAwareProjectManager implements ProjectManager {
     private final Collection<ProjectFileChangedListener> featureChangeListeners;
     private final Map<ProjectEventType, Set<ProjectChangedListener>> projectChangeListeners;
 
-    private final IElementChangedListener classpathDependencyListener;
-    private final IElementChangedListener sourceFileChangedListener;
+    private final Collection<IElementChangedListener> javaListeners;
 
     private final IResourceChangeListener featureSubstepFileChangeListener;
 
@@ -46,16 +67,21 @@ public class CacheAwareProjectManager implements ProjectManager {
         this.featureChangeListeners = new HashSet<ProjectFileChangedListener>();
         this.projectChangeListeners = new HashMap<ProjectEventType, Set<ProjectChangedListener>>();
 
-        this.sourceFileChangedListener = createClassFilesChangedListener();
-        this.classpathDependencyListener = createClasspathChangedListener();
+        this.javaListeners = new ArrayList<IElementChangedListener>();
+        this.javaListeners.add(createClassFilesChangedListener());
+        this.javaListeners.add(createClasspathChangedListener());
+        this.javaListeners.add(createProjectCreatedListener());
+        this.javaListeners.add(createProjectDeletedListener());
+
         this.featureSubstepFileChangeListener = createSubstepsFileChangedListener();
     }
 
 
     @Override
     public void registerFrameworkListeners() {
-        JavaCore.addElementChangedListener(sourceFileChangedListener);
-        JavaCore.addElementChangedListener(classpathDependencyListener);
+        for (final IElementChangedListener listener : javaListeners) {
+            JavaCore.addElementChangedListener(listener);
+        }
 
         ResourcesPlugin.getWorkspace().addResourceChangeListener(featureSubstepFileChangeListener,
                 IResourceChangeEvent.POST_CHANGE);
@@ -64,8 +90,11 @@ public class CacheAwareProjectManager implements ProjectManager {
 
     @Override
     public void unregisterFrameworkListeners() {
-        JavaCore.removeElementChangedListener(sourceFileChangedListener);
-        JavaCore.removeElementChangedListener(classpathDependencyListener);
+        for (final IElementChangedListener listener : javaListeners) {
+            JavaCore.removeElementChangedListener(listener);
+        }
+
+        ResourcesPlugin.getWorkspace().removeResourceChangeListener(featureSubstepFileChangeListener);
     }
 
 
@@ -89,6 +118,14 @@ public class CacheAwareProjectManager implements ProjectManager {
     public void preferencesChanged(final IProject project) {
         FeatureEditorPlugin.instance().info("Preferences changed for project " + project);
         updateCaches(project);
+    }
+
+
+    @Override
+    public void workspaceLoaded() {
+        for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+            updateCaches(project);
+        }
     }
 
 
@@ -140,6 +177,13 @@ public class CacheAwareProjectManager implements ProjectManager {
     }
 
 
+    protected void evictFromCaches(final IProject project) {
+        for (final CacheMonitor<IProject> cacheMonitor : cacheMonitors) {
+            cacheMonitor.evictFrom(project);
+        }
+    }
+
+
     protected IElementChangedListener createClassFilesChangedListener() {
         return new ClassFileChangedListener(updateProjectCachesCallback(ProjectEventType.SourceFileAnnotationsChanged));
     }
@@ -147,6 +191,16 @@ public class CacheAwareProjectManager implements ProjectManager {
 
     protected IElementChangedListener createClasspathChangedListener() {
         return new ClasspathChangedListener(updateProjectCachesCallback(ProjectEventType.ProjectDependenciesChanged));
+    }
+
+
+    protected IElementChangedListener createProjectDeletedListener() {
+        return new ProjectDeletedListener(removeProjectFromCacheCallback(ProjectEventType.ProjectRemoved));
+    }
+
+
+    protected IElementChangedListener createProjectCreatedListener() {
+        return new ProjectCreatedListener(updateProjectCachesCallback(ProjectEventType.ProjectInserted));
     }
 
 
@@ -190,7 +244,28 @@ public class CacheAwareProjectManager implements ProjectManager {
 
                     @Override
                     protected IStatus run(final IProgressMonitor monitor) {
+                        notifyProjectChangeListeners(project, projectEventType);
                         updateCaches(project);
+                        return Status.OK_STATUS;
+                    }
+                };
+                job.setRule(ResourcesPlugin.getWorkspace().getRoot());
+                job.setPriority(Job.DECORATE);
+                job.schedule(200);
+            }
+        };
+    }
+
+
+    private Callback1<IProject> removeProjectFromCacheCallback(final ProjectEventType projectEventType) {
+        return new Callback1<IProject>() {
+            @Override
+            public void doCallback(final IProject project) {
+                final Job job = new Job("Update caches") {
+
+                    @Override
+                    protected IStatus run(final IProgressMonitor monitor) {
+                        evictFromCaches(project);
                         notifyProjectChangeListeners(project, projectEventType);
                         return Status.OK_STATUS;
                     }

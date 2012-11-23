@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.technophobia.substeps</groupId>
 		<artifactId>com.technophobia.substeps.parent</artifactId>
-		<version>0.2.1-SNAPSHOT</version>
+		<version>0.2.3-SNAPSHOT</version>
 		<relativePath>../com.technophobia.substeps.parent/pom.xml</relativePath>
 	</parent>
 
