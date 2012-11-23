@@ -1,4 +1,4 @@
-package com.technophobia.eclipse.project.cache;
+package com.technophobia.eclipse.project.cache.listener;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.ElementChangedEvent;

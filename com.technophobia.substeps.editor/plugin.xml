@@ -185,4 +185,7 @@
            </enabledWhen>
      </page>
   </extension>
+  <extension
+        point="org.eclipse.jdt.core.compilationParticipant">
+  </extension>
 </plugin>

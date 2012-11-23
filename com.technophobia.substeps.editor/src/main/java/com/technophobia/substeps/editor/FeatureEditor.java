@@ -123,7 +123,9 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
 
         FeatureEditorPlugin.instance().info("Saving file " + ((FileEditorInput) editorInput).getFile().getLocation());
 
-        outlinePage.update();
+        if (outlinePage != null) {
+            outlinePage.update();
+        }
         resetDocument();
     }
 

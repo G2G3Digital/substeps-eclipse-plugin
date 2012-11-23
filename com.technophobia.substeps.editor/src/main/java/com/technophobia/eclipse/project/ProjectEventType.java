@@ -4,5 +4,7 @@ public enum ProjectEventType {
 
     FeatureFileChanged, //
     SourceFileAnnotationsChanged, //
-    ProjectDependenciesChanged;
+    ProjectDependenciesChanged, //
+    ProjectInserted, //
+    ProjectRemoved;
 }
