@@ -106,6 +106,14 @@ public class CacheAwareProjectManager implements ProjectManager {
 
 
     @Override
+    public void workspaceLoaded() {
+        for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+            updateCaches(project);
+        }
+    }
+
+
+    @Override
     public void addFeatureFileListener(final ProjectFileChangedListener listener) {
         this.featureChangeListeners.add(listener);
     }

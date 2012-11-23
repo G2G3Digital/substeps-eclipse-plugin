@@ -93,8 +93,11 @@ public class FeatureFileToElementTransformer implements Transformer<FeatureFile,
 
 
     private void addStepsTo(final AbstractStepContainerElement stepContainerElement, final List<Step> steps) {
-        for (final Step step : steps) {
-            stepContainerElement.addStep(new StepElement(step.getLine(), asOffsetPosition(step.getSourceLineNumber())));
+        if (steps != null) {
+            for (final Step step : steps) {
+                stepContainerElement.addStep(new StepElement(step.getLine(), asOffsetPosition(step
+                        .getSourceLineNumber())));
+            }
         }
     }
 

@@ -84,10 +84,15 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
 
 
     protected void clean(final IProject project) {
-        if (staleProjects.contains(project)) {
+        if (staleProjects.contains(project) || isEmpty(project)) {
             loadProject(project);
             staleProjects.remove(project);
         }
+    }
+
+
+    protected boolean isEmpty(final IProject project) {
+        return !stepImplementationMap.containsKey(project);
     }
 
 

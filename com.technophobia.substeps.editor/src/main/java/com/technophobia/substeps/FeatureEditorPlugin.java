@@ -241,6 +241,7 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         projectManager.addProjectListener(ProjectEventType.ProjectDependenciesChanged, externalSuggestionProvider);
         projectManager.addProjectListener(ProjectEventType.ProjectInserted, externalSuggestionProvider);
         projectManager.addProjectListener(ProjectEventType.ProjectRemoved, externalSuggestionProvider);
+
         projectManager.addProjectListener(ProjectEventType.SourceFileAnnotationsChanged,
                 projectSpecificSuggestionProvider);
         projectManager.addSubstepsFileListener(substepSuggestionProvider);

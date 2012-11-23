@@ -62,7 +62,9 @@ public class FileToSubstepDefinitionElementTransformer implements Transformer<Pr
         final Position lineNumber = lineNumberToPositionTransformer.from(Integer.valueOf(step.getSourceLineNumber()));
         final SubstepsDefinitionElement substepDefinition = new SubstepsDefinitionElement(step.getParent().getLine(),
                 lineNumber);
-        addStepsTo(substepDefinition, step.getSteps());
+
+        final List<Step> steps = step.getSteps();
+        addStepsTo(substepDefinition, steps != null ? steps : Collections.<Step> emptyList());
         return substepDefinition;
     }
 

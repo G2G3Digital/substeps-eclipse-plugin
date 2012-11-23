@@ -8,7 +8,7 @@ public class FeatureEditorStartup implements IStartup {
 
     @Override
     public void earlyStartup() {
-        // No-op
+        FeatureEditorPlugin.instance().getProjectManager().workspaceLoaded();
     }
 
 }
