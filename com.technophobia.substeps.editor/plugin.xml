@@ -188,4 +188,10 @@
   <extension
         point="org.eclipse.jdt.core.compilationParticipant">
   </extension>
+  <extension
+        point="org.eclipse.ui.startup">
+     <startup
+           class="com.technophobia.substeps.FeatureEditorPlugin">
+     </startup>
+  </extension>
 </plugin>

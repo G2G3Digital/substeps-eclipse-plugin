@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IStartup;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -68,7 +69,7 @@ import com.technophobia.substeps.syntax.CachingProjectToSyntaxTransformer;
  * @author sforbes
  * 
  */
-public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, PluginLogger {
+public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, PluginLogger, IStartup {
 
     public static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
@@ -95,6 +96,12 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
                 (IPersistentPreferenceStore) getPreferenceStore());
         this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer(preferenceLookupFactory);
         this.projectManager = new CacheAwareProjectManager(projectToSyntaxTransformer);
+    }
+
+
+    @Override
+    public void earlyStartup() {
+        // No-op
     }
 
 
