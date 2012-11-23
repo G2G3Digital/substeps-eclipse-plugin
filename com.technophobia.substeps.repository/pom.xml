@@ -21,8 +21,8 @@
 
     <licenses>
         <license>
-            <name>LGPL 3.0 license</name>
-            <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+            <name>EPL v1.0 license</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
             <distribution>manual</distribution>
       </license>
     </licenses>
