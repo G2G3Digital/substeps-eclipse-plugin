@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IStartup;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -69,7 +68,7 @@ import com.technophobia.substeps.syntax.CachingProjectToSyntaxTransformer;
  * @author sforbes
  * 
  */
-public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, PluginLogger, IStartup {
+public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, PluginLogger {
 
     public static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
@@ -100,15 +99,10 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     @Override
-    public void earlyStartup() {
-        // No-op
-    }
-
-
-    @Override
     public void start(final BundleContext bundleContext) throws Exception {
         context = bundleContext;
         log = Platform.getLog(bundleContext.getBundle());
+
         try {
             resourceBundle = ResourceBundle.getBundle("com.technophobia.substeps.FeatureEditorResources");
         } catch (final MissingResourceException x) {

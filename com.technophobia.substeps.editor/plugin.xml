@@ -190,8 +190,7 @@
   </extension>
   <extension
         point="org.eclipse.ui.startup">
-     <startup
-           class="com.technophobia.substeps.FeatureEditorPlugin">
+     <startup>
      </startup>
-  </extension>
+ com.technophobia.substeps.FeatureEditorStartup </extension>
 </plugin>
