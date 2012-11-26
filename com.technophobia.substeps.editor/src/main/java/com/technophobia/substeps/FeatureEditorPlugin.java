@@ -88,7 +88,6 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     public FeatureEditorPlugin() {
         super();
         FeatureEditorPlugin.pluginInstance = this;
-        this.suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
         this.preferenceLookupFactory = new SubstepsProjectPreferenceLookupFactory(PLUGIN_ID,
                 (IPersistentPreferenceStore) getPreferenceStore());
         this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer(preferenceLookupFactory);
@@ -108,7 +107,7 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         }
 
         projectManager.registerFrameworkListeners();
-        addSuggestionProviders();
+        // addSuggestionProviders();
     }
 
 
@@ -134,6 +133,14 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     public ContextualSuggestionManager getSuggestionManager() {
+        if (suggestionManager == null) {
+            suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
+            addSuggestionProviders();
+
+            // New suggestion providers means syntax should now have changed, re
+            // update it
+            refreshAllProjectSyntaxes();
+        }
         return suggestionManager;
     }
 
@@ -149,7 +156,7 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     public ProjectStepImplementationProvider getStepImplementationProvider() {
-        return suggestionManager;
+        return (ProjectStepImplementationProvider) getSuggestionManager();
     }
 
 
@@ -159,7 +166,7 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     public List<String> externalDependencyStepClasses(final IProject project) {
-        final Collection<ProjectSuggestionProvider> providers = suggestionManager
+        final Collection<ProjectSuggestionProvider> providers = ((ProvidedSuggestionManager) getSuggestionManager())
                 .providersOfSource(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION);
         final List<String> stepClasses = new ArrayList<String>();
         for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
@@ -224,17 +231,18 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     private void addSuggestionProviders() {
+        final ProvidedSuggestionManager suggestions = (ProvidedSuggestionManager) getSuggestionManager();
         final ExternalStepImplementationProvider externalSuggestionProvider = new ExternalStepImplementationProvider(
                 new ProjectStepImplementationLoader());
-        suggestionManager.addProvider(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION, externalSuggestionProvider);
+        suggestions.addProvider(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION, externalSuggestionProvider);
 
         final ProjectSpecificSuggestionProvider projectSpecificSuggestionProvider = new ProjectSpecificSuggestionProvider(
                 projectToSyntaxTransformer, new ParameterisedStepImplementationRenderer());
-        suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, projectSpecificSuggestionProvider);
+        suggestions.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, projectSpecificSuggestionProvider);
 
         final SubstepSuggestionProvider substepSuggestionProvider = new SubstepSuggestionProvider(
                 projectToSyntaxTransformer);
-        suggestionManager.addProvider(SuggestionSource.SUBSTEP_DEFINITION, substepSuggestionProvider);
+        suggestions.addProvider(SuggestionSource.SUBSTEP_DEFINITION, substepSuggestionProvider);
 
         projectManager.addProjectListener(ProjectEventType.ProjectDependenciesChanged, externalSuggestionProvider);
         projectManager.addProjectListener(ProjectEventType.ProjectInserted, externalSuggestionProvider);
@@ -243,6 +251,14 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         projectManager.addProjectListener(ProjectEventType.SourceFileAnnotationsChanged,
                 projectSpecificSuggestionProvider);
         projectManager.addSubstepsFileListener(substepSuggestionProvider);
-        suggestionManager.load(ResourcesPlugin.getWorkspace());
+        suggestions.load(ResourcesPlugin.getWorkspace());
+    }
+
+
+    private void refreshAllProjectSyntaxes() {
+        final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+        for (final IProject project : projects) {
+            projectToSyntaxTransformer.refreshCacheFor(project);
+        }
     }
 }
