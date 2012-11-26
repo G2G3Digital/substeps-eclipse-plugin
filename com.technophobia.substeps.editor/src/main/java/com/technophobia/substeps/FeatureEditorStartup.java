@@ -24,7 +24,7 @@ public class FeatureEditorStartup implements IStartup {
 
     @Override
     public void earlyStartup() {
-        FeatureEditorPlugin.instance().getProjectManager().workspaceLoaded();
+        // FeatureEditorPlugin.instance().getProjectManager().workspaceLoaded();
     }
 
 }

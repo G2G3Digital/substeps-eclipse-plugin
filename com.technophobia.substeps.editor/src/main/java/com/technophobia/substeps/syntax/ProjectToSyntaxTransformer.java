@@ -57,28 +57,31 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
     public Syntax from(final IProject project) {
 
         final IJavaProject javaProject = new ProjectToJavaProjectTransformer().from(project);
-        final ClassLoader classLoader = new JavaProjectClassLoader(javaProject);
-        final Set<String> outputFolders = outputFoldersForProject(javaProject);
-        final File projectFile = new File(projectLocationPath(javaProject).toOSString());
+        if (javaProject != null) {
+            final ClassLoader classLoader = new JavaProjectClassLoader(javaProject);
+            final Set<String> outputFolders = outputFoldersForProject(javaProject);
+            final File projectFile = new File(projectLocationPath(javaProject).toOSString());
 
-        final List<Class<?>> stepClasses = new ArrayList<Class<?>>();
-        for (final String outputFolder : outputFolders) {
-            final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
-            stepClasses.addAll(stepClasses(outputFolder, classLocator));
+            final List<Class<?>> stepClasses = new ArrayList<Class<?>>();
+            for (final String outputFolder : outputFolders) {
+                final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
+                stepClasses.addAll(stepClasses(outputFolder, classLocator));
 
+            }
+            // augment step classes with externally dependent classes
+            stepClasses.addAll(externalDependenciesFor(project, classLoader));
+
+            try {
+                return buildSyntaxFor(projectFile, stepClasses, classLoader, syntaxErrorReporterFor(project));
+            } catch (final RuntimeException ex) {
+                FeatureEditorPlugin.instance().warn(
+                        "Error when building syntax for project " + project + ": " + ex.getMessage(), ex);
+            }
         }
-        // augment step classes with externally dependent classes
-        stepClasses.addAll(externalDependenciesFor(project, classLoader));
-
-        try {
-            return buildSyntaxFor(projectFile, stepClasses, classLoader, syntaxErrorReporterFor(project));
-        } catch (final RuntimeException ex) {
-            FeatureEditorPlugin.instance().warn(
-                    "Error when building syntax for project " + project + ": " + ex.getMessage(), ex);
-            final Syntax nullSyntax = new Syntax();
-            nullSyntax.setSubStepsMap(new PatternMap<ParentStep>());
-            return nullSyntax;
-        }
+        // If we get to here, we can't resolve a valid syntax, return a null one
+        final Syntax nullSyntax = new Syntax();
+        nullSyntax.setSubStepsMap(new PatternMap<ParentStep>());
+        return nullSyntax;
     }
 
 
