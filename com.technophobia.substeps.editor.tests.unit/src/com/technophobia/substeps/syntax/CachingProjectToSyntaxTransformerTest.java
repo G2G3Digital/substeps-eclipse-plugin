@@ -18,6 +18,7 @@ package com.technophobia.substeps.syntax;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import org.eclipse.core.resources.IProject;
 import org.jmock.Expectations;
@@ -65,6 +66,9 @@ public class CachingProjectToSyntaxTransformerTest {
                 oneOf(delegate).from(project);
                 will(returnValue(syntax));
 
+                oneOf(project).isOpen();
+                will(returnValue(Boolean.TRUE));
+
                 allowing(project).getName();
                 will(returnValue("Project"));
 
@@ -85,6 +89,9 @@ public class CachingProjectToSyntaxTransformerTest {
             {
                 oneOf(delegate).from(project);
                 will(returnValue(syntax));
+
+                oneOf(project).isOpen();
+                will(returnValue(Boolean.TRUE));
 
                 allowing(project).getName();
                 will(returnValue("Project"));
@@ -108,6 +115,9 @@ public class CachingProjectToSyntaxTransformerTest {
                 exactly(2).of(delegate).from(project);
                 will(returnValue(syntax));
 
+                exactly(2).of(project).isOpen();
+                will(returnValue(Boolean.TRUE));
+
                 allowing(project).getName();
                 will(returnValue("Project"));
 
@@ -120,6 +130,50 @@ public class CachingProjectToSyntaxTransformerTest {
         transformer.refreshCacheFor(project);
 
         assertThat(transformer.from(project), is(syntax));
+    }
+
+
+    @Test
+    public void closedProjectsHaveNullSyntax() {
+        final IProject project = context.mock(IProject.class);
+
+        context.checking(new Expectations() {
+            {
+                oneOf(project).isOpen();
+                will(returnValue(Boolean.FALSE));
+
+                allowing(project).getName();
+                will(returnValue("Project"));
+
+                allowing(pluginLogger).info(with(any(String.class)));
+            }
+        });
+
+        assertThat(transformer.from(project), is(nullValue()));
+    }
+
+
+    @Test
+    public void closedProjectsDoNotGetRefreshed() {
+        final IProject project = context.mock(IProject.class);
+
+        context.checking(new Expectations() {
+            {
+                exactly(3).of(project).isOpen();
+                will(returnValue(Boolean.FALSE));
+
+                allowing(project).getName();
+                will(returnValue("Project"));
+
+                allowing(pluginLogger).info(with(any(String.class)));
+            }
+        });
+
+        assertThat(transformer.from(project), is(nullValue()));
+
+        transformer.refreshCacheFor(project);
+
+        assertThat(transformer.from(project), is(nullValue()));
     }
 
 

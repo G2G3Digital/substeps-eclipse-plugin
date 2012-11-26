@@ -55,7 +55,7 @@ public class CachingProjectToSyntaxTransformer implements CachingResultTransform
     @Override
     public Syntax from(final IProject project) {
         pluginLogger.info("Getting syntax for project " + project.getName());
-        if (!cache.containsKey(project)) {
+        if (!cache.containsKey(project) && project.isOpen()) {
             pluginLogger.info("No syntax cached for project " + project.getName() + ", generating now");
             cache.put(project, delegate.from(project));
         }
@@ -66,7 +66,12 @@ public class CachingProjectToSyntaxTransformer implements CachingResultTransform
     @Override
     public void refreshCacheFor(final IProject project) {
         pluginLogger.info("Clearing cache for project " + project);
-        cache.put(project, delegate.from(project));
+        if (project.isOpen()) {
+            cache.put(project, delegate.from(project));
+        } else {
+            pluginLogger.info("Project " + project + " is closed. Evicting from cache if it was present");
+            evictFrom(project);
+        }
     }
 
 

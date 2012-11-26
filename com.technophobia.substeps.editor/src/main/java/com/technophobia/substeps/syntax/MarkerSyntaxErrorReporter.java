@@ -17,6 +17,8 @@
 package com.technophobia.substeps.syntax;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -41,6 +43,8 @@ import com.technophobia.substeps.model.exception.SubstepsParsingException;
 import com.technophobia.substeps.preferences.SubstepsPreferences;
 
 public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorReporter {
+
+    private static final Collection<String> SUBSTEPS_FILE_EXTENSIONS = Arrays.asList("feature", "substeps");
 
     private final IProject project;
     private final Map<IResource, Set<Problem>> resourceToProblemMap;
@@ -118,7 +122,16 @@ public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorRe
 
     protected void clearErrorsFor(final IResource resource) {
         try {
-            resource.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+            final IMarker[] markers = resource.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+            for (final IMarker marker : markers) {
+                final IResource res = marker.getResource();
+                if (res instanceof IFile) {
+                    final IFile file = (IFile) res;
+                    if (SUBSTEPS_FILE_EXTENSIONS.contains(file.getFileExtension().toLowerCase())) {
+                        marker.delete();
+                    }
+                }
+            }
         } catch (final CoreException ex) {
             FeatureEditorPlugin.instance().error("Could not clear problems for resource " + resource.getFullPath(), ex);
         }
