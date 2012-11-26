@@ -240,7 +240,7 @@ public class CacheAwareProjectManager implements ProjectManager {
         return new Callback1<IProject>() {
             @Override
             public void doCallback(final IProject project) {
-                final Job job = new Job("Update caches") {
+                final Job job = new Job("Update Substeps model for project " + project.getName()) {
 
                     @Override
                     protected IStatus run(final IProgressMonitor monitor) {
@@ -261,7 +261,7 @@ public class CacheAwareProjectManager implements ProjectManager {
         return new Callback1<IProject>() {
             @Override
             public void doCallback(final IProject project) {
-                final Job job = new Job("Update caches") {
+                final Job job = new Job("Update Substeps model for project " + project.getName()) {
 
                     @Override
                     protected IStatus run(final IProgressMonitor monitor) {
