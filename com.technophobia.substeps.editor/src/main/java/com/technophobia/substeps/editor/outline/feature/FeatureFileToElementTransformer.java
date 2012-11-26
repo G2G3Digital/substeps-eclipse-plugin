@@ -50,7 +50,7 @@ public class FeatureFileToElementTransformer implements Transformer<FeatureFile,
     @Override
     public FeatureElement from(final FeatureFile file) {
 
-        final FeatureElement element = new FeatureElement(file.getName(), asOffsetPosition(0));
+        final FeatureElement element = new FeatureElement(file.getName(), asOffsetPosition(1));
 
         addBackground(element, file);
 
@@ -132,6 +132,8 @@ public class FeatureFileToElementTransformer implements Transformer<FeatureFile,
 
 
     private Position asOffsetPosition(final int lineNumber) {
-        return lineNumberToPositionTransformer.from(Integer.valueOf(lineNumber));
+        // line number comes from Syntax, which is 1-based. However, the
+        // lineNumberToPositionTransformer will expect it to be 0-based
+        return lineNumberToPositionTransformer.from(Integer.valueOf(lineNumber - 1));
     }
 }

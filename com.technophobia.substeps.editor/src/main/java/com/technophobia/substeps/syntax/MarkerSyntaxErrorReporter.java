@@ -56,7 +56,7 @@ public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorRe
 
     @Override
     public void applyChanges() {
-        final Job job = new Job("Update problems view") {
+        final Job job = new Job("Validating Substeps models") {
 
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
