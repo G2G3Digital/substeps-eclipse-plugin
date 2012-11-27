@@ -31,6 +31,18 @@ public enum SubstepsPreferences {
         protected void setDefault(final PreferenceLookup lookup) {
             lookup.setDefault(key(), false);
         }
+    },
+    FEATURE_FOLDER("folder.feature") {
+        @Override
+        protected void setDefault(final PreferenceLookup lookup) {
+            lookup.setDefault(key(), "");
+        }
+    },
+    SUBSTEPS_FOLDER("folder.substeps") {
+        @Override
+        protected void setDefault(final PreferenceLookup lookup) {
+            lookup.setDefault(key(), "");
+        }
     };
 
     private final String key;

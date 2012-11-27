@@ -41,6 +41,8 @@ import com.technophobia.eclipse.preference.PreferenceLookup;
 import com.technophobia.eclipse.preference.PreferenceLookupFactory;
 import com.technophobia.eclipse.project.ProjectEventType;
 import com.technophobia.eclipse.project.ProjectManager;
+import com.technophobia.eclipse.project.ProjectObserver;
+import com.technophobia.eclipse.project.PropertyBasedProjectManager;
 import com.technophobia.eclipse.project.cache.CacheAwareProjectManager;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
 import com.technophobia.substeps.model.Syntax;
@@ -79,7 +81,8 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     private ProvidedSuggestionManager suggestionManager;
     private CachingResultTransformer<IProject, Syntax> projectToSyntaxTransformer;
 
-    private ProjectManager projectManager;
+    private ProjectObserver projectObserver;
+    private final ProjectManager projectManager;
 
     private final PreferenceLookupFactory<IProject> preferenceLookupFactory;
 
@@ -90,8 +93,9 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         FeatureEditorPlugin.pluginInstance = this;
         this.preferenceLookupFactory = new SubstepsProjectPreferenceLookupFactory(PLUGIN_ID,
                 (IPersistentPreferenceStore) getPreferenceStore());
-        this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer(preferenceLookupFactory);
-        this.projectManager = new CacheAwareProjectManager(projectToSyntaxTransformer);
+        this.projectManager = new PropertyBasedProjectManager(preferenceLookupFactory);
+        this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer(projectManager, preferenceLookupFactory);
+        this.projectObserver = new CacheAwareProjectManager(projectToSyntaxTransformer);
     }
 
 
@@ -106,15 +110,15 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
             resourceBundle = null;
         }
 
-        projectManager.registerFrameworkListeners();
+        projectObserver.registerFrameworkListeners();
         // addSuggestionProviders();
     }
 
 
     @Override
     public void stop(final BundleContext bundleContext) throws Exception {
-        projectManager.unregisterFrameworkListeners();
-        projectManager = null;
+        projectObserver.unregisterFrameworkListeners();
+        projectObserver = null;
         suggestionManager = null;
         projectToSyntaxTransformer = null;
         resourceBundle = null;
@@ -145,8 +149,8 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     }
 
 
-    public ProjectManager getProjectManager() {
-        return projectManager;
+    public ProjectObserver getProjectObserver() {
+        return projectObserver;
     }
 
 
@@ -244,13 +248,13 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
                 projectToSyntaxTransformer);
         suggestions.addProvider(SuggestionSource.SUBSTEP_DEFINITION, substepSuggestionProvider);
 
-        projectManager.addProjectListener(ProjectEventType.ProjectDependenciesChanged, externalSuggestionProvider);
-        projectManager.addProjectListener(ProjectEventType.ProjectInserted, externalSuggestionProvider);
-        projectManager.addProjectListener(ProjectEventType.ProjectRemoved, externalSuggestionProvider);
+        projectObserver.addProjectListener(ProjectEventType.ProjectDependenciesChanged, externalSuggestionProvider);
+        projectObserver.addProjectListener(ProjectEventType.ProjectInserted, externalSuggestionProvider);
+        projectObserver.addProjectListener(ProjectEventType.ProjectRemoved, externalSuggestionProvider);
 
-        projectManager.addProjectListener(ProjectEventType.SourceFileAnnotationsChanged,
+        projectObserver.addProjectListener(ProjectEventType.SourceFileAnnotationsChanged,
                 projectSpecificSuggestionProvider);
-        projectManager.addSubstepsFileListener(substepSuggestionProvider);
+        projectObserver.addSubstepsFileListener(substepSuggestionProvider);
         suggestions.load(ResourcesPlugin.getWorkspace());
     }
 

@@ -83,9 +83,10 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
 
         final IFile file = (IFile) editorInput.getAdapter(IFile.class);
 
-        final boolean isFeatureFile = file.getName().endsWith("feature");
+        final boolean isFeatureFile = file.getFileExtension().toLowerCase().equals("feature");
+        final boolean isSubstepsFile = file.getFileExtension().toLowerCase().equals("substeps");
 
-        if (isFeatureFile) {
+        if (isFeatureFile || isSubstepsFile) {
 
             final IContainer container = file.getParent();
 

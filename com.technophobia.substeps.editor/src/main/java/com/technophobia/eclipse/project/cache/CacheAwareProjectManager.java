@@ -38,7 +38,7 @@ import org.eclipse.jdt.core.JavaCore;
 import com.technophobia.eclipse.project.ProjectChangedListener;
 import com.technophobia.eclipse.project.ProjectEventType;
 import com.technophobia.eclipse.project.ProjectFileChangedListener;
-import com.technophobia.eclipse.project.ProjectManager;
+import com.technophobia.eclipse.project.ProjectObserver;
 import com.technophobia.eclipse.project.cache.listener.ClassFileChangedListener;
 import com.technophobia.eclipse.project.cache.listener.ClasspathChangedListener;
 import com.technophobia.eclipse.project.cache.listener.FileWithExtensionChangedListener;
@@ -48,7 +48,7 @@ import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.observer.CacheMonitor;
 import com.technophobia.substeps.supplier.Callback1;
 
-public class CacheAwareProjectManager implements ProjectManager {
+public class CacheAwareProjectManager implements ProjectObserver {
 
     private final CacheMonitor<IProject>[] cacheMonitors;
 
