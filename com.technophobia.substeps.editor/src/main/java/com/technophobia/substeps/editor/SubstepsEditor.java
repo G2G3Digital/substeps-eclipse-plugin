@@ -20,7 +20,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.part.FileEditorInput;
 
-import com.technophobia.eclipse.project.ProjectManager;
+import com.technophobia.eclipse.project.ProjectObserver;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.feature.SubstepsContentDefinitionFactory;
@@ -38,11 +38,11 @@ import com.technophobia.substeps.supplier.Transformer;
  */
 public class SubstepsEditor extends FeatureEditor {
 
-    private final ProjectManager projectManager;
+    private final ProjectObserver projectObserver;
 
 
     public SubstepsEditor() {
-        this.projectManager = FeatureEditorPlugin.instance().getProjectManager();
+        this.projectObserver = FeatureEditorPlugin.instance().getProjectObserver();
     }
 
 
@@ -64,6 +64,6 @@ public class SubstepsEditor extends FeatureEditor {
 
         final IFile file = ((FileEditorInput) getEditorInput()).getFile();
         final IProject project = file.getProject();
-        projectManager.projectFileChange(project, file);
+        projectObserver.projectFileChange(project, file);
     }
 }
