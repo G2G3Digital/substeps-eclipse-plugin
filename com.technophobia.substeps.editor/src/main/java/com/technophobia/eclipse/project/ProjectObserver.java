@@ -14,18 +14,33 @@
  * You should have received a copy of the Eclipse Public License
  * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
  ******************************************************************************/
-package com.technophobia.eclipse.lookup;
+package com.technophobia.eclipse.project;
 
-public interface PreferenceLookup {
+public interface ProjectObserver extends ProjectFileChangedListener, ProjectPreferencesChangedListener {
 
-    String valueFor(String key);
-
-
-    boolean booleanFor(String key);
+    void workspaceLoaded();
 
 
-    void setDefault(String key, String value);
+    void registerFrameworkListeners();
 
 
-    void setDefault(String key, boolean value);
+    void unregisterFrameworkListeners();
+
+
+    void addFeatureFileListener(ProjectFileChangedListener listener);
+
+
+    void removeFeatureFileListener(ProjectFileChangedListener listener);
+
+
+    void addSubstepsFileListener(ProjectFileChangedListener listener);
+
+
+    void removeSubstepsFileListener(ProjectFileChangedListener listener);
+
+
+    void addProjectListener(ProjectEventType projectEventType, ProjectChangedListener listener);
+
+
+    void removeProjectListener(ProjectEventType projectEventType, ProjectChangedListener listener);
 }

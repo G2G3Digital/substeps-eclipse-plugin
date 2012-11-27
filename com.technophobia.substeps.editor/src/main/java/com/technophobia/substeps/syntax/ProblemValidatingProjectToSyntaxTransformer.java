@@ -23,6 +23,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 
 import com.technophobia.eclipse.preference.PreferenceLookupFactory;
+import com.technophobia.eclipse.project.ProjectManager;
 import com.technophobia.substeps.model.FeatureFile;
 import com.technophobia.substeps.model.ParentStep;
 import com.technophobia.substeps.model.Syntax;
@@ -35,12 +36,15 @@ import com.technophobia.substeps.runner.syntax.validation.SyntaxAwareStepValidat
 public class ProblemValidatingProjectToSyntaxTransformer extends ProjectToSyntaxTransformer {
 
     private final PreferenceLookupFactory<IProject> preferenceLookupFactory;
+    private final ProjectManager projectManager;
 
 
-    ProblemValidatingProjectToSyntaxTransformer(final PreferenceLookupFactory<IProject> preferenceLookupFactory) {
+    ProblemValidatingProjectToSyntaxTransformer(final ProjectManager projectManager,
+            final PreferenceLookupFactory<IProject> preferenceLookupFactory) {
         // package scope constructor to encourage use of the
         // CachingProjectToSyntaxTransformer
-        super();
+        super(projectManager);
+        this.projectManager = projectManager;
         this.preferenceLookupFactory = preferenceLookupFactory;
     }
 
@@ -52,13 +56,15 @@ public class ProblemValidatingProjectToSyntaxTransformer extends ProjectToSyntax
 
 
     @Override
-    protected Syntax buildSyntaxFor(final File projectFile, final List<Class<?>> stepClasses,
-            final ClassLoader classLoader, final SyntaxErrorReporter syntaxErrorReporter) {
-        final Syntax syntax = super.buildSyntaxFor(projectFile, stepClasses, classLoader, syntaxErrorReporter);
+    protected Syntax buildSyntaxFor(final IProject project, final File substepsFolder,
+            final List<Class<?>> stepClasses, final ClassLoader classLoader,
+            final SyntaxErrorReporter syntaxErrorReporter) {
+        final Syntax syntax = super.buildSyntaxFor(project, substepsFolder, stepClasses, classLoader,
+                syntaxErrorReporter);
 
         // while we're here, lets validate the feature and substep files for
         // missing steps
-        reportMissingSteps(projectFile, syntax, syntaxErrorReporter);
+        reportMissingSteps(project, syntax, syntaxErrorReporter);
 
         // we know we're using a DeferredReportingSyntaxErrorReporter, so finish
         // it off
@@ -68,10 +74,11 @@ public class ProblemValidatingProjectToSyntaxTransformer extends ProjectToSyntax
     }
 
 
-    private void reportMissingSteps(final File projectFile, final Syntax syntax,
+    private void reportMissingSteps(final IProject project, final Syntax syntax,
             final SyntaxErrorReporter syntaxErrorReporter) {
         final StepValidator validator = new SyntaxAwareStepValidator(syntax);
-        reportMissingScenarioSteps(projectFile, syntax, validator, syntaxErrorReporter);
+        reportMissingScenarioSteps(projectManager.featureFolderFor(project).toFile(), syntax, validator,
+                syntaxErrorReporter);
         reportMissingSubsteps(syntax.getSubStepsMap().values(), validator, syntaxErrorReporter);
     }
 

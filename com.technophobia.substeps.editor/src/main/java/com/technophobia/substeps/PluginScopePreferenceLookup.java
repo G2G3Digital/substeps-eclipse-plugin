@@ -18,7 +18,7 @@ package com.technophobia.substeps;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import com.technophobia.eclipse.lookup.PreferenceLookup;
+import com.technophobia.eclipse.preference.PreferenceLookup;
 
 public class PluginScopePreferenceLookup implements PreferenceLookup {
 

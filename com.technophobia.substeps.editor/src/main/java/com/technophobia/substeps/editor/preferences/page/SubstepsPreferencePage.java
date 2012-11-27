@@ -23,18 +23,18 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.technophobia.eclipse.project.ProjectManager;
+import com.technophobia.eclipse.project.ProjectObserver;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.preferences.SubstepsPreferences;
 
 public class SubstepsPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-    private final ProjectManager projectManager;
+    private final ProjectObserver projectObserver;
 
 
     public SubstepsPreferencePage() {
         super(GRID);
-        this.projectManager = FeatureEditorPlugin.instance().getProjectManager();
+        this.projectObserver = FeatureEditorPlugin.instance().getProjectObserver();
     }
 
 
@@ -70,7 +70,7 @@ public class SubstepsPreferencePage extends FieldEditorPreferencePage implements
 
     private void updateProjects() {
         for (final IProject project : affectedProjects()) {
-            projectManager.preferencesChanged(project);
+            projectObserver.preferencesChanged(project);
         }
     }
 
