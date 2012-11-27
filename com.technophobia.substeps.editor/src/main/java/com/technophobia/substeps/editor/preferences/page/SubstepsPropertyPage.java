@@ -22,13 +22,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
+import org.eclipse.jface.preference.StringButtonFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -36,9 +43,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbenchPropertyPage;
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 import org.eclipse.ui.dialogs.PropertyPage;
+import org.eclipse.ui.model.BaseWorkbenchContentProvider;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-import com.technophobia.eclipse.project.ProjectManager;
+import com.technophobia.eclipse.project.ProjectObserver;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.editor.preferences.OverridableProjectLocalPreferenceStore;
 import com.technophobia.substeps.preferences.SubstepsPreferences;
@@ -50,13 +61,13 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
     private final List<FieldEditor> fieldEditors;
     private final Map<FieldEditor, Composite> fieldToParentMap;
 
-    private final ProjectManager projectManager;
+    private final ProjectObserver projectObserver;
 
 
     public SubstepsPropertyPage() {
         this.fieldEditors = new ArrayList<FieldEditor>();
         this.fieldToParentMap = new HashMap<FieldEditor, Composite>();
-        this.projectManager = FeatureEditorPlugin.instance().getProjectManager();
+        this.projectObserver = FeatureEditorPlugin.instance().getProjectObserver();
         this.pluginId = FeatureEditorPlugin.PLUGIN_ID;
     }
 
@@ -93,6 +104,7 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
         createProjectOverrideControl(composite);
 
         createProblemsGroup(composite);
+        createFoldersGroup(composite);
 
         final boolean projectOverride = getPreferenceStore().getBoolean(SubstepsPreferences.PROJECT_OVERRIDE.key());
         setFieldsEnabled(projectOverride);
@@ -162,6 +174,39 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
     }
 
 
+    private void createFoldersGroup(final Composite composite) {
+        final Group group = new Group(composite, SWT.NONE);
+        group.setFont(composite.getFont());
+        group.setText("Folders");
+        final GridData layoutData = new GridData(GridData.FILL, GridData.FILL, true, false);
+        layoutData.verticalIndent = 20;
+        group.setLayoutData(layoutData);
+
+        group.setLayout(new GridLayout(1, false));
+
+        addField(createStringFieldEditor(SubstepsPreferences.FEATURE_FOLDER, "&Feature folder", group), group);
+        addField(createStringFieldEditor(SubstepsPreferences.SUBSTEPS_FOLDER, "&Substeps folder", group), group);
+    }
+
+
+    private FieldEditor createStringFieldEditor(final SubstepsPreferences preference, final String label,
+            final Group group) {
+        final StringButtonFieldEditor fieldEditor = new StringButtonFieldEditor(preference.key(), label, group) {
+
+            @Override
+            protected String changePressed() {
+                final String newLocation = handleBrowseFolderClick();
+                return newLocation != null ? newLocation : "";
+            }
+        };
+        fieldEditor.setChangeButtonText("Browse");
+        fieldEditor.setPage(this);
+        fieldEditor.setPreferenceStore(getPreferenceStore());
+        fieldEditor.load();
+        return fieldEditor;
+    }
+
+
     private Composite createComposite(final Composite parent) {
         final Composite composite = new Composite(parent, SWT.NULL);
         final GridLayout layout = new GridLayout(1, false);
@@ -190,6 +235,57 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
     private void updateProject() {
         final IProject project = (IProject) getElement().getAdapter(IProject.class);
 
-        projectManager.preferencesChanged(project);
+        projectObserver.preferencesChanged(project);
+    }
+
+
+    private String handleBrowseFolderClick() {
+        final IResource resource = chooseFolderResource();
+        if (resource == null) {
+            return "";
+        }
+
+        return projectLocalisedPathFor(resource);
+    }
+
+
+    private IResource chooseFolderResource() {
+        final ILabelProvider labelProvider = new WorkbenchLabelProvider();
+        final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(), labelProvider,
+                new BaseWorkbenchContentProvider());
+        dialog.setTitle("Choose folder");
+        dialog.setMessage("Please select a folder");
+        dialog.setInput(getElement().getAdapter(IProject.class));
+        dialog.setAllowMultiple(false);
+        dialog.setValidator(new ISelectionStatusValidator() {
+
+            @Override
+            public IStatus validate(final Object[] selection) {
+                if (selection.length > 0) {
+                    final Object item = selection[0];
+                    if (item instanceof IFolder) {
+                        return new Status(IStatus.OK, FeatureEditorPlugin.PLUGIN_ID, "");
+                    }
+                }
+                return new Status(IStatus.ERROR, FeatureEditorPlugin.PLUGIN_ID, "Not a folder");
+            }
+        });
+
+        if (dialog.open() == Window.OK) {
+            return (IResource) dialog.getFirstResult();
+        }
+        return null;
+    }
+
+
+    /**
+     * Convert a resource to its os-specific project localised path string
+     * 
+     * @param resource
+     *            to be localised
+     * @return localised path
+     */
+    protected String projectLocalisedPathFor(final IResource resource) {
+        return resource.getFullPath().removeFirstSegments(1).toOSString();
     }
 }

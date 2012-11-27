@@ -31,6 +31,7 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 
+import com.technophobia.eclipse.project.ProjectManager;
 import com.technophobia.eclipse.transformer.ProjectToJavaProjectTransformer;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.classloader.ClassLoadedClassAnalyser;
@@ -47,7 +48,11 @@ import com.technophobia.substeps.supplier.Transformer;
 
 public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax> {
 
-    ProjectToSyntaxTransformer() {
+    private final ProjectManager projectManager;
+
+
+    ProjectToSyntaxTransformer(final ProjectManager projectManager) {
+        this.projectManager = projectManager;
         // package scope constructor to encourage use of the
         // CachingProjectToSyntaxTransformer
     }
@@ -60,7 +65,7 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
         if (javaProject != null) {
             final ClassLoader classLoader = new JavaProjectClassLoader(javaProject);
             final Set<String> outputFolders = outputFoldersForProject(javaProject);
-            final File projectFile = new File(projectLocationPath(javaProject).toOSString());
+            final File substepsFolder = new File(projectManager.substepsFolderFor(project).toOSString());
 
             final List<Class<?>> stepClasses = new ArrayList<Class<?>>();
             for (final String outputFolder : outputFolders) {
@@ -72,7 +77,8 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
             stepClasses.addAll(externalDependenciesFor(project, classLoader));
 
             try {
-                return buildSyntaxFor(projectFile, stepClasses, classLoader, syntaxErrorReporterFor(project));
+                return buildSyntaxFor(project, substepsFolder, stepClasses, classLoader,
+                        syntaxErrorReporterFor(project));
             } catch (final RuntimeException ex) {
                 FeatureEditorPlugin.instance().warn(
                         "Error when building syntax for project " + project + ": " + ex.getMessage(), ex);
@@ -113,10 +119,11 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
     }
 
 
-    protected Syntax buildSyntaxFor(final File projectFile, final List<Class<?>> stepClasses,
-            final ClassLoader classLoader, final SyntaxErrorReporter syntaxErrorReporter) {
-        return SyntaxBuilder.buildSyntax(stepClasses, projectFile, true, null,
-                new ClassLoadedClassAnalyser(classLoader), false, syntaxErrorReporter);
+    protected Syntax buildSyntaxFor(final IProject project, final File substepsFolder,
+            final List<Class<?>> stepClasses, final ClassLoader classLoader,
+            final SyntaxErrorReporter syntaxErrorReporter) {
+        return SyntaxBuilder.buildSyntax(stepClasses, substepsFolder, true, null, new ClassLoadedClassAnalyser(
+                classLoader), false, syntaxErrorReporter);
     }
 
 
