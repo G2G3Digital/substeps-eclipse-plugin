@@ -240,17 +240,14 @@ public class CacheAwareProjectManager implements ProjectObserver {
         return new Callback1<IProject>() {
             @Override
             public void doCallback(final IProject project) {
-                final Job job = new Job("Update Substeps model for project " + project.getName()) {
-
-                    @Override
-                    protected IStatus run(final IProgressMonitor monitor) {
-                        notifyProjectChangeListeners(project, projectEventType);
-                        updateCaches(project);
-                        return Status.OK_STATUS;
-                    }
-                };
+                final Job job = new UpdateProjectInCachesJob("Update Substeps model for project " + project.getName(),
+                        project, projectEventType);
                 job.setRule(ResourcesPlugin.getWorkspace().getRoot());
                 job.setPriority(Job.DECORATE);
+
+                FeatureEditorPlugin.instance().info(
+                        "Found " + Job.getJobManager().find(project).length + " existing jobs");
+                Job.getJobManager().cancel(project);
                 job.schedule(200);
             }
         };
@@ -275,5 +272,32 @@ public class CacheAwareProjectManager implements ProjectObserver {
                 job.schedule(200);
             }
         };
+    }
+
+    private final class UpdateProjectInCachesJob extends Job {
+        private final IProject project;
+        private final ProjectEventType projectEventType;
+
+
+        private UpdateProjectInCachesJob(final String name, final IProject project,
+                final ProjectEventType projectEventType) {
+            super(name);
+            this.project = project;
+            this.projectEventType = projectEventType;
+        }
+
+
+        @Override
+        protected IStatus run(final IProgressMonitor monitor) {
+            notifyProjectChangeListeners(project, projectEventType);
+            updateCaches(project);
+            return Status.OK_STATUS;
+        }
+
+
+        @Override
+        public boolean belongsTo(final Object family) {
+            return project.equals(family);
+        }
     }
 }

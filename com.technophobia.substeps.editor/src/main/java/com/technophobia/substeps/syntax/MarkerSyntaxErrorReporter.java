@@ -128,7 +128,13 @@ public class MarkerSyntaxErrorReporter implements DeferredReportingSyntaxErrorRe
                 if (res instanceof IFile) {
                     final IFile file = (IFile) res;
                     if (SUBSTEPS_FILE_EXTENSIONS.contains(file.getFileExtension().toLowerCase())) {
-                        marker.delete();
+                        try {
+                            marker.delete();
+                        } catch (final Throwable ex) {
+                            // Again, nothing to do but catch a throwable
+                            FeatureEditorPlugin.instance().error("Could not delete marker for file " + file.getName(),
+                                    ex);
+                        }
                     }
                 }
             }
