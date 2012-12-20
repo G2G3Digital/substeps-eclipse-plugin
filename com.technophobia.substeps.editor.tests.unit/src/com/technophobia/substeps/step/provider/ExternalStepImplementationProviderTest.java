@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.step.provider;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -10,7 +26,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.jdt.core.JavaCore;
@@ -23,6 +38,7 @@ import org.junit.runner.RunWith;
 
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
+import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Transformer;
 
 @RunWith(JMock.class)
@@ -51,7 +67,7 @@ public class ExternalStepImplementationProviderTest {
         final IProject project = aProjectWith("project");
         suggestionProvider.load(aWorkspaceWith(project));
 
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project);
+        final Collection<Suggestion> suggestions = suggestionProvider.suggestionsFor(project);
         assertTrue(suggestions.isEmpty());
     }
 
@@ -66,30 +82,40 @@ public class ExternalStepImplementationProviderTest {
                 aStepImplementation("stepClass2Project2", "step7", "step8"));
         suggestionProvider.load(aWorkspaceWith(project1, project2));
 
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project2);
+        final Collection<Suggestion> suggestions = suggestionProvider.suggestionsFor(project2);
         assertEquals(4, suggestions.size());
-        assertThat(suggestions, hasItems("step5", "step6", "step7", "step8"));
+        assertThat(
+                suggestions,
+                hasItems(new Suggestion("step5"), new Suggestion("step6"), new Suggestion("step7"), new Suggestion(
+                        "step8")));
 
     }
 
 
     @Test
-    public void clearingProjectRemovesCorrespondingSuggestions() throws Exception {
+    public void clearingProjectForcesStepImplementationsToBeReloadedOnNextOCall() throws Exception {
         final IProject project1 = aProjectWith("project-1",
                 aStepImplementation("stepClass1Project1", "step1", "step2"),
                 aStepImplementation("stepClass2Project1", "step4", "step4"));
-        final IProject project2 = aProjectWith("project-2",
+        final IProject project2 = aProjectWith("project-2", 2,
                 aStepImplementation("stepClass1Project2", "step5", "step6"),
                 aStepImplementation("stepClass2Project2", "step7", "step8"));
         suggestionProvider.load(aWorkspaceWith(project1, project2));
 
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project2);
+        final Collection<Suggestion> suggestions = suggestionProvider.suggestionsFor(project2);
         assertEquals(4, suggestions.size());
-        assertThat(suggestions, hasItems("step5", "step6", "step7", "step8"));
+        assertThat(
+                suggestions,
+                hasItems(new Suggestion("step5"), new Suggestion("step6"), new Suggestion("step7"), new Suggestion(
+                        "step8")));
 
         suggestionProvider.clearStepImplementationsFor(project2);
-        final Collection<String> updatedSuggestions = suggestionProvider.suggestionsFor(project2);
-        assertTrue(updatedSuggestions.isEmpty());
+        final Collection<Suggestion> updatedSuggestions = suggestionProvider.suggestionsFor(project2);
+        assertEquals(4, updatedSuggestions.size());
+        assertThat(
+                updatedSuggestions,
+                hasItems(new Suggestion("step5"), new Suggestion("step6"), new Suggestion("step7"), new Suggestion(
+                        "step8")));
     }
 
 
@@ -101,7 +127,7 @@ public class ExternalStepImplementationProviderTest {
         final IProject project2 = aProjectWith("project-2");
         suggestionProvider.load(aWorkspaceWith(project1, project2));
 
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project2);
+        final Collection<Suggestion> suggestions = suggestionProvider.suggestionsFor(project2);
         assertTrue(suggestions.isEmpty());
 
         context.checking(new Expectations() {
@@ -113,44 +139,12 @@ public class ExternalStepImplementationProviderTest {
         });
 
         suggestionProvider.loadProject(project2);
-        final Collection<String> updatedSuggestions = suggestionProvider.suggestionsFor(project2);
+        final Collection<Suggestion> updatedSuggestions = suggestionProvider.suggestionsFor(project2);
         assertEquals(4, updatedSuggestions.size());
-        assertThat(updatedSuggestions, hasItems("step5", "step6", "step7", "step8"));
-    }
-
-
-    @Test
-    public void closedProjectDoesntLoadSuggestions() {
-        final IProject project = context.mock(IProject.class);
-        context.checking(new Expectations() {
-            {
-                oneOf(project).isAccessible();
-                will(returnValue(Boolean.FALSE));
-            }
-        });
-
-        suggestionProvider.load(aWorkspaceWith(project));
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project);
-        assertTrue(suggestions.isEmpty());
-    }
-
-
-    @Test
-    public void ProjectDoesntLoadSuggestions() throws Exception {
-        final IProject project = context.mock(IProject.class);
-        context.checking(new Expectations() {
-            {
-                oneOf(project).isAccessible();
-                will(returnValue(Boolean.TRUE));
-
-                oneOf(project).hasNature(JavaCore.NATURE_ID);
-                will(returnValue(Boolean.FALSE));
-            }
-        });
-
-        suggestionProvider.load(aWorkspaceWith(project));
-        final Collection<String> suggestions = suggestionProvider.suggestionsFor(project);
-        assertTrue(suggestions.isEmpty());
+        assertThat(
+                updatedSuggestions,
+                hasItems(new Suggestion("step5"), new Suggestion("step6"), new Suggestion("step7"), new Suggestion(
+                        "step8")));
     }
 
 
@@ -182,11 +176,11 @@ public class ExternalStepImplementationProviderTest {
 
 
     @Test
-    public void clearingProjectRemovesCorrespondingStepImplementationClasses() throws Exception {
+    public void clearingProjectForcesCorrespondingStepImplementationClassesToBeReloadedOnNextCall() throws Exception {
         final IProject project1 = aProjectWith("project-1",
                 aStepImplementation("stepClass1Project1", "step1", "step2"),
                 aStepImplementation("stepClass2Project1", "step4", "step4"));
-        final IProject project2 = aProjectWith("project-2",
+        final IProject project2 = aProjectWith("project-2", 2,
                 aStepImplementation("stepClass1Project2", "step5", "step6"),
                 aStepImplementation("stepClass2Project2", "step7", "step8"));
         suggestionProvider.load(aWorkspaceWith(project1, project2));
@@ -197,7 +191,8 @@ public class ExternalStepImplementationProviderTest {
 
         suggestionProvider.clearStepImplementationsFor(project2);
         final Collection<String> updatedStepImplementations = suggestionProvider.stepImplementationClasses(project2);
-        assertTrue(updatedStepImplementations.isEmpty());
+        assertEquals(2, updatedStepImplementations.size());
+        assertThat(updatedStepImplementations, hasItems("stepClass1Project2", "stepClass2Project2"));
     }
 
 
@@ -238,8 +233,6 @@ public class ExternalStepImplementationProviderTest {
 
                 oneOf(root).getProjects();
                 will(returnValue(projects));
-
-                oneOf(workspace).addResourceChangeListener(with(any(IResourceChangeListener.class)));
             }
         });
 
@@ -249,11 +242,17 @@ public class ExternalStepImplementationProviderTest {
 
     private IProject aProjectWith(final String name, final StepImplementationsDescriptor... stepImplementations)
             throws Exception {
+        return aProjectWith(name, 1, stepImplementations);
+    }
+
+
+    private IProject aProjectWith(final String name, final int stepImplLoads,
+            final StepImplementationsDescriptor... stepImplementations) throws Exception {
         final IProject project = context.mock(IProject.class, name);
 
         context.checking(new Expectations() {
             {
-                oneOf(stepImplementationLoader).from(project);
+                exactly(stepImplLoads).of(stepImplementationLoader).from(project);
                 will(returnValue(Arrays.asList(stepImplementations)));
 
                 oneOf(project).isAccessible();

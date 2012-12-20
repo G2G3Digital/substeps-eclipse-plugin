@@ -1,7 +1,24 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.step;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +52,11 @@ public class ProvidedSuggestionManager implements ContextualSuggestionManager, P
     }
 
 
+    public Collection<ProjectSuggestionProvider> providersOfSource(final SuggestionSource source) {
+        return projectSuggestionProviders.get(source);
+    }
+
+
     public void load(final IWorkspace workspace) {
         for (final Set<ProjectSuggestionProvider> providers : projectSuggestionProviders.values()) {
             for (final ProjectSuggestionProvider provider : providers) {
@@ -45,21 +67,21 @@ public class ProvidedSuggestionManager implements ContextualSuggestionManager, P
 
 
     @Override
-    public List<String> suggestionsFor(final SuggestionType suggestionType, final IResource resource) {
+    public List<Suggestion> suggestionsFor(final IResource resource) {
 
-        final Set<String> suggestions = new HashSet<String>();
+        final Set<Suggestion> suggestions = new HashSet<Suggestion>();
 
         final IProject project = resourceToProjectTransformer.from(resource);
 
         for (final Entry<SuggestionSource, Set<ProjectSuggestionProvider>> entry : projectSuggestionProviders
                 .entrySet()) {
-            if (suggestionType.isPermittedSuggestionSource(entry.getKey())) {
-                for (final ProjectSuggestionProvider provider : entry.getValue()) {
-                    suggestions.addAll(provider.suggestionsFor(project));
-                }
+            for (final ProjectSuggestionProvider provider : entry.getValue()) {
+                suggestions.addAll(provider.suggestionsFor(project));
             }
         }
-        return new ArrayList<String>(suggestions);
+        final List<Suggestion> suggestionsList = new ArrayList<Suggestion>(suggestions);
+        Collections.sort(suggestionsList);
+        return suggestionsList;
     }
 
 

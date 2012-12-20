@@ -1,21 +1,19 @@
-/*
- *	Copyright Technophobia Ltd 2012
- *
- *   This file is part of Substeps.
- *
- *    Substeps is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Lesser General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
- *
- *    Substeps is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public License
- *    along with Substeps.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.document.content;
 
 import org.eclipse.jface.text.formatter.IFormattingStrategy;
@@ -24,6 +22,7 @@ import org.eclipse.jface.text.rules.IRule;
 
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.formatting.FormattingContext;
+import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.supplier.Supplier;
 
 /**
@@ -40,13 +39,15 @@ public interface ContentTypeDefinition {
      * @return id
      */
     String id();
-    
+
+
     /**
      * Text that will be visible in the editor for this content type
      * 
      * @return prefixText
      */
     String prefixText();
+
 
     /**
      * Is this item optional in the editor
@@ -59,9 +60,11 @@ public interface ContentTypeDefinition {
     /**
      * Return the {@link PredicateRule} associated with this content type
      * 
+     * @param partitionContext
+     * 
      * @return PredicateRule
      */
-    IPredicateRule partitionRule();
+    IPredicateRule partitionRule(final Supplier<PartitionContext> partitionContextSupplier);
 
 
     /**
@@ -69,7 +72,7 @@ public interface ContentTypeDefinition {
      * 
      * @return DamageRepairer Rule
      */
-    IRule damageRepairerRule(ColourManager colourManager);
+    IRule damageRepairerRule(ColourManager colourManager, final Supplier<PartitionContext> partitionContextSupplier);
 
 
     /**

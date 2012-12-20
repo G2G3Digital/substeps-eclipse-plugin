@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.classloader;
 
 import java.net.MalformedURLException;
@@ -8,7 +24,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.launching.JavaRuntime;
@@ -71,8 +86,7 @@ public class JavaProjectClassLoader extends ClassLoader {
         try {
             return JavaRuntime.computeDefaultRuntimeClassPath(project);
         } catch (final CoreException e) {
-            FeatureEditorPlugin.instance().log(
-                    IStatus.ERROR,
+            FeatureEditorPlugin.instance().error(
                     "Could not get classpath entries for project " + project.getProject().getName()
                             + ", returning empty array");
             return new String[0];
@@ -83,8 +97,8 @@ public class JavaProjectClassLoader extends ClassLoader {
     /**
      * Converts a classpath entry to a url
      * 
-     * @param entry
-     *            The classpath entry
+     * @param The
+     *            classpath entry
      * @return url representation of the entry
      */
     private URL entryToUrl(final String entry) {
@@ -93,8 +107,7 @@ public class JavaProjectClassLoader extends ClassLoader {
             final URL url = path.toFile().toURI().toURL();
             return url;
         } catch (final MalformedURLException ex) {
-            FeatureEditorPlugin.instance().log(IStatus.ERROR,
-                    "classpath entry " + entry + " could not be mapped to a url");
+            FeatureEditorPlugin.instance().error("classpath entry " + entry + " could not be mapped to a url");
             return null;
         }
     }

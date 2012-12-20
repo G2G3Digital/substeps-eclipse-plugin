@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.document.content.feature.definition;
 
 import org.eclipse.jface.text.TextAttribute;
@@ -8,12 +24,15 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
+import org.eclipse.swt.SWT;
 
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.FeatureColour;
 import com.technophobia.substeps.document.text.rule.SingleLineWithTrailingCommentRule;
 import com.technophobia.substeps.document.text.rule.UntilOtherContentTypeSequenceRule;
+import com.technophobia.substeps.document.text.rule.word.MultipleChoiceSingleWordDetector;
+import com.technophobia.substeps.document.text.rule.word.SingleWordDetector;
 
 public abstract class AbstractFeatureContentTypeDefinition implements ContentTypeDefinition {
 
@@ -53,28 +72,14 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
     }
 
 
+    protected IToken boldColourToken(final FeatureColour colour, final ColourManager colourManager) {
+        return new Token(new TextAttribute(colourManager.getColor(colour.colour()), null, SWT.BOLD));
+    }
+
+
     protected IRule fixedWordRule(final String word, final IToken token) {
         // return new WordRule(word(word), token);
-        final WordRule rule = new WordRule(new IWordDetector() {
-
-            /**
-             * Only really interested in the keyword, so only pick words which
-             * start with the same character
-             */
-            @Override
-            public boolean isWordStart(final char c) {
-                return c == word.charAt(0);
-            }
-
-
-            /**
-             * "Words" may contain any non-whitespace characters
-             */
-            @Override
-            public boolean isWordPart(final char c) {
-                return !Character.isWhitespace(c);
-            }
-        });
+        final WordRule rule = new WordRule(new SingleWordDetector(word));
         rule.addWord(word, token);
         return rule;
     }
@@ -83,6 +88,15 @@ public abstract class AbstractFeatureContentTypeDefinition implements ContentTyp
     protected IRule fixedMultiWordRule(final String word, final IToken token) {
         final WordRule rule = new WordRule(word(word));
         rule.addWord(word, token);
+        return rule;
+    }
+
+
+    protected IRule fixedWordSetRule(final String[] words, final IToken token) {
+        final WordRule rule = new WordRule(new MultipleChoiceSingleWordDetector(words));
+        for (final String word : words) {
+            rule.addWord(word, token);
+        }
         return rule;
     }
 

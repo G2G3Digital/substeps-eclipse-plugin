@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright Technophobia Ltd 2012
+  
+  This file is part of the Substeps Eclipse Plugin.
+  
+  The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+  it under the terms of the Eclipse Public License v1.0.
+  
+  The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  Eclipse Public License for more details.
+  
+  You should have received a copy of the Eclipse Public License
+  along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+-->
 <project
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -7,7 +23,7 @@
 	<parent>
 		<groupId>com.technophobia.substeps</groupId>
 		<artifactId>com.technophobia.substeps.parent</artifactId>
-		<version>0.0.19-SNAPSHOT</version>
+		<version>0.2.8-SNAPSHOT</version>
 		<relativePath>../com.technophobia.substeps.parent</relativePath>
 	</parent>
 	
@@ -22,8 +38,8 @@
 
     <licenses>
         <license>
-            <name>LGPL 3.0 license</name>
-            <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+            <name>EPL v1.0 license</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
             <distribution>manual</distribution>
       </license>
     </licenses>

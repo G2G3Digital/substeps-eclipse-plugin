@@ -1,21 +1,19 @@
-/*
- *	Copyright Technophobia Ltd 2012
- *
- *   This file is part of Substeps.
- *
- *    Substeps is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Lesser General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
- *
- *    Substeps is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public License
- *    along with Substeps.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.document.content.feature;
 
 import static org.junit.Assert.assertTrue;
@@ -25,18 +23,15 @@ import org.junit.Test;
 
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.NullContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.AndContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.BackgroundContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.CommentContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.FeatureContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.GivenContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioExampleRowContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.ScenarioOutlineContentTypeDefinition;
+import com.technophobia.substeps.document.content.feature.definition.StepContentTypeDefinition;
 import com.technophobia.substeps.document.content.feature.definition.TagContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.ThenContentTypeDefinition;
-import com.technophobia.substeps.document.content.feature.definition.WhenContentTypeDefinition;
 
 public class FeatureContentTypeDefinitionFactoryTest {
 
@@ -59,10 +54,7 @@ public class FeatureContentTypeDefinitionFactoryTest {
         assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_scenario_outline") instanceof ScenarioOutlineContentTypeDefinition);
         assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_example") instanceof ScenarioExampleContentTypeDefinition);
         assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_example_row") instanceof ScenarioExampleRowContentTypeDefinition);
-        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_given") instanceof GivenContentTypeDefinition);
-        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_when") instanceof WhenContentTypeDefinition);
-        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_then") instanceof ThenContentTypeDefinition);
-        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_and") instanceof AndContentTypeDefinition);
+        assertTrue(contentTypeDefinitionFactory.contentTypeDefintionByName("__feature_step") instanceof StepContentTypeDefinition);
     }
 
 

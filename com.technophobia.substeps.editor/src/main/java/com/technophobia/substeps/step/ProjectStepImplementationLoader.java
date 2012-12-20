@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.step;
 
 import java.io.File;
@@ -12,7 +28,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
@@ -53,7 +68,7 @@ public class ProjectStepImplementationLoader implements Transformer<IProject, Li
         try {
             return project.hasNature(JavaCore.NATURE_ID);
         } catch (final CoreException e) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+            FeatureEditorPlugin.instance().warn(
                     "Could not determine if project " + project.getName() + " is a java project");
             return false;
         }
@@ -70,14 +85,16 @@ public class ProjectStepImplementationLoader implements Transformer<IProject, Li
             final IPackageFragmentRoot[] fragmentRoots = javaProject.getPackageFragmentRoots();
             final Collection<String> rootPaths = new ArrayList<String>(fragmentRoots.length);
             for (int i = 0; i < fragmentRoots.length; i++) {
-                final String path = getPathFor(fragmentRoots[i]);
-                if (path != null) {
-                    rootPaths.add(path);
+                if (fragmentRoots[i].getKind() == IPackageFragmentRoot.K_BINARY) {
+                    final String path = getPathFor(fragmentRoots[i]);
+                    if (path != null) {
+                        rootPaths.add(path);
+                    }
                 }
             }
             return rootPaths.toArray(new String[rootPaths.size()]);
         } catch (final JavaModelException ex) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+            FeatureEditorPlugin.instance().warn(
                     "Could not get package fragment roots for project " + javaProject.getProject().getName());
             return new String[0];
         }
@@ -114,14 +131,14 @@ public class ProjectStepImplementationLoader implements Transformer<IProject, Li
             return stepImplementationDescriptors != null ? stepImplementationDescriptors : Collections
                     .<StepImplementationsDescriptor> emptyList();
         } catch (final IOException ex) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING, "Could not open jar file " + path);
+            FeatureEditorPlugin.instance().warn("Could not open jar file " + path);
         } finally {
             try {
                 if (jarFile != null) {
                     jarFile.close();
                 }
             } catch (final IOException e) {
-                FeatureEditorPlugin.instance().log(IStatus.WARNING, "Could not close jar file " + path);
+                FeatureEditorPlugin.instance().warn("Could not close jar file " + path);
             }
         }
 

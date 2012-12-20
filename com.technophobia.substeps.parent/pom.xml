@@ -5,7 +5,7 @@
 
 	<groupId>com.technophobia.substeps</groupId>
 	<artifactId>com.technophobia.substeps.parent</artifactId>
-	<version>0.0.19-SNAPSHOT</version>
+	<version>0.2.8-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<organization>
@@ -14,15 +14,17 @@
 	</organization>
 
 	<licenses>
-		<license>
-			<name>LGPL 3.0 license</name>
-			<url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
-			<distribution>manual</distribution>
-		</license>
-	</licenses>
+        <license>
+            <name>EPL v1.0 license</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
+            <distribution>manual</distribution>
+      </license>
+    </licenses>
 
 	<properties>
 		<tycho.version>0.15.0</tycho.version>
+                <KEY_STORE>/path/to/keystore</KEY_STORE>
+                <ALIAS>alias</ALIAS>
 	</properties>
 
 	<repositories>
@@ -118,5 +120,38 @@
 			</distributionManagement>
 
 		</profile>
+		<profile>
+			<id>sign</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jarsigner-plugin</artifactId>
+						<version>1.2</version>
+						<executions>
+							<execution>
+								<id>sign</id>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>verify</id>
+								<goals>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<keystore>${KEY_STORE}</keystore>
+							<alias>${ALIAS}</alias>
+							<storepass>${env.STORE_PASSWORD}</storepass>
+							<keypass>${env.KEY_PASSWORD}</keypass>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 	</profiles>
 </project>

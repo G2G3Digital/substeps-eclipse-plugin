@@ -1,21 +1,19 @@
-/*
- *	Copyright Technophobia Ltd 2012
- *
- *   This file is part of Substeps.
- *
- *    Substeps is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Lesser General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
- *
- *    Substeps is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public License
- *    along with Substeps.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.document.content.view;
 
 import java.util.Collections;
@@ -24,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -31,6 +30,8 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.editors.text.TextEditor;
@@ -39,9 +40,13 @@ import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.assist.ContentAssistantFactory;
+import com.technophobia.substeps.document.content.feature.FeatureColour;
 import com.technophobia.substeps.document.formatting.ContextAwareContentFormatter;
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
 import com.technophobia.substeps.document.formatting.strategy.NullFormattingStrategy;
+import com.technophobia.substeps.document.partition.PartitionContext;
+import com.technophobia.substeps.document.text.rule.word.AnySingleWordDetector;
+import com.technophobia.substeps.supplier.Supplier;
 
 /**
  * SourceViewerConfiguration for rendering {@link TextEditor}s using a
@@ -58,16 +63,19 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
     private Map<String, ContentTypeDefinition> contentTypeDefinitionMap = null;
     private final ContentTypeDefinitionFactory contentTypeDefinitionFactory;
     private final ContentAssistantFactory contentAssistantFactory;
+    private final Supplier<PartitionContext> partitionContextSupplier;
 
 
     public ContentTypeViewConfiguration(final ColourManager colourManager,
             final ContentTypeDefinitionFactory contentTypeDefinitionFactory,
             final FormattingContextFactory formattingContextFactory,
-            final ContentAssistantFactory contentAssistantFactory) {
+            final ContentAssistantFactory contentAssistantFactory,
+            final Supplier<PartitionContext> partitionContextSupplier) {
         this.colourManager = colourManager;
         this.contentTypeDefinitionFactory = contentTypeDefinitionFactory;
         this.formattingContextFactory = formattingContextFactory;
         this.contentAssistantFactory = contentAssistantFactory;
+        this.partitionContextSupplier = partitionContextSupplier;
     }
 
 
@@ -84,10 +92,19 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
 
         for (final Map.Entry<String, ContentTypeDefinition> entry : definitionMap().entrySet()) {
             if (entry.getValue() != null) {
-                setDamagerRepairer(entry.getKey(), entry.getValue().damageRepairerRule(colourManager), reconciler);
+                setDamagerRepairer(entry.getKey(),
+                        entry.getValue().damageRepairerRule(colourManager, partitionContextSupplier), reconciler);
             }
         }
+
+        setDamagerRepairer(IDocument.DEFAULT_CONTENT_TYPE, defaultDamageRepairer(), reconciler);
         return reconciler;
+    }
+
+
+    private IRule defaultDamageRepairer() {
+        final Token token = new Token(new TextAttribute(colourManager.getColor(FeatureColour.BLACK.colour())));
+        return new WordRule(new AnySingleWordDetector(), token);
     }
 
 
