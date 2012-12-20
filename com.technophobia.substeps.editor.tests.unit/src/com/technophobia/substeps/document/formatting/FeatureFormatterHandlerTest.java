@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.document.formatting;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -11,7 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.technophobia.eclipse.editor.FormattableEditorPart;
-import com.technophobia.eclipse.log.Logger;
+import com.technophobia.eclipse.log.PluginLogger;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.supplier.Transformer;
 
@@ -21,7 +37,7 @@ public class FeatureFormatterHandlerTest {
     private Mockery context;
 
     private Transformer<ExecutionEvent, IEditorPart> editorSupplier;
-    private Logger logger;
+    private PluginLogger logger;
 
     private IHandler handler;
 
@@ -32,7 +48,7 @@ public class FeatureFormatterHandlerTest {
         this.context = new Mockery();
 
         this.editorSupplier = context.mock(Transformer.class);
-        this.logger = context.mock(Logger.class);
+        this.logger = context.mock(PluginLogger.class);
 
         this.handler = new FeatureFormatterHandler(editorSupplier, logger);
 
@@ -68,7 +84,7 @@ public class FeatureFormatterHandlerTest {
                 oneOf(editorSupplier).from(event);
                 will(returnValue(editor));
 
-                allowing(logger).log(with(any(int.class)), with(any(String.class)));
+                allowing(logger).warn(with(any(String.class)));
             }
         });
         handler.execute(event);
@@ -84,7 +100,7 @@ public class FeatureFormatterHandlerTest {
                 oneOf(editorSupplier).from(event);
                 will(returnValue(null));
 
-                allowing(logger).log(with(any(int.class)), with(any(String.class)));
+                allowing(logger).warn(with(any(String.class)));
             }
         });
         handler.execute(event);

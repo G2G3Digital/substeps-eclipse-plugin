@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.step.provider;
 
 import java.util.ArrayList;
@@ -6,14 +22,17 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspace;
 
+import com.technophobia.eclipse.project.ProjectFileChangedListener;
 import com.technophobia.substeps.model.ParentStep;
+import com.technophobia.substeps.model.Step;
 import com.technophobia.substeps.model.Syntax;
-import com.technophobia.substeps.supplier.Callback1;
+import com.technophobia.substeps.step.PatternSuggestion;
+import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Transformer;
 
-public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionProvider {
+public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionProvider implements
+        ProjectFileChangedListener {
 
     private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
 
@@ -24,28 +43,20 @@ public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionPro
 
 
     @Override
-    public void load(final IWorkspace workspace) {
-        super.load(workspace);
-
-        workspace.addResourceChangeListener(new FileChangedListener("substeps", new Callback1<IFile>() {
-
-            @Override
-            public void doCallback(final IFile file) {
-                final IProject project = file.getProject();
-                markAsStale(project);
-            }
-        }));
+    public void projectFileChange(final IProject project, final IFile file) {
+        markAsStale(project);
     }
 
 
     @Override
-    protected Collection<String> findStepImplementationsFor(final IProject project) {
+    protected Collection<Suggestion> findStepImplementationsFor(final IProject project) {
         final Syntax syntax = projectToSyntaxTransformer.from(project);
 
         final List<ParentStep> substeps = syntax.getSortedRootSubSteps();
-        final List<String> suggestions = new ArrayList<String>();
+        final List<Suggestion> suggestions = new ArrayList<Suggestion>(substeps.size());
         for (final ParentStep substep : substeps) {
-            suggestions.add(substep.getParent().getLine());
+            final Step parentStep = substep.getParent();
+            suggestions.add(new PatternSuggestion(parentStep.getPattern(), parentStep.getLine()));
         }
         return suggestions;
     }

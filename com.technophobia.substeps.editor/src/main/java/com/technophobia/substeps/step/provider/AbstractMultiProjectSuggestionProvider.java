@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.step.provider;
 
 import java.util.ArrayList;
@@ -12,21 +28,21 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.JavaCore;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.step.ProjectSuggestionProvider;
+import com.technophobia.substeps.step.Suggestion;
 
 public abstract class AbstractMultiProjectSuggestionProvider implements ProjectSuggestionProvider {
 
-    private final Map<IProject, List<String>> stepImplementationMap;
+    private final Map<IProject, List<Suggestion>> stepImplementationMap;
 
     private final Set<IProject> staleProjects;
 
 
     public AbstractMultiProjectSuggestionProvider() {
-        this.stepImplementationMap = new HashMap<IProject, List<String>>();
+        this.stepImplementationMap = new HashMap<IProject, List<Suggestion>>();
         this.staleProjects = new HashSet<IProject>();
     }
 
@@ -45,7 +61,7 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
         try {
             return project.hasNature(JavaCore.NATURE_ID);
         } catch (final CoreException e) {
-            FeatureEditorPlugin.instance().log(IStatus.WARNING,
+            FeatureEditorPlugin.instance().warn(
                     "Could not determine if project " + project.getName() + " is a java project, returning false");
             return false;
         }
@@ -54,7 +70,9 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
 
     protected void loadProject(final IProject project) {
         if (!stepImplementationMap.containsKey(project)) {
-            stepImplementationMap.put(project, new ArrayList<String>());
+            stepImplementationMap.put(project, new ArrayList<Suggestion>());
+        } else {
+            stepImplementationMap.get(project).clear();
         }
 
         stepImplementationMap.get(project).addAll(findStepImplementationsFor(project));
@@ -67,10 +85,10 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
 
 
     @Override
-    public Collection<String> suggestionsFor(final IProject project) {
+    public Collection<Suggestion> suggestionsFor(final IProject project) {
         clean(project);
         return stepImplementationMap.containsKey(project) ? stepImplementationMap.get(project) : Collections
-                .<String> emptyList();
+                .<Suggestion> emptyList();
 
     }
 
@@ -82,12 +100,17 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
 
 
     protected void clean(final IProject project) {
-        if (staleProjects.contains(project)) {
+        if (staleProjects.contains(project) || isEmpty(project)) {
             loadProject(project);
             staleProjects.remove(project);
         }
     }
 
 
-    protected abstract Collection<String> findStepImplementationsFor(IProject project);
+    protected boolean isEmpty(final IProject project) {
+        return !stepImplementationMap.containsKey(project);
+    }
+
+
+    protected abstract Collection<Suggestion> findStepImplementationsFor(IProject project);
 }

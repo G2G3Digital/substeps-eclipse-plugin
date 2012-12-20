@@ -1,31 +1,27 @@
-/*
- *	Copyright Technophobia Ltd 2012
- *
- *   This file is part of Substeps.
- *
- *    Substeps is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Lesser General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
- *
- *    Substeps is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public License
- *    along with Substeps.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.document.partition;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
 
-import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.supplier.Supplier;
 
 /**
@@ -41,9 +37,13 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
 
     private IDocument thisDocument = null;
 
+    private final Supplier<PartitionContext> partitionContextSupplier;
 
-    public PartitionScannedDocumentProvider(final PartitionScannerFactory partitionScannerFactory) {
+
+    public PartitionScannedDocumentProvider(final PartitionScannerFactory partitionScannerFactory,
+            final Supplier<PartitionContext> partitionContextSupplier) {
         this.partitionScannerFactory = partitionScannerFactory;
+        this.partitionContextSupplier = partitionContextSupplier;
     }
 
 
@@ -51,7 +51,7 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
     protected IDocument createDocument(final Object element) throws CoreException {
         thisDocument = super.createDocument(element);
         if (thisDocument != null) {
-            attachPartitionerTo(thisDocument, partitionerContextFrom(element));
+            attachPartitionerTo(thisDocument, partitionContextSupplier);
         }
 
         return thisDocument;
@@ -75,20 +75,5 @@ public class PartitionScannedDocumentProvider extends FileDocumentProvider {
                 partitionScannerFactory.legalContentTypes());
         partitioner.connect(document);
         document.setDocumentPartitioner(partitioner);
-    }
-
-
-    private Supplier<PartitionContext> partitionerContextFrom(final Object element) {
-        return new Supplier<PartitionContext>() {
-
-            @Override
-            public PartitionContext get() {
-                if (element instanceof IEditorInput) {
-                    return new EditorInputPartitionContext((IEditorInput) element, FeatureEditorPlugin.instance()
-                            .getSuggestionManager());
-                }
-                return new CurrentSelectionPartitionContext();
-            }
-        };
     }
 }

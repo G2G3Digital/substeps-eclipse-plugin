@@ -1,6 +1,21 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.editor.outline.substeps;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,23 +32,23 @@ import com.technophobia.substeps.model.PatternMap;
 import com.technophobia.substeps.model.Step;
 import com.technophobia.substeps.runner.syntax.SubStepDefinitionParser;
 import com.technophobia.substeps.supplier.Transformer;
+import com.technophobia.substeps.syntax.NullSyntaxErrorReporter;
 
-public class FileToSubstepDefinitionElementTransformer implements Transformer<File, AbstractModelElement> {
+public class FileToSubstepDefinitionElementTransformer implements Transformer<ProjectFile, AbstractModelElement> {
 
     private final Transformer<Integer, Position> lineNumberToPositionTransformer;
-    private final SubStepDefinitionParser parser;
 
 
     public FileToSubstepDefinitionElementTransformer(
             final Transformer<Integer, Position> lineNumberToPositionTransformer) {
         this.lineNumberToPositionTransformer = lineNumberToPositionTransformer;
-        this.parser = new SubStepDefinitionParser();
     }
 
 
     @Override
-    public AbstractModelElement from(final File from) {
-        final PatternMap<ParentStep> stepMap = parser.loadSubSteps(from);
+    public AbstractModelElement from(final ProjectFile from) {
+        final SubStepDefinitionParser parser = new SubStepDefinitionParser(new NullSyntaxErrorReporter());
+        final PatternMap<ParentStep> stepMap = parser.loadSubSteps(from.getFile());
 
         final SubstepsRootElement root = new SubstepsRootElement("Substep", new Position(0));
 
@@ -63,7 +78,9 @@ public class FileToSubstepDefinitionElementTransformer implements Transformer<Fi
         final Position lineNumber = lineNumberToPositionTransformer.from(Integer.valueOf(step.getSourceLineNumber()));
         final SubstepsDefinitionElement substepDefinition = new SubstepsDefinitionElement(step.getParent().getLine(),
                 lineNumber);
-        addStepsTo(substepDefinition, step.getSteps());
+
+        final List<Step> steps = step.getSteps();
+        addStepsTo(substepDefinition, steps != null ? steps : Collections.<Step> emptyList());
         return substepDefinition;
     }
 

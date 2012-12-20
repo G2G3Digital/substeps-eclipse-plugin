@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.editor.outline;
 
 import java.io.File;
@@ -15,6 +31,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.technophobia.substeps.editor.outline.model.AbstractModelElement;
+import com.technophobia.substeps.editor.outline.substeps.ProjectFile;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class OutlineContentProvider implements ITreeContentProvider {
@@ -23,16 +40,21 @@ public class OutlineContentProvider implements ITreeContentProvider {
     private IEditorInput input;
     private final IDocumentProvider documentProvider;
 
-    private final Transformer<File, AbstractModelElement> fileToElementTransformer;
+    private final Transformer<ProjectFile, AbstractModelElement> fileToElementTransformer;
 
     protected final static String TAG_POSITIONS = "__tag_positions";
     protected IPositionUpdater positionUpdater = new DefaultPositionUpdater(TAG_POSITIONS);
 
 
-    public OutlineContentProvider(final Transformer<File, AbstractModelElement> fileToElementTransformer,
+    public OutlineContentProvider(final Transformer<ProjectFile, AbstractModelElement> fileToElementTransformer,
             final IDocumentProvider provider) {
         this.fileToElementTransformer = fileToElementTransformer;
         this.documentProvider = provider;
+    }
+
+
+    public AbstractModelElement getRoot() {
+        return root;
     }
 
 
@@ -123,15 +145,18 @@ public class OutlineContentProvider implements ITreeContentProvider {
 
 
     private AbstractModelElement parseEditor(final IEditorInput editorInput) {
-        final File file = asFile(editorInput);
-
-        final AbstractModelElement element = fileToElementTransformer.from(file);
-        return element;
+        final IFile iFile = ((FileEditorInput) editorInput).getFile();
+        if (iFile != null) {
+            final File file = asFile(iFile);
+            final AbstractModelElement element = fileToElementTransformer
+                    .from(new ProjectFile(iFile.getProject(), file));
+            return element;
+        }
+        return null;
     }
 
 
-    private File asFile(final IEditorInput editorInput) {
-        final IFile file = ((FileEditorInput) editorInput).getFile();
-        return new File(file.getLocation().makeAbsolute().toOSString());
+    private File asFile(final IFile iFile) {
+        return new File(iFile.getLocation().makeAbsolute().toOSString());
     }
 }

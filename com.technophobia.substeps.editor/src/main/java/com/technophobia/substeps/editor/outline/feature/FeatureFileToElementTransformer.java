@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.editor.outline.feature;
 
 import java.util.List;
@@ -22,7 +38,7 @@ import com.technophobia.substeps.supplier.Transformer;
 
 public class FeatureFileToElementTransformer implements Transformer<FeatureFile, FeatureElement> {
 
-    private final static String TAG_POSITIONS = "__tag_positions";
+    // private final static String TAG_POSITIONS = "__tag_positions";
     private final Transformer<Integer, Position> lineNumberToPositionTransformer;
 
 
@@ -34,7 +50,7 @@ public class FeatureFileToElementTransformer implements Transformer<FeatureFile,
     @Override
     public FeatureElement from(final FeatureFile file) {
 
-        final FeatureElement element = new FeatureElement(file.getDescription(), asOffsetPosition(0));
+        final FeatureElement element = new FeatureElement(file.getName(), asOffsetPosition(1));
 
         addBackground(element, file);
 
@@ -93,8 +109,11 @@ public class FeatureFileToElementTransformer implements Transformer<FeatureFile,
 
 
     private void addStepsTo(final AbstractStepContainerElement stepContainerElement, final List<Step> steps) {
-        for (final Step step : steps) {
-            stepContainerElement.addStep(new StepElement(step.getLine(), asOffsetPosition(step.getSourceLineNumber())));
+        if (steps != null) {
+            for (final Step step : steps) {
+                stepContainerElement.addStep(new StepElement(step.getLine(), asOffsetPosition(step
+                        .getSourceLineNumber())));
+            }
         }
     }
 
@@ -102,16 +121,19 @@ public class FeatureFileToElementTransformer implements Transformer<FeatureFile,
     private String exampleRowFrom(final Map<String, String> examples) {
         final StringBuilder sb = new StringBuilder();
         for (final String example : examples.values()) {
-            if (sb.length() > 0) {
+            if (sb.length() == 0) {
                 sb.append("|");
             }
             sb.append(example);
+            sb.append("|");
         }
         return sb.toString();
     }
 
 
     private Position asOffsetPosition(final int lineNumber) {
-        return lineNumberToPositionTransformer.from(Integer.valueOf(lineNumber));
+        // line number comes from Syntax, which is 1-based. However, the
+        // lineNumberToPositionTransformer will expect it to be 0-based
+        return lineNumberToPositionTransformer.from(Integer.valueOf(lineNumber - 1));
     }
 }

@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.document.content.feature.partiton;
 
 import static org.hamcrest.Matchers.is;
@@ -18,6 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.technophobia.substeps.step.ContextualSuggestionManager;
+import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Supplier;
 
 @RunWith(JMock.class)
@@ -25,8 +42,8 @@ public class SuggestionManagerTextProcessorTest {
 
     private static final IToken token = new Token("Test");
 
-    private static final Collection<String> suggestions = Arrays.asList("suggestion-1", "suggestion-2", "suggestion-3",
-            "valid-suggestion");
+    private static final Collection<Suggestion> suggestions = Arrays.asList(new Suggestion("suggestion-1"),
+            new Suggestion("suggestion-2"), new Suggestion("suggestion-3"), new Suggestion("valid-suggestion"));
 
     private Mockery context;
 

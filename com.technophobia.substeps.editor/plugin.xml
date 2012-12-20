@@ -132,4 +132,66 @@
            parentId="org.eclipse.ui.contexts.window">
      </context>
   </extension>
+  <extension
+        id="featureerror"
+        name="Feature error marker"
+        point="org.eclipse.core.resources.markers">
+     <super
+           type="org.eclipse.core.resources.problemmarker">
+     </super>
+     <super
+           type="org.eclipse.core.resources.textmarker">
+     </super>
+     <persistent
+           value="true">
+     </persistent>
+  </extension>
+  <extension
+        id="substeperror"
+        name="Substep error marker"
+        point="org.eclipse.core.resources.markers">
+     <super
+           type="org.eclipse.core.resources.problemmarker">
+     </super>
+     <super
+           type="org.eclipse.core.resources.textmarker">
+     </super>
+     <persistent
+           value="true">
+     </persistent>
+  </extension>
+  <extension
+        point="org.eclipse.ui.preferencePages">
+     <page
+           class="com.technophobia.substeps.editor.preferences.page.SubstepsPreferencePage"
+           id="com.technophobia.substeps.editor.preferences"
+           name="Substeps">
+     </page>
+  </extension>
+  <extension
+        point="org.eclipse.ui.propertyPages">
+     <page
+           class="com.technophobia.substeps.editor.preferences.page.SubstepsPropertyPage"
+           id="com.technophobia.substeps.editor.propertyPage"
+           name="Substeps">
+           
+           <enabledWhen>
+           	<adapt
+                  type="org.eclipse.core.resources.IResource">
+                  <instanceof
+                        value="org.eclipse.core.resources.IProject">
+                  </instanceof>
+           	</adapt>
+           </enabledWhen>
+     </page>
+  </extension>
+  <extension
+        point="org.eclipse.jdt.core.compilationParticipant">
+  </extension>
+  <extension
+        point="org.eclipse.ui.startup">
+     <startup
+           class="com.technophobia.substeps.FeatureEditorStartup">
+     </startup>
+  </extension>
 </plugin>

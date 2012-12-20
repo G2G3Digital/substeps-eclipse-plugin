@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.technophobia.substeps</groupId>
 		<artifactId>com.technophobia.substeps.parent</artifactId>
-		<version>0.0.19-SNAPSHOT</version>
+		<version>0.2.7-SNAPSHOT</version>
 		<relativePath>../com.technophobia.substeps.parent/pom.xml</relativePath>
 	</parent>
 
@@ -21,8 +21,8 @@
 
     <licenses>
         <license>
-            <name>LGPL 3.0 license</name>
-            <url>http://www.opensource.org/licenses/lgpl-3.0.html</url>
+            <name>EPL v1.0 license</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
             <distribution>manual</distribution>
       </license>
     </licenses>
@@ -34,15 +34,7 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-p2-director-plugin</artifactId>
 				<version>${tycho.version}</version>
-				<executions>
-					<execution>
-						<id>materialize-products</id>
-						<goals>
-							<goal>materialize-products</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+                        </plugin>
 		</plugins>
 	</build>
 </project>

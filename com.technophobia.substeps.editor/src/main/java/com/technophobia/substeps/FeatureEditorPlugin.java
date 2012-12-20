@@ -1,50 +1,65 @@
-/*
- *	Copyright Technophobia Ltd 2012
- *
- *   This file is part of Substeps.
- *
- *    Substeps is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Lesser General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
- *
- *    Substeps is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public License
- *    along with Substeps.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
-import com.technophobia.eclipse.log.Logger;
+import com.technophobia.eclipse.log.PluginLogger;
+import com.technophobia.eclipse.preference.PreferenceLookup;
+import com.technophobia.eclipse.preference.PreferenceLookupFactory;
+import com.technophobia.eclipse.project.ProjectEventType;
+import com.technophobia.eclipse.project.ProjectManager;
+import com.technophobia.eclipse.project.ProjectObserver;
+import com.technophobia.eclipse.project.PropertyBasedProjectManager;
+import com.technophobia.eclipse.project.cache.CacheAwareProjectManager;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
-import com.technophobia.substeps.document.content.assist.feature.ProjectToSyntaxTransformer;
+import com.technophobia.substeps.model.Syntax;
+import com.technophobia.substeps.preferences.SubstepsProjectPreferenceLookupFactory;
 import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
 import com.technophobia.substeps.step.ProjectStepImplementationProvider;
+import com.technophobia.substeps.step.ProjectSuggestionProvider;
 import com.technophobia.substeps.step.ProvidedSuggestionManager;
 import com.technophobia.substeps.step.SuggestionSource;
 import com.technophobia.substeps.step.provider.ExternalStepImplementationProvider;
 import com.technophobia.substeps.step.provider.ProjectSpecificSuggestionProvider;
 import com.technophobia.substeps.step.provider.SubstepSuggestionProvider;
+import com.technophobia.substeps.supplier.CachingResultTransformer;
 import com.technophobia.substeps.supplier.Supplier;
+import com.technophobia.substeps.syntax.CachingProjectToSyntaxTransformer;
 
 /**
  * BundleActivator/general bundle aware class for managing things such as
@@ -53,9 +68,9 @@ import com.technophobia.substeps.supplier.Supplier;
  * @author sforbes
  * 
  */
-public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, Logger {
+public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, PluginLogger {
 
-    private static final String PLUGIN_ID = "com.technophobia.substeps.editor";
+    public static final String PLUGIN_ID = "com.technophobia.substeps.editor";
 
     private static FeatureEditorPlugin pluginInstance;
 
@@ -63,13 +78,24 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     private ResourceBundle resourceBundle;
     private ILog log;
 
-    private final ProvidedSuggestionManager suggestionManager;
+    private ProvidedSuggestionManager suggestionManager;
+    private CachingResultTransformer<IProject, Syntax> projectToSyntaxTransformer;
+
+    private ProjectObserver projectObserver;
+    private final ProjectManager projectManager;
+
+    private final PreferenceLookupFactory<IProject> preferenceLookupFactory;
 
 
+    @SuppressWarnings("unchecked")
     public FeatureEditorPlugin() {
         super();
         FeatureEditorPlugin.pluginInstance = this;
-        this.suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
+        this.preferenceLookupFactory = new SubstepsProjectPreferenceLookupFactory(PLUGIN_ID,
+                (IPersistentPreferenceStore) getPreferenceStore());
+        this.projectManager = new PropertyBasedProjectManager(preferenceLookupFactory);
+        this.projectToSyntaxTransformer = new CachingProjectToSyntaxTransformer(projectManager, preferenceLookupFactory);
+        this.projectObserver = new CacheAwareProjectManager(projectToSyntaxTransformer);
     }
 
 
@@ -77,18 +103,24 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     public void start(final BundleContext bundleContext) throws Exception {
         context = bundleContext;
         log = Platform.getLog(bundleContext.getBundle());
+
         try {
             resourceBundle = ResourceBundle.getBundle("com.technophobia.substeps.FeatureEditorResources");
         } catch (final MissingResourceException x) {
             resourceBundle = null;
         }
 
-        addSuggestionProviders();
+        projectObserver.registerFrameworkListeners();
+        // addSuggestionProviders();
     }
 
 
     @Override
     public void stop(final BundleContext bundleContext) throws Exception {
+        projectObserver.unregisterFrameworkListeners();
+        projectObserver = null;
+        suggestionManager = null;
+        projectToSyntaxTransformer = null;
         resourceBundle = null;
         log = null;
     }
@@ -105,17 +137,52 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     public ContextualSuggestionManager getSuggestionManager() {
+        if (suggestionManager == null) {
+            suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
+            addSuggestionProviders();
+
+            // New suggestion providers means syntax should now have changed, re
+            // update it
+            refreshAllProjectSyntaxes();
+        }
         return suggestionManager;
+    }
+
+
+    public ProjectObserver getProjectObserver() {
+        return projectObserver;
+    }
+
+
+    public Syntax syntaxFor(final IProject project) {
+        return projectToSyntaxTransformer.from(project);
     }
 
 
     public ProjectStepImplementationProvider getStepImplementationProvider() {
-        return suggestionManager;
+        return (ProjectStepImplementationProvider) getSuggestionManager();
     }
 
-    public static void info(final String msg){
-    	instance().log.log(new Status(IStatus.INFO, PLUGIN_ID, msg));
-	}
+
+    public PreferenceLookup preferenceLookupFor(final IProject project) {
+        return preferenceLookupFactory.preferencesFor(project);
+    }
+
+
+    public List<String> externalDependencyStepClasses(final IProject project) {
+        final Collection<ProjectSuggestionProvider> providers = ((ProvidedSuggestionManager) getSuggestionManager())
+                .providersOfSource(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION);
+        final List<String> stepClasses = new ArrayList<String>();
+        for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
+            if (projectSuggestionProvider instanceof ProjectStepImplementationProvider) {
+                stepClasses.addAll(((ProjectStepImplementationProvider) projectSuggestionProvider)
+                        .stepImplementationClasses(project));
+            }
+        }
+
+        return Collections.unmodifiableList(stepClasses);
+    }
+
 
     public Supplier<IResource> currentResourceSupplier() {
         return new Supplier<IResource>() {
@@ -133,21 +200,33 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     @Override
-    public void log(final int status, final String message) {
-        instance().log.log(new Status(status, PLUGIN_ID, message));
+    public void info(final String msg) {
+        instance().log.log(new Status(IStatus.INFO, PLUGIN_ID, msg));
     }
 
-    public static void log(final Throwable ex) {
-        instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Error", ex));
+
+    @Override
+    public void warn(final String msg) {
+        instance().log.log(new Status(IStatus.WARNING, PLUGIN_ID, msg));
     }
 
-	public static void error(final String msg){
-		instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg));
-	}
 
-	public static void error(final String msg, final Throwable t){
-		instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg, t));
-	}
+    @Override
+    public void warn(final String msg, final Throwable ex) {
+        instance().log.log(new Status(IStatus.WARNING, PLUGIN_ID, msg, ex));
+    }
+
+
+    @Override
+    public void error(final String msg) {
+        instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg));
+    }
+
+
+    @Override
+    public void error(final String msg, final Throwable t) {
+        instance().log.log(new Status(IStatus.ERROR, PLUGIN_ID, msg, t));
+    }
 
 
     public static FeatureEditorPlugin instance() {
@@ -156,21 +235,34 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     private void addSuggestionProviders() {
-        final ProjectToSyntaxTransformer projectToSyntaxTransformer = new ProjectToSyntaxTransformer();
+        final ProvidedSuggestionManager suggestions = (ProvidedSuggestionManager) getSuggestionManager();
+        final ExternalStepImplementationProvider externalSuggestionProvider = new ExternalStepImplementationProvider(
+                new ProjectStepImplementationLoader());
+        suggestions.addProvider(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION, externalSuggestionProvider);
 
-        suggestionManager.addProvider(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION,
-                new ExternalStepImplementationProvider(new ProjectStepImplementationLoader()));
+        final ProjectSpecificSuggestionProvider projectSpecificSuggestionProvider = new ProjectSpecificSuggestionProvider(
+                projectToSyntaxTransformer, new ParameterisedStepImplementationRenderer());
+        suggestions.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION, projectSpecificSuggestionProvider);
 
-        suggestionManager.addProvider(SuggestionSource.PROJECT_STEP_IMPLEMENTATION,
-                new ProjectSpecificSuggestionProvider(projectToSyntaxTransformer,
-                        new ParameterisedStepImplementationRenderer()));
+        final SubstepSuggestionProvider substepSuggestionProvider = new SubstepSuggestionProvider(
+                projectToSyntaxTransformer);
+        suggestions.addProvider(SuggestionSource.SUBSTEP_DEFINITION, substepSuggestionProvider);
 
-        suggestionManager.addProvider(SuggestionSource.SUBSTEP_DEFINITION, new SubstepSuggestionProvider(
-                projectToSyntaxTransformer));
+        projectObserver.addProjectListener(ProjectEventType.ProjectDependenciesChanged, externalSuggestionProvider);
+        projectObserver.addProjectListener(ProjectEventType.ProjectInserted, externalSuggestionProvider);
+        projectObserver.addProjectListener(ProjectEventType.ProjectRemoved, externalSuggestionProvider);
 
-        suggestionManager.load(ResourcesPlugin.getWorkspace());
+        projectObserver.addProjectListener(ProjectEventType.SourceFileAnnotationsChanged,
+                projectSpecificSuggestionProvider);
+        projectObserver.addSubstepsFileListener(substepSuggestionProvider);
+        suggestions.load(ResourcesPlugin.getWorkspace());
     }
-    
-   
 
+
+    private void refreshAllProjectSyntaxes() {
+        final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+        for (final IProject project : projects) {
+            projectToSyntaxTransformer.refreshCacheFor(project);
+        }
+    }
 }

@@ -1,6 +1,24 @@
+/*******************************************************************************
+ * Copyright Technophobia Ltd 2012
+ * 
+ * This file is part of the Substeps Eclipse Plugin.
+ * 
+ * The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the Eclipse Public License v1.0.
+ * 
+ * The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Eclipse Public License for more details.
+ * 
+ * You should have received a copy of the Eclipse Public License
+ * along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+ ******************************************************************************/
 package com.technophobia.substeps.render;
 
 import com.technophobia.substeps.model.StepImplementation;
+import com.technophobia.substeps.step.PatternSuggestion;
+import com.technophobia.substeps.step.Suggestion;
 
 /**
  * For rendering during content assist - render the {@link StepImplementation},
@@ -9,18 +27,25 @@ import com.technophobia.substeps.model.StepImplementation;
  * @author sforbes
  * 
  */
-public class ParameterisedStepImplementationRenderer implements StepImplementationRenderer {
+public class ParameterisedStepImplementationRenderer implements StepImplementationToSuggestionRenderer {
 
     @Override
-    public String render(final StepImplementation stepImplementation) {
+    public Suggestion render(final StepImplementation stepImplementation) {
         // replace any regex's with parameter names
+
         if (stepImplementation.getMethod().getParameterTypes() != null
                 && stepImplementation.getMethod().getParameterTypes().length > 0) {
             // tokens to be replaced
-            return replaceRegExParams(stepImplementation.getValue(), "value");
+            return patternSuggestion(stepImplementation);
         }
 
-        return stepImplementation.getValue();
+        return new Suggestion(stepImplementation.getValue());
+    }
+
+
+    public Suggestion patternSuggestion(final StepImplementation stepImplementation) {
+        return new PatternSuggestion(stepImplementation.getValue(), replaceRegExParams(stepImplementation.getValue(),
+                "value"));
     }
 
 
