@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.technophobia.substeps</groupId>
 		<artifactId>com.technophobia.substeps.parent</artifactId>
-		<version>0.2.5-SNAPSHOT</version>
+		<version>0.2.10-SNAPSHOT</version>
 		<relativePath>../com.technophobia.substeps.parent/pom.xml</relativePath>
 	</parent>
 
@@ -34,15 +34,7 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-p2-director-plugin</artifactId>
 				<version>${tycho.version}</version>
-				<executions>
-					<execution>
-						<id>materialize-products</id>
-						<goals>
-							<goal>materialize-products</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+                        </plugin>
 		</plugins>
 	</build>
 </project>

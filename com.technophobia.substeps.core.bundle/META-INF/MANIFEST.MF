@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Testingtools
 Bundle-SymbolicName: com.technophobia.substeps.core.bundle
-Bundle-Version: 0.2.5.qualifier
+Bundle-Version: 0.2.10.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: velocity-1.5.jar,
  commons-io-2.1.jar,
@@ -11,9 +11,14 @@ Bundle-ClassPath: velocity-1.5.jar,
  slf4j-api-1.6.4.jar,
  xmlpull-1.1.3.1.jar,
  xstream-1.4.2.jar,
- substeps-core-1.0.2-SNAPSHOT.jar
+ substeps-core-1.1.0-SNAPSHOT.jar,
+ substeps-core-api-1.1.0-SNAPSHOT.jar,
+ substeps-runner-common-1.1.0-SNAPSHOT.jar,
+ substeps-junit-runner-1.1.0-SNAPSHOT.jar
 Require-Bundle: org.junit;bundle-version="4.10.0"
-Export-Package: com.technophobia.substeps.glossary,
+Export-Package: com.technophobia.substeps.execution,
+ com.technophobia.substeps.execution.node,
+ com.technophobia.substeps.glossary,
  com.technophobia.substeps.model,
  com.technophobia.substeps.model.exception,
  com.technophobia.substeps.runner,

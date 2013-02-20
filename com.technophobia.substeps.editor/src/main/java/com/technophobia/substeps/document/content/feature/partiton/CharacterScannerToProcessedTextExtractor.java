@@ -36,12 +36,20 @@ public class CharacterScannerToProcessedTextExtractor implements TextExtractor<I
     @Override
     public IToken extractText(final ICharacterScanner scanner) {
         final String text = readLine(scanner);
-        final IToken token = textProcessor.doWithText(text.trim());
+        
+        IToken token = null;
+        if (text != null){
+            token = textProcessor.doWithText(text.trim());
+        }
 
         // Didn't find it, so unread everything
-        if (token == null) {
+        if (text != null && token == null) {
             unread(scanner, text.length());
         }
+        else if (text == null && token == null){
+            unread(scanner, 0);
+        }
+        
 
         return token;
     }
@@ -65,9 +73,13 @@ public class CharacterScannerToProcessedTextExtractor implements TextExtractor<I
         if (c == EOF || c == COMMENT) {
             scanner.unread();
         }
-
-        final String text = sb.toString();
-        return text;
+        
+        if (sb.length() == 0){
+            return null;
+        }
+        else{
+            return sb.toString();
+        }
     }
 
 
