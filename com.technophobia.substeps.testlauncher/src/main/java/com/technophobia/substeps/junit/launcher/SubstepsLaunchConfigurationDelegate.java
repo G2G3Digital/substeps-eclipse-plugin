@@ -450,8 +450,7 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
     @Override
     public String[] getClasspath(final ILaunchConfiguration configuration) throws CoreException {
         final String[] cp = super.getClasspath(configuration);
-        final List<String> junitEntries = new ClasspathLocalizer(Platform.inDevelopmentMode())
-                .localizeClasspath(FeatureRunnerPlugin.PLUGIN_ID);
+        final List<String> junitEntries = new SubstepJarProvider().substepJars();
 
         final String[] classPath = new String[cp.length + junitEntries.size()];
         final String[] jea = junitEntries.toArray(new String[junitEntries.size()]);

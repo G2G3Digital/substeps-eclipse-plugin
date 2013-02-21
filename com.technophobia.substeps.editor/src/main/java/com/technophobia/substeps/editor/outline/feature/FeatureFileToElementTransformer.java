@@ -50,15 +50,18 @@ public class FeatureFileToElementTransformer implements Transformer<FeatureFile,
     @Override
     public FeatureElement from(final FeatureFile file) {
 
-        final FeatureElement element = new FeatureElement(file.getName(), asOffsetPosition(1));
+        if (file != null) {
+            final FeatureElement element = new FeatureElement(file.getName(), asOffsetPosition(1));
 
-        addBackground(element, file);
+            addBackground(element, file);
 
-        for (final Scenario scenario : file.getScenarios()) {
-            addScenarioTo(element, scenario);
+            for (final Scenario scenario : file.getScenarios()) {
+                addScenarioTo(element, scenario);
+            }
+
+            return element;
         }
-
-        return element;
+        return null;
     }
 
 

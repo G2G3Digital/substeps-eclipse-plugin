@@ -19,7 +19,9 @@ package com.technophobia.substeps.document.content.assist.feature;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaProject;
@@ -113,24 +115,39 @@ public class StepImplementationProposalProvider implements CompletionProposalPro
         // filter the list based on current text
         final String startOfLine = getLineUpTo(document, offset);
 
+        final Set<Suggestion> existingSuggestions = new HashSet<Suggestion>();
+
         for (final Suggestion suggestion : suggestions) {
             final String suggestionText = suggestion.getText();
-            if (startOfLine == null) {
-                completionProposals.add(new CompletionProposal(suggestionText, offset, 0, suggestionText.length()));
-            } else {
-                // only include if the suggestion matches
-                if (suggestion.isMatch(startOfLine)) {
-                    completionProposals.add(new CompletionProposal(suggestionText, offset - startOfLine.length(),
-                            startOfLine.length(), suggestionText.length()));
-                } else if (suggestion.isPartialMatch(startOfLine)) {
-                    // TODO: Rich wanted to look at this, by doing something
-                    // funky with partial patterns or something
-                    completionProposals.add(new CompletionProposal(suggestionText, offset - startOfLine.length(),
-                            startOfLine.length(), suggestionText.length()));
+            if (!isExistingSuggestion(suggestionText, existingSuggestions)) {
+                if (startOfLine == null) {
+                    completionProposals.add(new CompletionProposal(suggestionText, offset, 0, suggestionText.length()));
+                } else {
+                    // only include if the suggestion matches
+                    if (suggestion.isMatch(startOfLine)) {
+                        completionProposals.add(new CompletionProposal(suggestionText, offset - startOfLine.length(),
+                                startOfLine.length(), suggestionText.length()));
+                    } else if (suggestion.isPartialMatch(startOfLine)) {
+                        // TODO: Rich wanted to look at this, by doing something
+                        // funky with partial patterns or something
+                        completionProposals.add(new CompletionProposal(suggestionText, offset - startOfLine.length(),
+                                startOfLine.length(), suggestionText.length()));
+                    }
                 }
+                existingSuggestions.add(suggestion);
             }
         }
         return completionProposals;
+    }
+
+
+    private boolean isExistingSuggestion(final String suggestionText, final Set<Suggestion> existingSuggestions) {
+        for (final Suggestion suggestion : existingSuggestions) {
+            if (suggestion.isMatch(suggestionText)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

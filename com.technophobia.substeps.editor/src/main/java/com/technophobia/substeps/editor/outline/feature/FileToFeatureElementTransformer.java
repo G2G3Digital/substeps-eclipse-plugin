@@ -16,6 +16,8 @@
  ******************************************************************************/
 package com.technophobia.substeps.editor.outline.feature;
 
+import java.io.File;
+
 import org.eclipse.jface.text.Position;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
@@ -39,13 +41,16 @@ public class FileToFeatureElementTransformer implements Transformer<ProjectFile,
 
 
     @Override
-    public FeatureElement from(final ProjectFile file) {
-        try {
-            final FeatureFile featureFile = parser.loadFeatureFile(file.getFile());
-            return featureElementTransformer.from(featureFile);
-        } catch (final Exception ex) {
-            FeatureEditorPlugin.instance().error("Couldn't parse feature file " + file.getFile().getAbsolutePath(), ex);
-            return null;
+    public FeatureElement from(final ProjectFile projectFile) {
+        final File file = projectFile.getFile();
+        if (file != null) {
+            try {
+                final FeatureFile featureFile = parser.loadFeatureFile(file);
+                return featureElementTransformer.from(featureFile);
+            } catch (final Exception ex) {
+                FeatureEditorPlugin.instance().error("Couldn't parse feature file " + file.getAbsolutePath(), ex);
+            }
         }
+        return null;
     }
 }

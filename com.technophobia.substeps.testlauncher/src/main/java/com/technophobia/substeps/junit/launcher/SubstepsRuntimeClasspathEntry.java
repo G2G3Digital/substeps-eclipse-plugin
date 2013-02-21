@@ -22,9 +22,9 @@ public class SubstepsRuntimeClasspathEntry {
     private final String pluginRelativePath;
 
 
-    public SubstepsRuntimeClasspathEntry(final String pluginId, final String jarFile) {
+    public SubstepsRuntimeClasspathEntry(final String pluginId, final String relativePath) {
         this.pluginId = pluginId;
-        this.pluginRelativePath = jarFile;
+        this.pluginRelativePath = relativePath;
     }
 
 
@@ -35,11 +35,6 @@ public class SubstepsRuntimeClasspathEntry {
 
     public String getPluginRelativePath() {
         return pluginRelativePath;
-    }
-
-
-    public SubstepsRuntimeClasspathEntry developmentModeEntry() {
-        return new SubstepsRuntimeClasspathEntry(getPluginId(), "target/classes"); //$NON-NLS-1$
     }
 
 

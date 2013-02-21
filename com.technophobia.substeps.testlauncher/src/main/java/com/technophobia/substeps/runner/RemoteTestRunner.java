@@ -30,7 +30,7 @@ import java.net.Socket;
 import java.text.MessageFormat;
 import java.util.Vector;
 
-import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+//import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.model.MessageIds;
 import com.technophobia.substeps.runner.junit4.JUnit4TestLoader;
 
@@ -314,10 +314,10 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
             initDefaultLoader();
 
         if (testClassNames == null || testClassNames.length == 0)
-            throw new IllegalArgumentException(SubstepsFeatureMessages.RemoteTestRunner_error_classnamemissing);
+            throw new IllegalArgumentException("Error: parameter '-classNames' or '-className' not specified");
 
         if (port == -1)
-            throw new IllegalArgumentException(SubstepsFeatureMessages.RemoteTestRunner_error_portmissing);
+            throw new IllegalArgumentException("Error: parameter '-port' not specified");
         if (debugMode)
             System.out.println("keepalive " + keepAlive); //$NON-NLS-1$
     }
@@ -339,8 +339,8 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
         } catch (final Exception e) {
             final StringWriter trace = new StringWriter();
             e.printStackTrace(new PrintWriter(trace));
-            final String message = MessageFormat.format(SubstepsFeatureMessages.RemoteTestRunner_error_invalidloader,
-                    className, trace.toString());
+            final String message = "Error: test loader "+className+" not found:\n"+trace.toString();
+                    
             throw new IllegalArgumentException(message);
         }
     }
@@ -643,9 +643,8 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
             }
         }
 
-        runFailed(
-                MessageFormat.format(SubstepsFeatureMessages.RemoteTestRunner_error_connect, host,
-                        Integer.toString(port)), exception);
+        runFailed("Could not connect to: "+host+" : "+port
+                        , exception);
         return false;
     }
 
@@ -767,8 +766,7 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
         try {
             clazz = getTestClassLoader().loadClass(className);
         } catch (final ClassNotFoundException e) {
-            listener.runFailed(
-                    MessageFormat.format(SubstepsFeatureMessages.RemoteTestRunner_error_classnotfound, className), e);
+            listener.runFailed("Class not found "+className, e);
         }
         return clazz;
     }
