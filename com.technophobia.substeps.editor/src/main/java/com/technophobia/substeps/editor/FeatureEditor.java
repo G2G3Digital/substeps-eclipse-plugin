@@ -22,7 +22,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextListener;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -258,7 +260,6 @@ public class FeatureEditor extends TextEditor implements FormattableEditorPart, 
      */
     @Override
     protected void setSite(final IWorkbenchPartSite site) {
-
         super.setSite(site);
 
         // add an activation listener
