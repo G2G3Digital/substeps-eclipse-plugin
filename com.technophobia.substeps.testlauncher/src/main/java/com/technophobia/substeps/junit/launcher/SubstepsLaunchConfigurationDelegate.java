@@ -435,13 +435,13 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
 
         if (project != null) {
             results.add("-DsubstepsFeatureFile="
-                    + project.getRawLocation().addTrailingSeparator()
+                    + project.getLocation().addTrailingSeparator()
                             .append(getConfigAttribute(configuration, SubstepsFeatureLaunchShortcut.ATTR_FEATURE_FILE))
                             .toOSString());
 
             results.add("-DsubstepsFile="
                     + project
-                            .getRawLocation()
+                            .getLocation()
                             .addTrailingSeparator()
                             .append(getConfigAttribute(configuration,
                                     SubstepsLaunchConfigurationConstants.ATTR_SUBSTEPS_FILE)).toOSString());
