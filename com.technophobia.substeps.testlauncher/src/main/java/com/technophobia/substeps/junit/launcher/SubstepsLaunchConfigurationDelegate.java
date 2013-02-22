@@ -34,12 +34,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
@@ -60,6 +61,10 @@ import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.launcher.config.SubstepsLaunchConfigWorkingCopyDecorator;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.runner.RemoteTestRunner;
+import com.technophobia.substeps.supplier.Callback1;
+import com.technophobia.substeps.supplier.Predicate;
+import com.technophobia.substeps.util.ModelOperation;
+import com.technophobia.substeps.util.TemporaryModelEnhancer;
 
 public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfigurationDelegate {
 
@@ -118,70 +123,149 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
                 return;
             }
 
-            keepAlive = mode.equals(ILaunchManager.DEBUG_MODE)
-                    && configuration.getAttribute(SubstepsLaunchConfigurationConstants.ATTR_KEEPRUNNING, false);
-            port = evaluatePort();
-            launch.setAttribute(SubstepsLaunchConfigurationConstants.ATTR_PORT, String.valueOf(port));
+            final TemporaryModelEnhancer<IJavaProject> modelEnhancer = new TemporaryModelEnhancer<IJavaProject>(
+                    addSubstepsToClasspath(), removeSubstepsFromClasspath(), doRunTests(mode, configuration, launch,
+                            monitor), isSubstepsNotOnClasspath(configuration));
+            modelEnhancer.doOperationFor(getJavaProject(configuration));
 
-            testElements = evaluateTests(configuration, new SubProgressMonitor(monitor, 1));
-
-            final String mainTypeName = verifyMainTypeName(configuration);
-            final IVMRunner runner = getVMRunner(configuration, mode);
-
-            final File workingDir = verifyWorkingDirectory(configuration);
-            String workingDirName = null;
-            if (workingDir != null) {
-                workingDirName = workingDir.getAbsolutePath();
-            }
-
-            // Environment variables
-            final String[] envp = getEnvironment(configuration);
-
-            final ArrayList<String> vmArguments = new ArrayList<String>();
-            final ArrayList<String> programArguments = new ArrayList<String>();
-            collectExecutionArguments(configuration, vmArguments, programArguments);
-
-            // VM-specific attributes
-            final Map<String, Object> vmAttributesMap = getVMSpecificAttributesMap(configuration);
-
-            // Classpath
-            final String[] classpath = getClasspath(configuration);
-
-            // Create VM config
-            final VMRunnerConfiguration runConfig = new VMRunnerConfiguration(mainTypeName, classpath);
-            runConfig.setVMArguments(vmArguments.toArray(new String[vmArguments.size()]));
-            runConfig.setProgramArguments(programArguments.toArray(new String[programArguments.size()]));
-            runConfig.setEnvironment(envp);
-            runConfig.setWorkingDirectory(workingDirName);
-            runConfig.setVMSpecificAttributesMap(vmAttributesMap);
-
-            // Bootpath
-            runConfig.setBootClassPath(getBootpath(configuration));
-
-            // check for cancellation
-            if (monitor.isCanceled()) {
-                return;
-            }
-
-            // done the verification phase
-            monitor.worked(1);
-
-            monitor.subTask(SubstepsFeatureMessages.SubstepsLaunchConfigurationDelegate_create_source_locator_description);
-            // set the default source locator if required
-            setDefaultSourceLocator(launch, configuration);
-            monitor.worked(1);
-
-            // Launch the configuration - 1 unit of work
-            runner.run(runConfig, launch, monitor);
-
-            // check for cancellation
-            if (monitor.isCanceled()) {
-                return;
-            }
         } finally {
             testElements = null;
             monitor.done();
         }
+    }
+
+
+    private Callback1<IJavaProject> addSubstepsToClasspath() {
+        return new Callback1<IJavaProject>() {
+
+            @Override
+            public void doCallback(final IJavaProject project) {
+
+                try {
+                    final List<IClasspathEntry> newClasspath = new ArrayList<IClasspathEntry>(Arrays.asList(project
+                            .getRawClasspath()));
+
+                    final List<String> jarFiles = new SubstepJarProvider().junitRunnerJars();
+                    for (final String jarFile : jarFiles) {
+                        newClasspath.add(JavaCore.newLibraryEntry(new Path(jarFile), null, null));
+                    }
+                    project.setRawClasspath(newClasspath.toArray(new IClasspathEntry[newClasspath.size()]), null);
+                } catch (final JavaModelException ex) {
+                    FeatureRunnerPlugin.error("Could not add substeps jars to classpath", ex);
+                }
+            }
+        };
+    }
+
+
+    private Callback1<IJavaProject> removeSubstepsFromClasspath() {
+        return new Callback1<IJavaProject>() {
+
+            @Override
+            public void doCallback(final IJavaProject project) {
+                try {
+                    final List<IClasspathEntry> newClasspath = new ArrayList<IClasspathEntry>(Arrays.asList(project
+                            .getRawClasspath()));
+
+                    final List<String> jarFiles = new SubstepJarProvider().junitRunnerJars();
+                    for (final String jarFile : jarFiles) {
+                        newClasspath.remove(JavaCore.newLibraryEntry(new Path(jarFile), null, null));
+                    }
+                    project.setRawClasspath(newClasspath.toArray(new IClasspathEntry[newClasspath.size()]), null);
+                } catch (final JavaModelException ex) {
+                    FeatureRunnerPlugin.error("Could not remove substeps jars from classpath", ex);
+                }
+            }
+        };
+    }
+
+
+    private ModelOperation<IJavaProject> doRunTests(final String mode, final ILaunchConfiguration configuration,
+            final ILaunch launch, final IProgressMonitor monitor) {
+        return new ModelOperation<IJavaProject>() {
+
+            @Override
+            public void doOperationOn(final IJavaProject t) throws CoreException {
+                keepAlive = mode.equals(ILaunchManager.DEBUG_MODE)
+                        && configuration.getAttribute(SubstepsLaunchConfigurationConstants.ATTR_KEEPRUNNING, false);
+                port = evaluatePort();
+                launch.setAttribute(SubstepsLaunchConfigurationConstants.ATTR_PORT, String.valueOf(port));
+                testElements = evaluateTests(configuration, new SubProgressMonitor(monitor, 1));
+
+                final String mainTypeName = verifyMainTypeName(configuration);
+                final IVMRunner runner = getVMRunner(configuration, mode);
+
+                final File workingDir = verifyWorkingDirectory(configuration);
+                String workingDirName = null;
+                if (workingDir != null) {
+                    workingDirName = workingDir.getAbsolutePath();
+                }
+
+                // Environment variables
+                final String[] envp = getEnvironment(configuration);
+
+                final ArrayList<String> vmArguments = new ArrayList<String>();
+                final ArrayList<String> programArguments = new ArrayList<String>();
+                collectExecutionArguments(configuration, vmArguments, programArguments);
+
+                // VM-specific attributes
+                final Map<String, Object> vmAttributesMap = getVMSpecificAttributesMap(configuration);
+
+                // Classpath
+                final String[] classpath = getClasspath(configuration);
+
+                // Create VM config
+                final VMRunnerConfiguration runConfig = new VMRunnerConfiguration(mainTypeName, classpath);
+                runConfig.setVMArguments(vmArguments.toArray(new String[vmArguments.size()]));
+                runConfig.setProgramArguments(programArguments.toArray(new String[programArguments.size()]));
+                runConfig.setEnvironment(envp);
+                runConfig.setWorkingDirectory(workingDirName);
+                runConfig.setVMSpecificAttributesMap(vmAttributesMap);
+
+                // Bootpath
+                runConfig.setBootClassPath(getBootpath(configuration));
+
+                // check for cancellation
+                if (monitor.isCanceled()) {
+                    return;
+                }
+
+                // done the verification phase
+                monitor.worked(1);
+
+                monitor.subTask(SubstepsFeatureMessages.SubstepsLaunchConfigurationDelegate_create_source_locator_description);
+                // set the default source locator if required
+                setDefaultSourceLocator(launch, configuration);
+                monitor.worked(1);
+
+                // Launch the configuration - 1 unit of work
+                runner.run(runConfig, launch, monitor);
+
+                // check for cancellation
+                if (monitor.isCanceled()) {
+                    return;
+                }
+            }
+        };
+    }
+
+
+    private Predicate<IJavaProject> isSubstepsNotOnClasspath(final ILaunchConfiguration configuration) {
+        return new Predicate<IJavaProject>() {
+
+            @Override
+            public boolean forModel(final IJavaProject project) {
+                try {
+                    final IJavaElement element = getMainElementFromProject(configuration, project);
+                    return element == null;
+                } catch (final JavaModelException ex) {
+                    FeatureRunnerPlugin.error("Could not determine if substeps runner jars were on the classpath", ex);
+                } catch (final CoreException ex) {
+                    FeatureRunnerPlugin.error("Could not determine if substeps runner jars were on the classpath", ex);
+                }
+                return true;
+            }
+        };
     }
 
 
@@ -308,14 +392,10 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
         final String testFailureNames = configuration.getAttribute(
                 SubstepsLaunchConfigurationConstants.ATTR_FAILURES_NAMES, ""); //$NON-NLS-1$
 
-        programArguments.add("-version"); //$NON-NLS-1$
-        programArguments.add("3"); //$NON-NLS-1$
-
-        programArguments.add("-port"); //$NON-NLS-1$
-        programArguments.add(String.valueOf(port));
-
+        programArguments.add("version=3");
+        programArguments.add("port=" + String.valueOf(port));
         if (keepAlive)
-            programArguments.add(0, "-keepalive"); //$NON-NLS-1$
+            programArguments.add("keepalive"); //$NON-NLS-1$
 
         // final String testRunnerKind = getTestRunnerKind(configuration);
 
@@ -330,24 +410,21 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
         if (elements.length == 1) {
             if (elements[0] instanceof IMethod) {
                 final IMethod method = (IMethod) elements[0];
-                programArguments.add("-test"); //$NON-NLS-1$
-                programArguments.add(method.getDeclaringType().getFullyQualifiedName() + ':' + method.getElementName());
+                programArguments.add("test=" + method.getDeclaringType().getFullyQualifiedName() + ':'
+                        + method.getElementName());
             } else if (elements[0] instanceof IType) {
                 final IType type = (IType) elements[0];
-                programArguments.add("-classNames"); //$NON-NLS-1$
-                programArguments.add(type.getFullyQualifiedName());
+                programArguments.add("classNames=" + type.getFullyQualifiedName());
             } else {
                 abort(SubstepsFeatureMessages.SubstepsLaunchConfigurationDelegate_error_wrong_input, null,
                         IJavaLaunchConfigurationConstants.ERR_UNSPECIFIED_MAIN_TYPE);
             }
         } else if (elements.length > 1) {
             final String fileName = createTestNamesFile(elements);
-            programArguments.add("-testNameFile"); //$NON-NLS-1$
-            programArguments.add(fileName);
+            programArguments.add("testNameFile=" + fileName);
         }
         if (testFailureNames.length() > 0) {
-            programArguments.add("-testfailures"); //$NON-NLS-1$
-            programArguments.add(testFailureNames);
+            programArguments.add("testfailures=" + testFailureNames);
         }
     }
 
@@ -450,7 +527,7 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
     @Override
     public String[] getClasspath(final ILaunchConfiguration configuration) throws CoreException {
         final String[] cp = super.getClasspath(configuration);
-        final List<String> junitEntries = new SubstepJarProvider().substepJars();
+        final List<String> junitEntries = new SubstepJarProvider().allSubstepJars();
 
         final String[] classPath = new String[cp.length + junitEntries.size()];
         final String[] jea = junitEntries.toArray(new String[junitEntries.size()]);
@@ -510,6 +587,19 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
             }
             return element;
         }
+        final IJavaElement element = getMainElementFromProject(configuration, javaProject);
+        if (element != null) {
+            return element;
+        }
+
+        abort(SubstepsFeatureMessages.SubstepsLaunchConfigurationDelegate_input_type_does_not_exist, null,
+                IJavaLaunchConfigurationConstants.ERR_UNSPECIFIED_MAIN_TYPE);
+        return null; // not reachable
+    }
+
+
+    private IJavaElement getMainElementFromProject(final ILaunchConfiguration configuration,
+            final IJavaProject javaProject) throws CoreException, JavaModelException {
         final String testTypeName = getMainTypeName(configuration);
         if (testTypeName != null && testTypeName.length() != 0) {
             final IType type = javaProject.findType(testTypeName);
@@ -517,9 +607,7 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
                 return type;
             }
         }
-        abort(SubstepsFeatureMessages.SubstepsLaunchConfigurationDelegate_input_type_does_not_exist, null,
-                IJavaLaunchConfigurationConstants.ERR_UNSPECIFIED_MAIN_TYPE);
-        return null; // not reachable
+        return null;
     }
 
 

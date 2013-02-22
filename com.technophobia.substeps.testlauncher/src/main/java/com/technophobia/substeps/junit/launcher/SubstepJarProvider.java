@@ -19,6 +19,7 @@ package com.technophobia.substeps.junit.launcher;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -28,27 +29,33 @@ import com.technophobia.substeps.FeatureRunnerPlugin;
 
 public class SubstepJarProvider {
 
-    public List<String> substepJars() {
-        final SubstepsRuntimeClasspathEntry[] entries = entriesForCoreBundle();
+    public List<String> allSubstepJars(){
         final List<String> substepsEntries = new ArrayList<String>();
-        
-        
-        addEntry(substepsEntries, new SubstepsRuntimeClasspathEntry(FeatureRunnerPlugin.PLUGIN_ID, "target/classes"));
-        for (int i = 0; i < entries.length; i++) {
-        	addEntry(substepsEntries, entries[i]);
-        }
+
+        substepsEntries.add(entryString(new SubstepsRuntimeClasspathEntry(FeatureRunnerPlugin.PLUGIN_ID, "target/classes")));
+        substepsEntries.add(apiJar());
+        substepsEntries.add(coreJar());
+        substepsEntries.addAll(junitRunnerJars());
         return substepsEntries;
     }
+    
+    public String apiJar(){
+    	return entryStringForBundle("substeps-core-api", FeatureRunnerPlugin.SUBSTEPS_CORE_VERSION);
+    }
+    
+    public String coreJar(){
+    	return entryStringForBundle("substeps-core", FeatureRunnerPlugin.SUBSTEPS_CORE_VERSION);
+    }
+    
+    public List<String> junitRunnerJars(){
+    	return Arrays.asList(//
+    			entryStringForBundle("substeps-junit-runner", FeatureRunnerPlugin.SUBSTEPS_JUNIT_VERSION), //
+    			entryStringForBundle("substeps-runner-common", FeatureRunnerPlugin.SUBSTEPS_JUNIT_VERSION) //
+    		);
+    }
 
-
-    private SubstepsRuntimeClasspathEntry[] entriesForCoreBundle() {
-
-        return new SubstepsRuntimeClasspathEntry[]{ //
-        		new SubstepsRuntimeClasspathEntry(FeatureRunnerPlugin.DEPENDENCY_BUNDLE_PLUGIN_ID, createJarName("substeps-core", FeatureRunnerPlugin.SUBSTEPS_CORE_VERSION)), //
-        		new SubstepsRuntimeClasspathEntry(FeatureRunnerPlugin.DEPENDENCY_BUNDLE_PLUGIN_ID, createJarName("substeps-core-api", FeatureRunnerPlugin.SUBSTEPS_CORE_VERSION)), //
-        		new SubstepsRuntimeClasspathEntry(FeatureRunnerPlugin.DEPENDENCY_BUNDLE_PLUGIN_ID, createJarName("substeps-junit-runner", FeatureRunnerPlugin.SUBSTEPS_JUNIT_VERSION)), //
-        		new SubstepsRuntimeClasspathEntry(FeatureRunnerPlugin.DEPENDENCY_BUNDLE_PLUGIN_ID, createJarName("substeps-runner-common", FeatureRunnerPlugin.SUBSTEPS_JUNIT_VERSION)) //
-        };
+    private String entryStringForBundle(String jarName, String version) {
+    	return entryString(new SubstepsRuntimeClasspathEntry(FeatureRunnerPlugin.DEPENDENCY_BUNDLE_PLUGIN_ID, createJarName(jarName, version)));
     }
 
 
@@ -62,12 +69,7 @@ public class SubstepJarProvider {
 	}
 
 
-	private void addEntry(final List<String> substepsEntries, final SubstepsRuntimeClasspathEntry entry){
-        final String entryString = entryString(entry);
-        if (entryString != null)
-            substepsEntries.add(entryString);
-    }
-
+	
 
     private String entryString(final SubstepsRuntimeClasspathEntry entry) {
         final Bundle bundle = FeatureRunnerPlugin.instance().getBundle(entry.getPluginId());
