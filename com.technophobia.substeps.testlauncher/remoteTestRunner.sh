@@ -1,0 +1,11 @@
+#!/bin/sh
+mainClass="com/technophobia/substeps/runner/RemoteTestRunner"
+
+classpath="/home/sforbes/checkouts/personal/substeps-sample-project/target/classes, /home/sforbes/.m2/repository/com/technophobia/substeps/substeps-core/0.0.5/substeps-core-0.0.5.jar, /home/sforbes/.m2/repository/velocity/velocity/1.5/velocity-1.5.jar, /home/sforbes/.m2/repository/commons-collections/commons-collections/3.1/commons-collections-3.1.jar, /home/sforbes/.m2/repository/oro/oro/2.0.8/oro-2.0.8.jar, /home/sforbes/.m2/repository/commons-lang/commons-lang/2.6/commons-lang-2.6.jar, /home/sforbes/.m2/repository/org/slf4j/slf4j-api/1.6.4/slf4j-api-1.6.4.jar, /home/sforbes/.m2/repository/com/google/guava/guava/10.0/guava-10.0.jar, /home/sforbes/.m2/repository/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar, /home/sforbes/.m2/repository/net/sourceforge/findbugs/annotations/1.3.2/annotations-1.3.2.jar, /home/sforbes/.m2/repository/commons-configuration/commons-configuration/1.8/commons-configuration-1.8.jar, /home/sforbes/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar, /home/sforbes/.m2/repository/junit/junit/4.10/junit-4.10.jar, /home/sforbes/.m2/repository/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar, /home/sforbes/checkouts/technophobia/substeps/substeps-runner/Junit/target/classes, /home/sforbes/checkouts/technophobia/substeps/substeps-runner/Junit/target/test-classes, /home/sforbes/checkouts/personal/substeps-eclipse-plugin/com.technophobia.substeps.testlauncher/target/classes/, /home/sforbes/checkouts/personal/substeps-eclipse-plugin/com.technophobia.substeps.core.bundle/substeps-core-1.1.0-SNAPSHOT.jar, /home/sforbes/checkouts/personal/substeps-eclipse-plugin/com.technophobia.substeps.core.bundle/substeps-core-api-1.1.0-SNAPSHOT.jar, /home/sforbes/checkouts/personal/substeps-eclipse-plugin/com.technophobia.substeps.core.bundle/substeps-junit-runner-1.1.0.jar, /home/sforbes/checkouts/personal/substeps-eclipse-plugin/com.technophobia.substeps.core.bundle/substeps-runner-common-1.1.0.jar"
+
+programArgs="version=3 port=4381 classnames=com.technophobia.substeps.runner.runtime.DefinableFeatureTest"
+
+cd target/classes
+java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=1044 $mainClass $programArgs -cp $classpath
+
+cd -

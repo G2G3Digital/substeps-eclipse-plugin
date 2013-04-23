@@ -67,6 +67,15 @@ public class Problem {
         } catch (final CoreException ex) {
             FeatureEditorPlugin.instance().error("Could not mark resource " + resource, ex);
             return false;
+        } catch (final Throwable ex) {
+            // Unfortunately, eclipse seems quite keen to throw
+            // AbstractBundle.BundleStatusExceptions around
+            // with reckless abandon. What would be nice is if we could catch
+            // them, but they decided not to make it visible.
+            // Plan B would be to catch its superclass, but they decided to make
+            // it extend Throwable directly, so here we are.
+            FeatureEditorPlugin.instance().error("Could not mark resource " + resource, ex);
+            return false;
         }
     }
 }

@@ -474,7 +474,7 @@ public class SubstepsRunSessionImpl implements SubstepsRunSession, TestRunStats 
         if (testRoot != null)
             return;
 
-        throw new UnsupportedOperationException("Import from disk not supported");
+//        throw new UnsupportedOperationException("Import from disk not supported");
 
         /*
          * try { JUnitModel.importIntoTestRunSession(getSwapFile(), this); }

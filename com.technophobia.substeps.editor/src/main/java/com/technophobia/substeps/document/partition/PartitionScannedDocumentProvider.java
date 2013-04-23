@@ -17,7 +17,9 @@
 package com.technophobia.substeps.document.partition;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
@@ -33,47 +35,61 @@ import com.technophobia.substeps.supplier.Supplier;
  */
 public class PartitionScannedDocumentProvider extends FileDocumentProvider {
 
-    private final PartitionScannerFactory partitionScannerFactory;
+	private final PartitionScannerFactory partitionScannerFactory;
 
-    private IDocument thisDocument = null;
+	private IDocument thisDocument = null;
 
-    private final Supplier<PartitionContext> partitionContextSupplier;
+	private final Supplier<PartitionContext> partitionContextSupplier;
 
+	public PartitionScannedDocumentProvider(
+			final PartitionScannerFactory partitionScannerFactory,
+			final Supplier<PartitionContext> partitionContextSupplier) {
+		this.partitionScannerFactory = partitionScannerFactory;
+		this.partitionContextSupplier = partitionContextSupplier;
+	}
 
-    public PartitionScannedDocumentProvider(final PartitionScannerFactory partitionScannerFactory,
-            final Supplier<PartitionContext> partitionContextSupplier) {
-        this.partitionScannerFactory = partitionScannerFactory;
-        this.partitionContextSupplier = partitionContextSupplier;
-    }
+	@Override
+	protected IDocument createDocument(final Object element)
+			throws CoreException {
+		thisDocument = super.createDocument(element);
+		if (thisDocument != null) {
+			attachPartitionerTo(thisDocument, partitionContextSupplier);
+		}
 
+		thisDocument.addDocumentListener(new IDocumentListener() {
 
-    @Override
-    protected IDocument createDocument(final Object element) throws CoreException {
-        thisDocument = super.createDocument(element);
-        if (thisDocument != null) {
-            attachPartitionerTo(thisDocument, partitionContextSupplier);
-        }
+			@Override
+			public void documentChanged(DocumentEvent event) {
+				if(thisDocument != event.getDocument()){
+					thisDocument = event.getDocument();
+				}
+			}
 
-        return thisDocument;
-    }
+			@Override
+			public void documentAboutToBeChanged(DocumentEvent event) {
+				// No-op
+			}
+		});
 
+		return thisDocument;
+	}
 
-    public IDocument getDocuemnt() {
-        return thisDocument;
-    }
+	public IDocument getDocuemnt() {
+		return thisDocument;
+	}
 
-
-    /**
-     * Create a new {@link IDocumentPartitioner} and attach it do document
-     * 
-     * @param document
-     *            The document to attach the partitioner to
-     */
-    private void attachPartitionerTo(final IDocument document, final Supplier<PartitionContext> partitionContextSupplier) {
-        final IDocumentPartitioner partitioner = new FastPartitioner(
-                partitionScannerFactory.createScanner(partitionContextSupplier),
-                partitionScannerFactory.legalContentTypes());
-        partitioner.connect(document);
-        document.setDocumentPartitioner(partitioner);
-    }
+	/**
+	 * Create a new {@link IDocumentPartitioner} and attach it do document
+	 * 
+	 * @param document
+	 *            The document to attach the partitioner to
+	 */
+	private void attachPartitionerTo(final IDocument document,
+			final Supplier<PartitionContext> partitionContextSupplier) {
+		final IDocumentPartitioner partitioner = new FastPartitioner(
+				partitionScannerFactory.createScanner(partitionContextSupplier),
+				partitionScannerFactory.legalContentTypes());
+		partitioner.connect(document);
+		document.setDocumentPartitioner(partitioner);
+	}
 }

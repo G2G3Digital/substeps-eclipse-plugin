@@ -157,6 +157,9 @@ public class OutlineContentProvider implements ITreeContentProvider {
 
 
     private File asFile(final IFile iFile) {
-        return new File(iFile.getLocation().makeAbsolute().toOSString());
+        if (iFile != null && iFile.getLocation() != null) {
+            return new File(iFile.getLocation().makeAbsolute().toOSString());
+        }
+        return null;
     }
 }
