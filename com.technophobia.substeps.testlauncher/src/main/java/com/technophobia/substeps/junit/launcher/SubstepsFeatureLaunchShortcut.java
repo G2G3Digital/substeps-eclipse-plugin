@@ -35,6 +35,7 @@ import com.technophobia.eclipse.launcher.config.DialogConfigSelector;
 import com.technophobia.eclipse.launcher.config.FindExistingOrNewLaunchConfigFactory;
 import com.technophobia.eclipse.launcher.config.LaunchConfigurationFactory;
 import com.technophobia.eclipse.launcher.config.LaunchConfigurationWorkingCopyFactory;
+import com.technophobia.eclipse.launcher.config.SubstepsLaunchConfigurationConstants;
 import com.technophobia.eclipse.launcher.config.WorkingCopyLaunchConfigLocator;
 import com.technophobia.eclipse.launcher.exception.DialogExceptionReporter;
 import com.technophobia.eclipse.launcher.exception.ExceptionReporter;
@@ -161,8 +162,9 @@ public class SubstepsFeatureLaunchShortcut implements ILaunchShortcut2 {
 
     private Locator<ILaunchConfiguration, ILaunchConfigurationWorkingCopy> configLocator(
             final ILaunchManager launchManager, final ExceptionReporter exceptionReporter) {
-        return new WorkingCopyLaunchConfigLocator(new String[] { ATTR_FEATURE_FILE }, launchManager,
-                new DialogConfigSelector(shell(), SubstepsFeatureMessages.SubstepsFeature_choose_config_title,
-                        SubstepsFeatureMessages.SubstepsFeature_choose_config_title), exceptionReporter);
+        return new WorkingCopyLaunchConfigLocator(new String[] { ATTR_FEATURE_FILE,
+                SubstepsLaunchConfigurationConstants.ATTR_FEATURE_PROJECT }, launchManager, new DialogConfigSelector(
+                shell(), SubstepsFeatureMessages.SubstepsFeature_choose_config_title,
+                SubstepsFeatureMessages.SubstepsFeature_choose_config_title), exceptionReporter);
     }
 }

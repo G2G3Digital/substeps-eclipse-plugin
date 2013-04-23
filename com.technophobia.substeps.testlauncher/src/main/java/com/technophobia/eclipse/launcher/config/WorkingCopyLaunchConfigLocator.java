@@ -16,6 +16,8 @@
  ******************************************************************************/
 package com.technophobia.eclipse.launcher.config;
 
+import static com.technophobia.substeps.util.LogicOperators.not;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -86,12 +88,13 @@ public class WorkingCopyLaunchConfigLocator implements Locator<ILaunchConfigurat
             final ILaunchConfigurationWorkingCopy workingCopy) {
         try {
             for (final String attributeName : matchingAttributeNames) {
-                if (configuration.hasAttribute(attributeName)
+                if (not(configuration.hasAttribute(attributeName)
                         && configuration.getAttribute(attributeName, "not-defined").equals(
-                                workingCopy.getAttribute(attributeName, ""))) {
-                    return true;
+                                workingCopy.getAttribute(attributeName, "")))) {
+                    return false;
                 }
             }
+            return true;
         } catch (final CoreException ex) {
             // no-op, just return false;
         }

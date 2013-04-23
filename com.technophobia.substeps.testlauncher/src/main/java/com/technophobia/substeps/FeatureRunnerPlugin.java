@@ -47,6 +47,10 @@ import com.technophobia.substeps.model.SubstepsRunListener;
 public class FeatureRunnerPlugin extends AbstractUIPlugin implements BundleActivator {
 
     public static final String PLUGIN_ID = "com.technophobia.substeps.testlauncher";
+    public static final String DEPENDENCY_BUNDLE_PLUGIN_ID = "com.technophobia.substeps.core.bundle";
+    public static final String SUBSTEPS_CORE_VERSION = "1.1.0-SNAPSHOT";
+    public static final String SUBSTEPS_JUNIT_VERSION = "1.1.0";
+
     private static final String HISTORY_DIR_NAME = "history";
     private static final String ID_EXTENSION_POINT_SUBSTEPS_RUN_LISTENERS = PLUGIN_ID + ".substepsRunListeners";
 

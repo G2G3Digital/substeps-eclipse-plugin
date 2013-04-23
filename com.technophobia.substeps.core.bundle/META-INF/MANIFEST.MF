@@ -11,9 +11,14 @@ Bundle-ClassPath: velocity-1.5.jar,
  slf4j-api-1.6.4.jar,
  xmlpull-1.1.3.1.jar,
  xstream-1.4.2.jar,
- substeps-core-1.0.2-SNAPSHOT.jar
+ substeps-core-1.1.0-SNAPSHOT.jar,
+ substeps-core-api-1.1.0-SNAPSHOT.jar,
+ substeps-junit-runner-1.1.0.jar,
+ substeps-runner-common-1.1.0.jar
 Require-Bundle: org.junit;bundle-version="4.10.0"
-Export-Package: com.technophobia.substeps.glossary,
+Export-Package: com.technophobia.substeps.execution,
+ com.technophobia.substeps.execution.node,
+ com.technophobia.substeps.glossary,
  com.technophobia.substeps.model,
  com.technophobia.substeps.model.exception,
  com.technophobia.substeps.runner,
@@ -21,7 +26,7 @@ Export-Package: com.technophobia.substeps.glossary,
  com.technophobia.substeps.runner.setupteardown,
  com.technophobia.substeps.runner.syntax,
  com.technophobia.substeps.runner.syntax.validation,
- org.apache.commons.io,
- org.apache.commons.io.filefilter,
- org.apache.velocity,
- org.apache.velocity.exception
+ org.apache.commons.io;uses:="org.apache.commons.io.filefilter",
+ org.apache.commons.io.filefilter;uses:="org.apache.commons.io",
+ org.apache.velocity;uses:="org.apache.velocity.context,org.apache.velocity.runtime.resource",
+ org.apache.velocity.exception;uses:="org.apache.velocity.runtime.parser,org.apache.velocity.util.introspection"

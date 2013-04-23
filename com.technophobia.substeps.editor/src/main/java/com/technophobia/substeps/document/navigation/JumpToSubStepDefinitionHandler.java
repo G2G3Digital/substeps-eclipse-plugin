@@ -17,6 +17,7 @@
 package com.technophobia.substeps.document.navigation;
 
 import java.io.File;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.eclipse.core.commands.AbstractHandler;
@@ -118,7 +120,7 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
         final int offset = iSelection.getOffset();
 
         // get the line from where we are:
-
+        
         final String currentLine = getCurrentLine(currentDocument, offset);
 
         if (currentLine != null) {

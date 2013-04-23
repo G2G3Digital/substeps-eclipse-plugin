@@ -27,12 +27,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
-import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Vector;
 
-import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.model.MessageIds;
 import com.technophobia.substeps.runner.junit4.JUnit4TestLoader;
+//import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 
 /**
  * A TestRunner that reports results via a socket connection. See MessageIds for
@@ -251,60 +252,47 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
      */
     protected final void defaultInit(final String[] args) {
         for (int i = 0; i < args.length; i++) {
-            if (args[i].toLowerCase().equals("-classnames") || args[i].toLowerCase().equals("-classname")) { //$NON-NLS-1$ //$NON-NLS-2$
-                final Vector<String> list = new Vector<String>();
-                for (int j = i + 1; j < args.length; j++) {
-                    if (args[j].startsWith("-")) //$NON-NLS-1$
-                        break;
-                    list.add(args[j]);
-                }
+            if (args[i].toLowerCase().startsWith("classnames") || args[i].toLowerCase().equals("classname")) { //$NON-NLS-1$ //$NON-NLS-2$
+                final List<String> list = valueAsList(args[i]);
                 testClassNames = list.toArray(new String[list.size()]);
-            } else if (args[i].toLowerCase().equals("-test")) { //$NON-NLS-1$
-                String name = args[i + 1];
+            } else if (args[i].toLowerCase().startsWith("test")) { //$NON-NLS-1$
+                String name = valueAsString(args[i]);
                 final int p = testName.indexOf(':');
                 if (p == -1)
                     throw new IllegalArgumentException("Testname not separated by \'%\'"); //$NON-NLS-1$
                 name = name.substring(p + 1);
                 testClassNames = new String[] { name.substring(0, p) };
-                i++;
-            } else if (args[i].toLowerCase().equals("-testnamefile")) { //$NON-NLS-1$
-                final String testNameFile = args[i + 1];
+            } else if (args[i].toLowerCase().startsWith("testnamefile")) { //$NON-NLS-1$
+                final String testNameFile = valueAsString(args[i]);
                 try {
                     readTestNames(testNameFile);
                 } catch (final IOException e) {
                     throw new IllegalArgumentException("Cannot read testname file."); //$NON-NLS-1$
                 }
-                i++;
 
-            } else if (args[i].toLowerCase().equals("-testfailures")) { //$NON-NLS-1$
-                final String testFailuresFile = args[i + 1];
+            } else if (args[i].toLowerCase().startsWith("testfailures")) { //$NON-NLS-1$
+                final String testFailuresFile = valueAsString(args[i]);
                 try {
                     readFailureNames(testFailuresFile);
                 } catch (final IOException e) {
                     throw new IllegalArgumentException("Cannot read testfailures file."); //$NON-NLS-1$
                 }
-                i++;
-
-            } else if (args[i].toLowerCase().equals("-port")) { //$NON-NLS-1$
-                port = Integer.parseInt(args[i + 1]);
-                i++;
-            } else if (args[i].toLowerCase().equals("-host")) { //$NON-NLS-1$
-                host = args[i + 1];
-                i++;
-            } else if (args[i].toLowerCase().equals("-rerun")) { //$NON-NLS-1$
-                rerunTest = args[i + 1];
-                i++;
-            } else if (args[i].toLowerCase().equals("-keepalive")) { //$NON-NLS-1$
+            } else if (args[i].toLowerCase().startsWith("port")) { //$NON-NLS-1$
+                port = Integer.parseInt(valueAsString(args[i]));
+            } else if (args[i].toLowerCase().startsWith("host")) { //$NON-NLS-1$
+                host = valueAsString(args[i]);
+            } else if (args[i].toLowerCase().startsWith("rerun")) { //$NON-NLS-1$
+                rerunTest = valueAsString(args[i]);
+            } else if (args[i].toLowerCase().startsWith("keepalive")) { //$NON-NLS-1$
                 keepAlive = true;
-            } else if (args[i].toLowerCase().equals("-debugging") || args[i].toLowerCase().equals("-debug")) { //$NON-NLS-1$ //$NON-NLS-2$
+            } else if (args[i].toLowerCase().startsWith("debugging") || args[i].toLowerCase().startsWith("debug")) { //$NON-NLS-1$ //$NON-NLS-2$
                 debugMode = true;
-            } else if (args[i].toLowerCase().equals("-version")) { //$NON-NLS-1$
-                version = args[i + 1];
-                i++;
-            } else if (args[i].toLowerCase().equals("-junitconsole")) { //$NON-NLS-1$
+            } else if (args[i].toLowerCase().startsWith("version")) { //$NON-NLS-1$
+                version = valueAsString(args[i]);
+            } else if (args[i].toLowerCase().startsWith("junitconsole")) { //$NON-NLS-1$
                 consoleMode = true;
-            } else if (args[i].toLowerCase().equals("-testloaderclass")) { //$NON-NLS-1$
-                final String className = args[i + 1];
+            } else if (args[i].toLowerCase().startsWith("testloaderclass")) { //$NON-NLS-1$
+                final String className = valueAsString(args[i]);
                 createLoader(className);
                 i++;
             }
@@ -314,10 +302,10 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
             initDefaultLoader();
 
         if (testClassNames == null || testClassNames.length == 0)
-            throw new IllegalArgumentException(SubstepsFeatureMessages.RemoteTestRunner_error_classnamemissing);
+            throw new IllegalArgumentException("Error: parameter '-classNames' or '-className' not specified");
 
         if (port == -1)
-            throw new IllegalArgumentException(SubstepsFeatureMessages.RemoteTestRunner_error_portmissing);
+            throw new IllegalArgumentException("Error: parameter '-port' not specified");
         if (debugMode)
             System.out.println("keepalive " + keepAlive); //$NON-NLS-1$
     }
@@ -339,8 +327,8 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
         } catch (final Exception e) {
             final StringWriter trace = new StringWriter();
             e.printStackTrace(new PrintWriter(trace));
-            final String message = MessageFormat.format(SubstepsFeatureMessages.RemoteTestRunner_error_invalidloader,
-                    className, trace.toString());
+            final String message = "Error: test loader "+className+" not found:\n"+trace.toString();
+                    
             throw new IllegalArgumentException(message);
         }
     }
@@ -643,9 +631,8 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
             }
         }
 
-        runFailed(
-                MessageFormat.format(SubstepsFeatureMessages.RemoteTestRunner_error_connect, host,
-                        Integer.toString(port)), exception);
+        runFailed("Could not connect to: "+host+" : "+port
+                        , exception);
         return false;
     }
 
@@ -767,9 +754,27 @@ public class RemoteTestRunner implements MessageSender, IVisitsTestTrees {
         try {
             clazz = getTestClassLoader().loadClass(className);
         } catch (final ClassNotFoundException e) {
-            listener.runFailed(
-                    MessageFormat.format(SubstepsFeatureMessages.RemoteTestRunner_error_classnotfound, className), e);
+            listener.runFailed("Class not found "+className, e);
         }
         return clazz;
+    }
+    
+    private List<String> valueAsList(String arg){
+    	String[] kv = arg.split("=");
+    	if(kv.length != 2){
+    		// No idea what to do - should be key=value
+    		return null;
+    	}
+    	String[] listItems = kv[1].split(",");
+    	return Arrays.asList(listItems);
+    }
+    
+    private String valueAsString(String arg){
+    	String[] kv = arg.split("=");
+    	if(kv.length != 2){
+    		// No idea what to do - should be key=value
+    		return null;
+    	}
+    	return kv[1];
     }
 }
