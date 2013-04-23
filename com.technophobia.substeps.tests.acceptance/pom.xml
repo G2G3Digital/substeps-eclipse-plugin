@@ -50,7 +50,7 @@
 						<dependency>
 							<type>p2-installable-unit</type>
 							<artifactId>org.apache.velocity</artifactId>
-							<version>1.5</version>
+							<version>1.7</version>
 						</dependency>
 					</dependencies>
 				</configuration>

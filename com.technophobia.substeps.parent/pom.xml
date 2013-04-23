@@ -22,7 +22,7 @@
     </licenses>
 
 	<properties>
-		<tycho.version>0.15.0</tycho.version>
+		<tycho.version>0.17.0</tycho.version>
                 <KEY_STORE>/path/to/keystore</KEY_STORE>
                 <ALIAS>alias</ALIAS>
 	</properties>
@@ -36,7 +36,9 @@
 		<repository>
 			<id>swtbot</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/technology/swtbot/helios/dev-build/update-site</url>
+				<!-- 2.10 -->
+				<url>http://download.eclipse.org/technology/swtbot/releases/latest/</url>
+<!--  			<url>http://download.eclipse.org/technology/swtbot/helios/dev-build/update-site</url> -->
 		</repository>
 	</repositories>
 
@@ -92,14 +94,15 @@
 		<module>../com.technophobia.substeps.testlauncher</module>
 		<module>../com.technophobia.substeps.feature</module>
 		<module>../com.technophobia.substeps.repository</module>
-		<module>../com.technophobia.substeps.updatesite</module>
+		<!--  <module>../com.technophobia.substeps.updatesite</module>
+-->
 	</modules>
 
 	<profiles>
 		<profile>
 			<id>run-tests</id>
 			<modules>
-				<module>../com.technophobia.substeps.tests.acceptance</module>			
+				<module>../com.technophobia.substeps.swtbot.tests</module>
 			</modules>
 		</profile>
 		<profile>
