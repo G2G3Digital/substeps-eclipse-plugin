@@ -68,7 +68,7 @@ public class BasicTest {
 		switchToJavaPerspective();
 		
 		// TODO - fix the path for this as it will only work on my computer :-)
-		importProjectIntoWorkspace("test-substeps-project", "/home/ian/projects/github/substeps-eclipse-plugin/com.technophobia.substeps.swtbot.tests/tweaked_workspace/test-substeps-project");
+		importProjectIntoWorkspace("test-substeps-project", "/home/ian/projects/github/substeps-eclipse-plugin/com.technophobia.substeps.swtbot.tests/vanilla_workspace/test-substeps-project");
 		
 		System.out.println("done setupSubStepsProject");
 	}
