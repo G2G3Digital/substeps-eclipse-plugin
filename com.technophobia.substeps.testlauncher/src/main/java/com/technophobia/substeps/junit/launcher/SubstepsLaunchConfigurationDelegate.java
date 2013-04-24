@@ -21,20 +21,27 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -54,6 +61,7 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.SocketUtil;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
+import org.osgi.framework.Bundle;
 
 import com.technophobia.eclipse.launcher.config.SubstepsLaunchConfigurationConstants;
 import com.technophobia.substeps.FeatureEditorPlugin;
@@ -306,18 +314,6 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
         }
     }
 
-
-    // private String getTestRunnerKind(final ILaunchConfiguration
-    // configuration) {
-    // try {
-    // return configuration
-    // .getAttribute(SubstepsLaunchConfigurationConstants.ATTR_TEST_RUNNER_KIND,
-    // (String) null);
-    // } catch (final CoreException e) {
-    // return null;
-    // }
-    // }
-
     /*
      * (non-Javadoc)
      * 
@@ -527,55 +523,55 @@ public class SubstepsLaunchConfigurationDelegate extends AbstractJavaLaunchConfi
     @Override
     public String[] getClasspath(final ILaunchConfiguration configuration) throws CoreException {
         final String[] cp = super.getClasspath(configuration);
-        final List<String> junitEntries = new SubstepJarProvider().allSubstepJars();
 
-        final String[] classPath = new String[cp.length + junitEntries.size()];
-        final String[] jea = junitEntries.toArray(new String[junitEntries.size()]);
-        System.arraycopy(cp, 0, classPath, 0, cp.length);
-        System.arraycopy(jea, 0, classPath, cp.length, jea.length);
-        return classPath;
+        Set<String> total = new LinkedHashSet<String>();
+        
+        // TODO might be a good idea to log out the classpath that we're firing the tests off with..??
+        
+        for (String cpElem : cp){
+        	total.add(cpElem);
+        }
+        
+        // This is the classpath to the test launcher plugin - this works whether in eclipse or tycho
+        // and hopefully in a deployed plugin
+        String thisPluginsClasspath = getPluginClasspath(FeatureRunnerPlugin.PLUGIN_ID);
+                
+        final List<String> junitEntries = new SubstepJarProvider().allSubstepJars();
+        
+        total.add(thisPluginsClasspath);
+        total.addAll(junitEntries);
+        
+        return total.toArray(new String[total.size()]);
     }
 
+    private String getPluginClasspath(String pluginId) {
+    	
+    	String finalUrl = null;
+    	
+    	final Bundle bundle = FeatureRunnerPlugin.instance().getBundle(pluginId);
+    	
+    	URL url = null;
+        if (Platform.inDevelopmentMode()) {
+            url = bundle.getEntry("target/classes");
+        }
 
-    /*
-     * private static class ClasspathLocalizer {
-     * 
-     * private final boolean fInDevelopmentMode;
-     * 
-     * public ClasspathLocalizer(final boolean inDevelopmentMode) {
-     * fInDevelopmentMode = inDevelopmentMode; }
-     * 
-     * public List localizeClasspath(final ITestKind kind) { final
-     * JUnitRuntimeClasspathEntry[] entries= kind.getClasspathEntries(); final
-     * List junitEntries= new ArrayList();
-     * 
-     * for (int i= 0; i < entries.length; i++) { try { addEntry(junitEntries,
-     * entries[i]); } catch (final IOException e) { Assert.isTrue(false,
-     * entries[i].getPluginId() + " is available (required JAR)"); //$NON-NLS-1$
-     * } } return junitEntries; }
-     * 
-     * private void addEntry(final List junitEntries, final
-     * JUnitRuntimeClasspathEntry entry) throws IOException,
-     * MalformedURLException { final String entryString= entryString(entry); if
-     * (entryString != null) junitEntries.add(entryString); }
-     * 
-     * private String entryString(final JUnitRuntimeClasspathEntry entry) throws
-     * IOException, MalformedURLException { if (inDevelopmentMode()) { try {
-     * return localURL(entry.developmentModeEntry()); } catch (final IOException
-     * e3) { // fall through and try default } } return localURL(entry); }
-     * 
-     * private boolean inDevelopmentMode() { return fInDevelopmentMode; }
-     * 
-     * private String localURL(final JUnitRuntimeClasspathEntry jar) throws
-     * IOException, MalformedURLException { final Bundle bundle=
-     * JUnitCorePlugin.getDefault().getBundle(jar.getPluginId()); URL url; if
-     * (jar.getPluginRelativePath() == null) url= bundle.getEntry("/");
-     * //$NON-NLS-1$ else url= bundle.getEntry(jar.getPluginRelativePath()); if
-     * (url == null) throw new IOException(); return
-     * FileLocator.toFileURL(url).getFile(); } }
-     */
+        if (url == null){
+            url = bundle.getEntry("/");
+        }
+        
+        Assert.isNotNull(url, "url for plugin can't be null");
 
-    private final IJavaElement getTestTarget(final ILaunchConfiguration configuration, final IJavaProject javaProject)
+        try {
+			finalUrl = FileLocator.toFileURL(url).getFile();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+
+        return finalUrl;
+	}
+
+	private final IJavaElement getTestTarget(final ILaunchConfiguration configuration, final IJavaProject javaProject)
             throws CoreException {
         final String containerHandle = configuration.getAttribute(
                 SubstepsLaunchConfigurationConstants.ATTR_TEST_CONTAINER, ""); //$NON-NLS-1$
