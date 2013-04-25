@@ -23,8 +23,8 @@
 	<parent>
 		<groupId>com.technophobia.substeps</groupId>
 		<artifactId>com.technophobia.substeps.parent</artifactId>
-		<version>0.2.11-SNAPSHOT</version>
-		<relativePath>../com.technophobia.substeps.parent</relativePath>
+		<version>0.2.13-SNAPSHOT</version>
+		<relativePath>../com.technophobia.substeps.parent/pom.xml</relativePath>
 	</parent>
 	
 	<artifactId>com.technophobia.substeps.testlauncher.tests.unit</artifactId>

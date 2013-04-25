@@ -1,0 +1,9 @@
+to run the tests inside eclipse,
+
+Run Configurations:
+Main tab
+Workspace Data, Location = blank
+run a product, select 'com.technophobia.substeps.editor.substeps_product'
+
+Configuration
+check 'default location'

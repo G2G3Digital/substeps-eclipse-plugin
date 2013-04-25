@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tests
 Bundle-SymbolicName: com.technophobia.substeps.swtbot.tests
-Bundle-Version: 0.2.11.qualifier
+Bundle-Version: 0.2.13.qualifier
 Bundle-Activator: com.technophobia.substeps.swtbot.tests.Activator
 Bundle-Vendor: TECHNOPHOBIA
 Require-Bundle: org.eclipse.ui;bundle-version="3.8.0",
@@ -27,9 +27,9 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.8.0",
  org.hamcrest.library;bundle-version="1.1.0",
  org.eclipse.swtbot.junit4_x;bundle-version="2.1.0",
  org.apache.log4j,
- com.technophobia.substeps.editor;bundle-version="0.2.11",
- com.technophobia.substeps.testlauncher;bundle-version="0.2.11",
- com.technophobia.substeps.core.bundle;bundle-version="0.2.11"
+ com.technophobia.substeps.editor;bundle-version="0.2.13",
+ com.technophobia.substeps.testlauncher;bundle-version="0.2.13",
+ com.technophobia.substeps.core.bundle;bundle-version="0.2.13"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 

@@ -23,7 +23,7 @@
 	<parent>
 		<groupId>com.technophobia.substeps</groupId>
 		<artifactId>com.technophobia.substeps.parent</artifactId>
-		<version>0.2.11-SNAPSHOT</version>
+		<version>0.2.13-SNAPSHOT</version>
 		<relativePath>../com.technophobia.substeps.parent</relativePath>
 	</parent>
 
@@ -39,7 +39,7 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho.version}</version>
 				<configuration>
-					<appArgLine>-DM2_REPO=/home/ian/.m2/repository</appArgLine>
+					<!--  <appArgLine>-DM2_REPO=/home/ian/.m2/repository</appArgLine> -->
 					<!--debugPort>4001</debugPort -->
 					<argline>-Xdebug
 						--Xrunjdwp:transport=dt_socket,address=4001,server=y,suspend=y</argline>
@@ -49,8 +49,9 @@
 					<!-- <product>org.eclipse.sdk.ide</product>  
 					<application>org.eclipse.ui.ide.workbench</application> -->
 					<showEclipseLog>true</showEclipseLog>
-					<osgiDataDirectory>/home/ian/projects/github/substeps-eclipse-plugin/com.technophobia.substeps.swtbot.tests/workspacemvn</osgiDataDirectory> 
-					<surefireProperties>/home/ian/projects/github/substeps-eclipse-plugin/com.technophobia.substeps.swtbot.tests/target/surefire.properties</surefireProperties>
+					
+					<osgiDataDirectory>${basedir}/target/workspacemvn</osgiDataDirectory> 
+					<surefireProperties>${basedir}/target/surefire.properties</surefireProperties>
 					
 					
 				<!--	<dependencies>
@@ -62,6 +63,29 @@
 					</dependencies> -->
 				</configuration>
 			</plugin>
-		</plugins>
+		
+		
+		<plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+
+          <execution>
+            <id>add-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/test/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+		
+      </plugins>
 	</build>
 </project>

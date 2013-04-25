@@ -119,6 +119,8 @@ public class BasicTest {
 			}
 		}
 		
+		bot.sleep(1000 * 10);
+		
 		if (generalTreeItem != null)
 		{
 			generalTreeItem.expand();

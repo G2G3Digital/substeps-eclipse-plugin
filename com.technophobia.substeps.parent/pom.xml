@@ -5,7 +5,7 @@
 
 	<groupId>com.technophobia.substeps</groupId>
 	<artifactId>com.technophobia.substeps.parent</artifactId>
-	<version>0.2.11-SNAPSHOT</version>
+	<version>0.2.13-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<organization>
@@ -92,10 +92,12 @@
 		<module>../com.technophobia.substeps.editor</module>
 		<module>../com.technophobia.substeps.editor.tests.unit</module>
 		<module>../com.technophobia.substeps.testlauncher</module>
+		<module>../com.technophobia.substeps.testlauncher.tests.unit</module>
+		<!-- <module>../com.technophobia.substeps.swtbot.tests</module>  -->
 		<module>../com.technophobia.substeps.feature</module>
 		<module>../com.technophobia.substeps.repository</module>
-		<!--  <module>../com.technophobia.substeps.updatesite</module>
--->
+		
+		<module>../com.technophobia.substeps.updatesite</module>
 	</modules>
 
 	<profiles>
@@ -112,13 +114,13 @@
 				<snapshotRepository>
 					<id>${nexus.snapshot.artifacts}</id>
 					<name>${nexus.snapshot.artifacts}</name>
-					<url>${nexus.snapshot.url}</url>
+					<url>${nexus.internal.snapshot.url}</url>
 					<uniqueVersion>false</uniqueVersion>
 				</snapshotRepository>
 				<repository>
 					<id>${nexus.release.artifacts}</id>
 					<name>${nexus.release.artifacts}</name>
-					<url>${nexus.releases.url}</url>
+					<url>${nexus.internal.releases.url}</url>
 				</repository>
 			</distributionManagement>
 
