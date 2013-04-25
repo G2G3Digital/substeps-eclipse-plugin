@@ -27,6 +27,9 @@ public class SubstepsRuntimeClasspathEntry {
         this.pluginRelativePath = relativePath;
     }
 
+    public SubstepsRuntimeClasspathEntry developmentModeEntry() {
+        return new SubstepsRuntimeClasspathEntry(getPluginId(), "target/classes"); //$NON-NLS-1$
+    }
 
     public String getPluginId() {
         return pluginId;

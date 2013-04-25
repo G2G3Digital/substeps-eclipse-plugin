@@ -32,7 +32,6 @@ public class SubstepJarProvider {
     public List<String> allSubstepJars(){
         final List<String> substepsEntries = new ArrayList<String>();
 
-        substepsEntries.add(entryString(new SubstepsRuntimeClasspathEntry(FeatureRunnerPlugin.PLUGIN_ID, "target/classes")));
         substepsEntries.add(apiJar());
         substepsEntries.add(coreJar());
         substepsEntries.addAll(junitRunnerJars());
@@ -72,8 +71,10 @@ public class SubstepJarProvider {
 	
 
     private String entryString(final SubstepsRuntimeClasspathEntry entry) {
-        final Bundle bundle = FeatureRunnerPlugin.instance().getBundle(entry.getPluginId());
-        URL url = bundle.getEntry(entry.getPluginRelativePath());
+            	    	
+    	final Bundle bundle = FeatureRunnerPlugin.instance().getBundle(entry.getPluginId());
+    	
+    	URL url = bundle.getEntry(entry.getPluginRelativePath());
 
         if (url != null){
         	return toFile(url);
