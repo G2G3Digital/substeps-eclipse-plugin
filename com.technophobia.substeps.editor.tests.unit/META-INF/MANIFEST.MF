@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Unit Tests
 Bundle-SymbolicName: com.technophobia.substeps.editor.tests.unit
-Bundle-Version: 0.2.13.qualifier
+Bundle-Version: 0.2.14.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Fragment-Host: com.technophobia.substeps.editor
