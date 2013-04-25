@@ -92,8 +92,8 @@
 		<module>../com.technophobia.substeps.editor</module>
 		<module>../com.technophobia.substeps.editor.tests.unit</module>
 		<module>../com.technophobia.substeps.testlauncher</module>
-		<module>../com.technophobia.substeps.testlauncher.tests.unit</module>
-		<!-- <module>../com.technophobia.substeps.swtbot.tests</module>  -->
+		<!--<module>../com.technophobia.substeps.testlauncher.tests.unit</module>
+		 <module>../com.technophobia.substeps.swtbot.tests</module>  -->
 		<module>../com.technophobia.substeps.feature</module>
 		<module>../com.technophobia.substeps.repository</module>
 		

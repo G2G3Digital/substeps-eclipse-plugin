@@ -105,7 +105,10 @@ public class BasicTest {
 	
 	private void importProjectIntoWorkspace(String projectName, String path){
 
-		bot.menu("File").menu("Import...").click();		
+		bot.menu("File").menu("Import...").click();
+		
+		// are we still in the same shell now ?
+		
 		SWTBotTreeItem[] allItems = bot.tree().getAllItems();
 		SWTBotTreeItem generalTreeItem = null;
 		if (allItems != null)
@@ -119,7 +122,7 @@ public class BasicTest {
 			}
 		}
 		
-		bot.sleep(1000 * 10);
+		
 		
 		if (generalTreeItem != null)
 		{
