@@ -179,9 +179,52 @@ public class BasicTest {
         
         checkOpenSubstepDefinition();
         
+        checkSubstepFileSuggestions();
+        
     }
     
-    private Position getPositionThatIncludesText(SWTBotEclipseEditor textEditor, String text){
+    private void checkSubstepFileSuggestions() {
+
+        SWTBotEditor activeEditor = bot.activeEditor();
+        
+        SWTBotEclipseEditor textEditor = activeEditor.toTextEditor();
+        
+        int lineCount = textEditor.getLineCount();
+        
+        int len = textEditor.getTextOnLine(lineCount-1).length();
+
+        System.out.println("substep line count: " + lineCount + " len: " + len);
+        
+        textEditor.navigateTo(lineCount -1 , len);
+        
+        System.out.println("current line: " +  textEditor.getTextOnCurrentLine());
+        
+        textEditor.typeText( "\n");
+
+        List<String> proposals = textEditor.getAutoCompleteProposals("Ca");
+        
+        for (String s : proposals){
+        	
+        	System.out.println("proposal: " + s);
+        }
+        
+        Assert.assertThat(proposals.size(), is(4));
+        
+        Assert.assertThat(proposals.get(0), is("CallMethod One with parameter \"<value>\""));
+        Assert.assertThat(proposals.get(1), is("CallMethod Three"));
+        Assert.assertThat(proposals.get(2), is("CallMethod Two"));
+        Assert.assertThat(proposals.get(3), is("CallMethod four"));
+        
+        // not sure how to select one of the proposals, do we even need to ?
+        
+        
+        // how to handle the save
+        textEditor.save();
+
+	}
+
+
+	private Position getPositionThatIncludesText(SWTBotEclipseEditor textEditor, String text){
         return getPositionThatIncludesText(textEditor, text, 1);
     }
     
@@ -241,7 +284,9 @@ public class BasicTest {
         
         System.out.println("text on line 0: " + textEditor.getTextOnLine(0));
         
-        Position position = getPositionThatIncludesText(textEditor, "And I can call a method that doesn't exist yet");
+        String substep = "And I can call a method that doesn't exist yet";
+        
+        Position position = getPositionThatIncludesText(textEditor, substep);
         
         textEditor.navigateTo(position);
         
@@ -252,16 +297,15 @@ public class BasicTest {
             
         // should now have a substeps file open
         
-        
         SWTBotEditor activeEditor = bot.activeEditor();
         
         textEditor = activeEditor.toTextEditor();
         
         Assert.assertThat(activeEditor.getTitle(), is("plugin-tests-sample.substeps"));
         
-       
+        Assert.assertTrue(
+        textEditor.getTextOnCurrentLine().contains("Define: " + substep));
         
-        bot.sleep(1000 * 10);
     }
 
 
@@ -304,15 +348,6 @@ public class BasicTest {
                 "CallMethod One with parameter \"param\"");
         scenarioNode.addChildNode("And I can call a method that doesn't exist yet").addChildNode("CallMethod four");
         scenarioNode.addChildNode("Then I can do something else").addChildNode("CallMethod Two");
-        /*
-         * 
-         * feature tree: Features [..... A feature to write some ... a test
-         * scenario Given I can call method one with <param> CallMethod One with
-         * parameter "param" And I can call a method that doesn't exist yet
-         * CallMethod four Then I can do something else CallMethod Two
-         * 
-         * console ends with DefinableFeatureTest notifyTestFinished
-         */
 
         recurseAndcheckSWTBotTree(substepsTreeItem, rootNode);
     }
