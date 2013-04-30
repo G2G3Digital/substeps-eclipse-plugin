@@ -24,10 +24,13 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.utils.Position;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -62,9 +65,14 @@ public class BasicTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-
+        
+        // http://www.eclipse.org/forums/index.php/t/166612/
+        SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US"; // doesn't like en_GB
+        
         bot = new SWTWorkbenchBot();
-
+        
+        
+        
         outerShell = bot.activeShell();
 
         outerShell.activate();
@@ -199,14 +207,10 @@ public class BasicTest {
         
         System.out.println("current line: " +  textEditor.getTextOnCurrentLine());
         
-        textEditor.typeText( "\n");
-
-        List<String> proposals = textEditor.getAutoCompleteProposals("Ca");
         
-        for (String s : proposals){
-        	
-        	System.out.println("proposal: " + s);
-        }
+        textEditor.typeText("\n");
+  
+        List<String> proposals = textEditor.getAutoCompleteProposals("Ca");
         
         Assert.assertThat(proposals.size(), is(4));
         
@@ -217,14 +221,10 @@ public class BasicTest {
         
         // not sure how to select one of the proposals, do we even need to ?
         
-        
-        // how to handle the save
         textEditor.save();
+    }
 
-	}
-
-
-	private Position getPositionThatIncludesText(SWTBotEclipseEditor textEditor, String text){
+    private Position getPositionThatIncludesText(SWTBotEclipseEditor textEditor, String text){
         return getPositionThatIncludesText(textEditor, text, 1);
     }
     
