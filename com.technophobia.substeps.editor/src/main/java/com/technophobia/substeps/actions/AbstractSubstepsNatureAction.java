@@ -4,11 +4,16 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.ui.IPackagesViewPart;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.nature.SubstepsNature;
@@ -85,9 +90,26 @@ public abstract class AbstractSubstepsNatureAction implements IObjectActionDeleg
 
     private void updateDescription(final IProject project, final IProjectDescription description) {
         try {
-            currentProject.setDescription(description, new NullProgressMonitor());
+            final NullProgressMonitor monitor = new NullProgressMonitor();
+            currentProject.setDescription(description, monitor);
+            updatePackageExplorer();
+            // currentProject.refreshLocal(1, monitor);
+            // currentProject.touch(monitor);
         } catch (final CoreException ex) {
             FeatureEditorPlugin.instance().error("Could not update project " + project.getName(), ex);
         }
+    }
+
+
+    private void updatePackageExplorer() {
+        final IViewPart foundView = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+                .findView(JavaUI.ID_PACKAGES);
+
+        if (foundView instanceof IPackagesViewPart) {
+            final IPackagesViewPart packageExplorerView = (IPackagesViewPart) foundView;
+            final TreeViewer treeViewer = packageExplorerView.getTreeViewer();
+            treeViewer.refresh();
+        }
+
     }
 }

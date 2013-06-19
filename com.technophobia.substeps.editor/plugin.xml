@@ -195,6 +195,14 @@
      </startup>
   </extension>
   <extension
+        point="org.eclipse.ui.ide.projectNatureImages">
+     <image
+           icon="src/main/resources/icons/substeps-nature.gif"
+           id="com.technophobia.substeps.editor.substepsNature.img"
+           natureId="com.technophobia.substeps.editor.substepsNature">
+     </image>
+  </extension>
+  <extension
         id="substepsNature"
         name="Substeps Nature"
         point="org.eclipse.core.resources.natures">
@@ -203,14 +211,6 @@
               class="com.technophobia.substeps.nature.SubstepsNature">
         </run>
      </runtime>
-  </extension>
-  <extension
-        point="org.eclipse.ui.ide.projectNatureImages">
-     <image
-           icon="src/main/resources/icons/substeps-nature.gif"
-           id="com.technophobia.substeps.editor.substepsNature.img"
-           natureId="com.technophobia.substeps.editor.substepsNature">
-     </image>
   </extension>
   <extension
         point="org.eclipse.ui.popupMenus">

@@ -14,8 +14,8 @@ public class EnableSubstepsNatureAction extends AbstractSubstepsNatureAction {
 
     private String[] addNatureId(final String natureId, final String[] oldNatureIds) {
         final String[] newNatureIds = new String[oldNatureIds.length + 1];
-        System.arraycopy(oldNatureIds, 0, newNatureIds, 0, oldNatureIds.length);
-        newNatureIds[newNatureIds.length - 1] = natureId;
+        System.arraycopy(oldNatureIds, 0, newNatureIds, 1, oldNatureIds.length);
+        newNatureIds[0] = natureId;
         return newNatureIds;
     }
 }
