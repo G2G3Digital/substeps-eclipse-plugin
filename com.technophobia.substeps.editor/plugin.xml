@@ -194,4 +194,75 @@
            class="com.technophobia.substeps.FeatureEditorStartup">
      </startup>
   </extension>
+  <extension
+        id="substepsNature"
+        name="Substeps Nature"
+        point="org.eclipse.core.resources.natures">
+     <runtime>
+        <run
+              class="com.technophobia.substeps.nature.SubstepsNature">
+        </run>
+     </runtime>
+  </extension>
+  <extension
+        point="org.eclipse.ui.ide.projectNatureImages">
+     <image
+           icon="src/main/resources/icons/substeps-nature.gif"
+           id="com.technophobia.substeps.editor.substepsNature.img"
+           natureId="com.technophobia.substeps.editor.substepsNature">
+     </image>
+  </extension>
+  <extension
+        point="org.eclipse.ui.popupMenus">
+     <objectContribution
+           adaptable="true"
+           id="com.technophobia.substeps.editor.enableSubstepsNature"
+           objectClass="org.eclipse.core.resources.IProject">
+        <action
+              class="com.technophobia.substeps.actions.EnableSubstepsNatureAction"
+              enablesFor="+"
+              id="com.technophobia.substeps.editor.action.enableSubstepsNatureAction"
+              label="Mark as a Substeps project"
+              menubarPath="org.eclipse.ui.projectConfigure/additions">
+        </action>
+        <visibility>
+           <and>
+              <objectState
+                    name="open"
+                    value="true">
+              </objectState>
+              <not>
+                 <objectState
+                       name="nature"
+                       value="com.technophobia.substeps.editor.substepsNature">
+                 </objectState>
+              </not>
+           </and>
+        </visibility>
+     </objectContribution>
+     <objectContribution
+           adaptable="true"
+           id="com.technophobia.substeps.editor.disableSubstepsNature"
+           objectClass="org.eclipse.core.resources.IProject">
+        <action
+              class="com.technophobia.substeps.actions.DisableSubstepsNatureAction"
+              enablesFor="+"
+              id="com.technophobia.substeps.editor.action.disableSubstepsNatureAction"
+              label="Unmark as a Substeps project"
+              menubarPath="org.eclipse.ui.projectConfigure/additions">
+        </action>
+        <visibility>
+           <and>
+              <objectState
+                    name="open"
+                    value="true">
+              </objectState>
+              <objectState
+                    name="nature"
+                    value="com.technophobia.substeps.editor.substepsNature">
+              </objectState>
+           </and>
+        </visibility>
+     </objectContribution>
+  </extension>
 </plugin>

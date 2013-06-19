@@ -26,6 +26,7 @@ import com.technophobia.eclipse.preference.PreferenceLookupFactory;
 import com.technophobia.eclipse.project.ProjectManager;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.model.Syntax;
+import com.technophobia.substeps.nature.SubstepsNature;
 import com.technophobia.substeps.observer.CacheMonitor;
 import com.technophobia.substeps.supplier.CachingResultTransformer;
 import com.technophobia.substeps.supplier.Transformer;
@@ -68,7 +69,7 @@ public class CachingProjectToSyntaxTransformer implements CachingResultTransform
     @Override
     public void refreshCacheFor(final IProject project) {
         pluginLogger.info("Clearing cache for project " + project);
-        if (project.isOpen()) {
+        if (project.isOpen() && SubstepsNature.isSubstepsProject(project)) {
             cache.put(project, delegate.from(project));
         } else {
             pluginLogger.info("Project " + project + " is closed. Evicting from cache if it was present");

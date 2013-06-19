@@ -122,6 +122,16 @@ public class CacheAwareProjectManager implements ProjectObserver {
 
 
     @Override
+    public void projectChanged(final IProject project) {
+        updateCaches(project);
+        for (final ProjectChangedListener listener : projectChangeListeners
+                .get(ProjectEventType.ProjectConfigurationChanged)) {
+            listener.projectChanged(project);
+        }
+    }
+
+
+    @Override
     public void workspaceLoaded() {
         for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
             updateCaches(project);

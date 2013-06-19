@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.JavaCore;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
+import com.technophobia.substeps.nature.SubstepsNature;
 import com.technophobia.substeps.step.ProjectSuggestionProvider;
 import com.technophobia.substeps.step.Suggestion;
 
@@ -75,7 +76,9 @@ public abstract class AbstractMultiProjectSuggestionProvider implements ProjectS
             stepImplementationMap.get(project).clear();
         }
 
-        stepImplementationMap.get(project).addAll(findStepImplementationsFor(project));
+        if (SubstepsNature.isSubstepsProject(project)) {
+            stepImplementationMap.get(project).addAll(findStepImplementationsFor(project));
+        }
     }
 
 

@@ -39,6 +39,7 @@ import com.technophobia.substeps.classloader.JavaProjectClassLoader;
 import com.technophobia.substeps.model.ParentStep;
 import com.technophobia.substeps.model.PatternMap;
 import com.technophobia.substeps.model.Syntax;
+import com.technophobia.substeps.nature.SubstepsNature;
 import com.technophobia.substeps.runner.runtime.ClassLocator;
 import com.technophobia.substeps.runner.runtime.StepClassLocator;
 import com.technophobia.substeps.runner.syntax.DefaultSyntaxErrorReporter;
@@ -61,27 +62,29 @@ public class ProjectToSyntaxTransformer implements Transformer<IProject, Syntax>
     @Override
     public Syntax from(final IProject project) {
 
-        final IJavaProject javaProject = new ProjectToJavaProjectTransformer().from(project);
-        if (javaProject != null) {
-            final ClassLoader classLoader = new JavaProjectClassLoader(javaProject);
-            final Set<String> outputFolders = outputFoldersForProject(javaProject);
-            final File substepsFolder = new File(projectManager.substepsFolderFor(project).toOSString());
+        if (SubstepsNature.isSubstepsProject(project)) {
+            final IJavaProject javaProject = new ProjectToJavaProjectTransformer().from(project);
+            if (javaProject != null) {
+                final ClassLoader classLoader = new JavaProjectClassLoader(javaProject);
+                final Set<String> outputFolders = outputFoldersForProject(javaProject);
+                final File substepsFolder = new File(projectManager.substepsFolderFor(project).toOSString());
 
-            final List<Class<?>> stepClasses = new ArrayList<Class<?>>();
-            for (final String outputFolder : outputFolders) {
-                final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
-                stepClasses.addAll(stepClasses(outputFolder, classLocator));
+                final List<Class<?>> stepClasses = new ArrayList<Class<?>>();
+                for (final String outputFolder : outputFolders) {
+                    final ClassLocator classLocator = new StepClassLocator(outputFolder, classLoader);
+                    stepClasses.addAll(stepClasses(outputFolder, classLocator));
 
-            }
-            // augment step classes with externally dependent classes
-            stepClasses.addAll(externalDependenciesFor(project, classLoader));
+                }
+                // augment step classes with externally dependent classes
+                stepClasses.addAll(externalDependenciesFor(project, classLoader));
 
-            try {
-                return buildSyntaxFor(project, substepsFolder, stepClasses, classLoader,
-                        syntaxErrorReporterFor(project));
-            } catch (final RuntimeException ex) {
-                FeatureEditorPlugin.instance().warn(
-                        "Error when building syntax for project " + project + ": " + ex.getMessage(), ex);
+                try {
+                    return buildSyntaxFor(project, substepsFolder, stepClasses, classLoader,
+                            syntaxErrorReporterFor(project));
+                } catch (final RuntimeException ex) {
+                    FeatureEditorPlugin.instance().warn(
+                            "Error when building syntax for project " + project + ": " + ex.getMessage(), ex);
+                }
             }
         }
         // If we get to here, we can't resolve a valid syntax, return a null one

@@ -22,5 +22,6 @@ public enum ProjectEventType {
     SourceFileAnnotationsChanged, //
     ProjectDependenciesChanged, //
     ProjectInserted, //
-    ProjectRemoved;
+    ProjectRemoved, //
+    ProjectConfigurationChanged;
 }
