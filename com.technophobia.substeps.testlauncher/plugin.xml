@@ -55,15 +55,22 @@
            id="com.technophobia.substeps.junitShortcut">
         <contextualLaunch>
            <enablement>
-             <with variable="selection">
-                <count value="1"/>
+             <with
+                   variable="selection">
+                <count
+                      value="1">
+                </count>
                 <iterate>
-                   <adapt type="org.eclipse.core.resources.IFile">
-                      <test property="org.eclipse.debug.ui.matchesPattern" value="*.feature"/>
-                      <!--or>
-                      <test property="scala.tools.eclipse.launching.canLaunchAsJUnit" forcePluginActivation="true"/>
-                      <test property="scala.tools.eclipse.launching.junit.canLaunchAsJUnit" forcePluginActivation="true"/>
-                      </or-->
+                   <adapt
+                         type="org.eclipse.core.resources.IFile">
+                      <test
+                            property="org.eclipse.debug.ui.matchesPattern"
+                            value="*.feature">
+                      </test>
+                      <test
+                            property="org.eclipse.core.resources.projectNature"
+                            value="com.technophobia.substeps.editor.substepsNature">
+                      </test>
                    </adapt>
                 </iterate>
              </with>
