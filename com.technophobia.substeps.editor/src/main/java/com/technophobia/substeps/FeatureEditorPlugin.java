@@ -111,7 +111,8 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         }
 
         projectObserver.registerFrameworkListeners();
-        // addSuggestionProviders();
+
+        addSuggestionProviders();
     }
 
 
@@ -139,7 +140,6 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     public ContextualSuggestionManager getSuggestionManager() {
         if (suggestionManager == null) {
             suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
-            addSuggestionProviders();
 
             // New suggestion providers means syntax should now have changed, re
             // update it
@@ -173,10 +173,12 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         final Collection<ProjectSuggestionProvider> providers = ((ProvidedSuggestionManager) getSuggestionManager())
                 .providersOfSource(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION);
         final List<String> stepClasses = new ArrayList<String>();
-        for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
-            if (projectSuggestionProvider instanceof ProjectStepImplementationProvider) {
-                stepClasses.addAll(((ProjectStepImplementationProvider) projectSuggestionProvider)
-                        .stepImplementationClasses(project));
+        if (providers != null) {
+            for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
+                if (projectSuggestionProvider instanceof ProjectStepImplementationProvider) {
+                    stepClasses.addAll(((ProjectStepImplementationProvider) projectSuggestionProvider)
+                            .stepImplementationClasses(project));
+                }
             }
         }
 

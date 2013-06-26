@@ -1,26 +1,13 @@
 package com.technophobia.substeps.actions;
 
+import org.eclipse.core.resources.IProject;
+
+import com.technophobia.substeps.nature.SubstepsNature;
 
 public class DisableSubstepsNatureAction extends AbstractSubstepsNatureAction {
 
     @Override
-    protected String[] getUpdatedNatureIds(final String natureId, final String[] originalNatureIds,
-            final boolean naturePresent) {
-        if (naturePresent) {
-            return removeNatureId(originalNatureIds, natureId);
-        }
-        return originalNatureIds;
-    }
-
-
-    private String[] removeNatureId(final String[] oldNatureIds, final String natureId) {
-        final String[] newNatureIds = new String[oldNatureIds.length - 1];
-        int i = 0;
-        for (final String oldNatureId : oldNatureIds) {
-            if (!oldNatureId.equals(natureId)) {
-                newNatureIds[i++] = oldNatureId;
-            }
-        }
-        return newNatureIds;
+    protected void updateProject(final IProject project) {
+        SubstepsNature.ensureProjectDoesNotHaveNature(project);
     }
 }

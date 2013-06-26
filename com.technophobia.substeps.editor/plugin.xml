@@ -222,7 +222,7 @@
               class="com.technophobia.substeps.actions.EnableSubstepsNatureAction"
               enablesFor="+"
               id="com.technophobia.substeps.editor.action.enableSubstepsNatureAction"
-              label="Mark as a Substeps project"
+              label="Convert to Substeps project"
               menubarPath="org.eclipse.ui.projectConfigure/additions">
         </action>
         <visibility>
@@ -248,7 +248,7 @@
               class="com.technophobia.substeps.actions.DisableSubstepsNatureAction"
               enablesFor="+"
               id="com.technophobia.substeps.editor.action.disableSubstepsNatureAction"
-              label="Unmark as a Substeps project"
+              label="Disable Substeps nature"
               menubarPath="org.eclipse.ui.projectConfigure/additions">
         </action>
         <visibility>
