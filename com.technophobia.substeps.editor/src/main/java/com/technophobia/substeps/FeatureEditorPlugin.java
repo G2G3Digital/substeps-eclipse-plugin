@@ -137,6 +137,11 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     }
 
 
+    public ProjectManager projectManager() {
+        return projectManager;
+    }
+
+
     public ContextualSuggestionManager getSuggestionManager() {
         if (suggestionManager == null) {
             suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
