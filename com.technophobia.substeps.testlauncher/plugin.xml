@@ -159,5 +159,11 @@
             type="org.eclipse.core.resources.IContainer">
       </propertyTester>
    </extension>
+   <extension point="org.eclipse.core.runtime.adapters">
+	  <factory class="org.eclipse.core.runtime.IAdaptable"
+	           adaptableType="org.eclipse.core.resources.IResource">
+	     <adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
+	  </factory>
+	</extension>
   
 </plugin>
