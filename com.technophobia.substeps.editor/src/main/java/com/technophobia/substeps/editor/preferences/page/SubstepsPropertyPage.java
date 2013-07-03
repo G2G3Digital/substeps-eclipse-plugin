@@ -52,7 +52,6 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import com.technophobia.eclipse.project.ProjectObserver;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.editor.preferences.OverridableProjectLocalPreferenceStore;
-import com.technophobia.substeps.nature.SubstepsNature;
 import com.technophobia.substeps.preferences.SubstepsPreferences;
 
 public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchPropertyPage {
@@ -255,7 +254,8 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
     private IPersistentPreferenceStore createResourceLocalPreferenceStore(final IProject project,
             final IPersistentPreferenceStore preferenceStore) {
         final OverridableProjectLocalPreferenceStore overridableProjectLocalPreferenceStore = new OverridableProjectLocalPreferenceStore(
-                pluginId, SubstepsPreferences.PROJECT_OVERRIDE.key(), "true", project, preferenceStore);
+                pluginId, SubstepsPreferences.PROJECT_OVERRIDE.key(), "true", project, preferenceStore,
+                SubstepsPreferences.PROJECT_NATURE.key());
 
         return new SubstepsPreferenceStore(overridableProjectLocalPreferenceStore, getProject());
     }
@@ -263,12 +263,6 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
 
     private void updateProject() {
         final IProject project = getProject();
-
-        if (getPreferenceStore().getBoolean(SubstepsPreferences.PROJECT_NATURE.key())) {
-            SubstepsNature.ensureProjectHasNature(project);
-        } else {
-            SubstepsNature.ensureProjectDoesNotHaveNature(project);
-        }
 
         projectObserver.preferencesChanged(project);
     }
