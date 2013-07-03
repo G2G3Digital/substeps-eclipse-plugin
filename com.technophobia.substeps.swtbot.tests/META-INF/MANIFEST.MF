@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tests
 Bundle-SymbolicName: com.technophobia.substeps.swtbot.tests
-Bundle-Version: 0.2.12.qualifier
+Bundle-Version: 0.2.14
 Bundle-Activator: com.technophobia.substeps.swtbot.tests.Activator
 Bundle-Vendor: TECHNOPHOBIA
 Require-Bundle: org.eclipse.ui;bundle-version="3.8.0",
