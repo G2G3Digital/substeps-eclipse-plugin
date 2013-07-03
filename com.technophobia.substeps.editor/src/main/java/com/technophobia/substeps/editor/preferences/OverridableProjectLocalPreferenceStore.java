@@ -16,6 +16,9 @@
  ******************************************************************************/
 package com.technophobia.substeps.editor.preferences;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 
@@ -23,24 +26,36 @@ public class OverridableProjectLocalPreferenceStore extends ProjectLocalPreferen
 
     private final String controlPropertyName;
     private final String overrideGlobalOnValue;
+    private final List<String> excludedPropertyNames;
 
 
     public OverridableProjectLocalPreferenceStore(final String pageId, final String controlPropertyName,
             final String overrideGlobalOnValue, final IProject project,
-            final IPersistentPreferenceStore globalPreferenceStore) {
+            final IPersistentPreferenceStore globalPreferenceStore, final String... excludedPropertyNames) {
         super(pageId, project, globalPreferenceStore);
         this.controlPropertyName = controlPropertyName;
         this.overrideGlobalOnValue = overrideGlobalOnValue;
+        this.excludedPropertyNames = Arrays.asList(excludedPropertyNames);
 
     }
 
 
     @Override
     protected String getLocalPropertyOrNull(final String name) {
-        final String controlValue = super.getLocalPropertyOrNull(controlPropertyName);
-        if (overrideGlobalOnValue.equals(controlValue)) {
+        if (isExcluded(name) || isControlAllowed()) {
             return super.getLocalPropertyOrNull(name);
         }
         return null;
+    }
+
+
+    private boolean isExcluded(final String name) {
+        return excludedPropertyNames.contains(name);
+    }
+
+
+    private boolean isControlAllowed() {
+        final String controlValue = super.getLocalPropertyOrNull(controlPropertyName);
+        return overrideGlobalOnValue.equals(controlValue);
     }
 }
