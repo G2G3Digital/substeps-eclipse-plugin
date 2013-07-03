@@ -94,9 +94,9 @@ public class SubstepsFeatureLaunchShortcut implements ILaunchShortcut2 {
     @Override
     public void launch(final ISelection selection, final String mode) {
         // TODO: Find all scenarios in selection, and run only them
-        final IFile file = Transformers.selectionToFileOrNull(selection);
-        if (file != null) {
-            final ILaunchConfigurationWorkingCopy workingCopy = workingCopyFactory.create(file.getName(), file);
+        final IResource resource = selectionAsResource(selection);
+        if (resource != null) {
+            final ILaunchConfigurationWorkingCopy workingCopy = workingCopyFactory.create(resource.getName(), resource);
             final ILaunchConfiguration config = launchConfigurationFactory.create(workingCopy);
             DebugUITools.launch(config, mode);
         }
@@ -105,9 +105,9 @@ public class SubstepsFeatureLaunchShortcut implements ILaunchShortcut2 {
 
     @Override
     public ILaunchConfiguration[] getLaunchConfigurations(final ISelection selection) {
-        final IFile file = Transformers.selectionToFileOrNull(selection);
-        if (file != null) {
-            final ILaunchConfigurationWorkingCopy workingCopy = workingCopyFactory.create(file.getName(), file);
+        final IResource resource = selectionAsResource(selection);
+        if (resource != null) {
+            final ILaunchConfigurationWorkingCopy workingCopy = workingCopyFactory.create(resource.getName(), resource);
             final Collection<ILaunchConfiguration> allConfigs = configLocator.all(workingCopy);
             return allConfigs.toArray(new ILaunchConfiguration[allConfigs.size()]);
         }
@@ -133,6 +133,15 @@ public class SubstepsFeatureLaunchShortcut implements ILaunchShortcut2 {
     @Override
     public IResource getLaunchableResource(final IEditorPart editorpart) {
         return Transformers.editorToResource(editorpart);
+    }
+
+
+    private IResource selectionAsResource(final ISelection selection) {
+        final IFile file = Transformers.selectionToFileOrNull(selection);
+        if (file == null) {
+            return Transformers.selectionToFolderOrNull(selection);
+        }
+        return file;
     }
 
 

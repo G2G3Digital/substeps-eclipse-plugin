@@ -111,7 +111,8 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         }
 
         projectObserver.registerFrameworkListeners();
-        // addSuggestionProviders();
+
+        addSuggestionProviders();
     }
 
 
@@ -136,10 +137,14 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     }
 
 
+    public ProjectManager projectManager() {
+        return projectManager;
+    }
+
+
     public ContextualSuggestionManager getSuggestionManager() {
         if (suggestionManager == null) {
             suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
-            addSuggestionProviders();
 
             // New suggestion providers means syntax should now have changed, re
             // update it
@@ -173,10 +178,12 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         final Collection<ProjectSuggestionProvider> providers = ((ProvidedSuggestionManager) getSuggestionManager())
                 .providersOfSource(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION);
         final List<String> stepClasses = new ArrayList<String>();
-        for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
-            if (projectSuggestionProvider instanceof ProjectStepImplementationProvider) {
-                stepClasses.addAll(((ProjectStepImplementationProvider) projectSuggestionProvider)
-                        .stepImplementationClasses(project));
+        if (providers != null) {
+            for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
+                if (projectSuggestionProvider instanceof ProjectStepImplementationProvider) {
+                    stepClasses.addAll(((ProjectStepImplementationProvider) projectSuggestionProvider)
+                            .stepImplementationClasses(project));
+                }
             }
         }
 
@@ -251,6 +258,10 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         projectObserver.addProjectListener(ProjectEventType.ProjectDependenciesChanged, externalSuggestionProvider);
         projectObserver.addProjectListener(ProjectEventType.ProjectInserted, externalSuggestionProvider);
         projectObserver.addProjectListener(ProjectEventType.ProjectRemoved, externalSuggestionProvider);
+        projectObserver.addProjectListener(ProjectEventType.ProjectConfigurationChanged, externalSuggestionProvider);
+        projectObserver.addProjectListener(ProjectEventType.ProjectConfigurationChanged,
+                projectSpecificSuggestionProvider);
+        projectObserver.addProjectListener(ProjectEventType.ProjectConfigurationChanged, substepSuggestionProvider);
 
         projectObserver.addProjectListener(ProjectEventType.SourceFileAnnotationsChanged,
                 projectSpecificSuggestionProvider);

@@ -55,16 +55,30 @@
            id="com.technophobia.substeps.junitShortcut">
         <contextualLaunch>
            <enablement>
-             <with variable="selection">
-                <count value="1"/>
+             <with
+                   variable="selection">
+                <count
+                      value="1">
+                </count>
                 <iterate>
-                   <adapt type="org.eclipse.core.resources.IFile">
-                      <test property="org.eclipse.debug.ui.matchesPattern" value="*.feature"/>
-                      <!--or>
-                      <test property="scala.tools.eclipse.launching.canLaunchAsJUnit" forcePluginActivation="true"/>
-                      <test property="scala.tools.eclipse.launching.junit.canLaunchAsJUnit" forcePluginActivation="true"/>
-                      </or-->
-                   </adapt>
+                	<or>
+                		<adapt type="org.eclipse.core.resources.IFile">
+                      		<test
+                            	property="org.eclipse.debug.ui.matchesPattern"
+                            	value="*.feature">
+                      		</test>
+                      	</adapt>
+                  <adapt
+                        type="org.eclipse.core.resources.IContainer">
+                        <test
+                              property="com.technophobia.substeps.testlauncher.feature.isFeatureFolder">
+                        </test>
+                  </adapt>
+                	</or>
+                      <test
+                            property="org.eclipse.core.resources.projectNature"
+                            value="com.technophobia.substeps.editor.substepsNature">
+                      </test>
                 </iterate>
              </with>
           </enablement>
@@ -135,5 +149,21 @@
             class="com.technophobia.substeps.junit.ui.UITestRunListener">
       </substepsRunListener>
    </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="com.technophobia.substeps.junit.launcher.model.FeatureFolderPropertyTester"
+            id="com.technophobia.substeps.testlauncher.isFeatureFolderPropertyTester"
+            namespace="com.technophobia.substeps.testlauncher.feature"
+            properties="isFeatureFolder"
+            type="org.eclipse.core.resources.IContainer">
+      </propertyTester>
+   </extension>
+   <extension point="org.eclipse.core.runtime.adapters">
+	  <factory class="org.eclipse.core.runtime.IAdaptable"
+	           adaptableType="org.eclipse.core.resources.IResource">
+	     <adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
+	  </factory>
+	</extension>
   
 </plugin>

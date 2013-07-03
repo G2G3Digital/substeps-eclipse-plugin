@@ -30,6 +30,7 @@ import org.junit.runner.RunWith;
 
 import com.technophobia.eclipse.log.PluginLogger;
 import com.technophobia.substeps.model.Syntax;
+import com.technophobia.substeps.nature.SubstepsNature;
 import com.technophobia.substeps.supplier.CachingResultTransformer;
 import com.technophobia.substeps.supplier.Transformer;
 
@@ -106,7 +107,7 @@ public class CachingProjectToSyntaxTransformerTest {
 
 
     @Test
-    public void retrieveSyntaxFetchesFromDelegateIfDirty() {
+    public void retrieveSyntaxFetchesFromDelegateIfDirty() throws Exception {
         final IProject project = context.mock(IProject.class);
         final Syntax syntax = createSyntax();
 
@@ -117,6 +118,9 @@ public class CachingProjectToSyntaxTransformerTest {
 
                 exactly(2).of(project).isOpen();
                 will(returnValue(Boolean.TRUE));
+
+                oneOf(project).hasNature(SubstepsNature.NATURE_ID);
+                will(returnValue(true));
 
                 allowing(project).getName();
                 will(returnValue("Project"));

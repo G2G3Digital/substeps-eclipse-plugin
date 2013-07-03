@@ -19,6 +19,7 @@ package com.technophobia.substeps.junit.launcher.tab.component;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
@@ -44,6 +45,7 @@ import com.technophobia.eclipse.transformer.Callback;
 import com.technophobia.substeps.FeatureRunnerPlugin;
 import com.technophobia.substeps.junit.launcher.model.SubstepsLaunchModel;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.supplier.Predicate;
 import com.technophobia.substeps.supplier.Supplier;
 
 public class FeatureFileComponent extends AbstractTabComponent {
@@ -51,9 +53,13 @@ public class FeatureFileComponent extends AbstractTabComponent {
     private Text featureFileLocationText;
     private Button featureFileLocationButton;
 
+    private final Predicate<IFolder> isFeatureFolderPredicate;
 
-    public FeatureFileComponent(final Callback onChangeCallback, final Supplier<IProject> projectSupplier) {
+
+    public FeatureFileComponent(final Callback onChangeCallback, final Supplier<IProject> projectSupplier,
+            final Predicate<IFolder> featureFolderPredicate) {
         super(onChangeCallback, projectSupplier);
+        isFeatureFolderPredicate = featureFolderPredicate;
     }
 
 
@@ -183,6 +189,10 @@ public class FeatureFileComponent extends AbstractTabComponent {
                         if ("feature".equalsIgnoreCase(file.getFileExtension())) {
                             return new Status(IStatus.OK, FeatureRunnerPlugin.PLUGIN_ID, "");
                         }
+                    } else if (item instanceof IFolder) {
+                        if (isFeatureFolderPredicate.forModel((IFolder) item)) {
+                            return new Status(IStatus.OK, FeatureRunnerPlugin.PLUGIN_ID, "");
+                        }
                     }
                 }
                 return new Status(IStatus.ERROR, FeatureRunnerPlugin.PLUGIN_ID,
@@ -208,15 +218,32 @@ public class FeatureFileComponent extends AbstractTabComponent {
      */
     private boolean validFeatureFile(final IProject project, final String featureFileName,
             final Collection<String> errorMessageList) {
-        if (featureFileName.endsWith(".feature")) {
-            if (!project.getFile(featureFileName).exists()) {
-                errorMessageList.add(SubstepsFeatureMessages.SubstepsLaunchConfigurationTab_error_featurefilenotexists);
+        if (isFileName(featureFileName)) {
+            if (featureFileName.endsWith(".feature")) {
+                if (!project.getFile(featureFileName).exists()) {
+                    errorMessageList
+                            .add(SubstepsFeatureMessages.SubstepsLaunchConfigurationTab_error_featurefilenotexists);
+                    return false;
+                }
+            } else {
+                errorMessageList.add(SubstepsFeatureMessages.SubstepsLaunchConfigurationTab_error_notFeatureFile);
                 return false;
             }
         } else {
-            errorMessageList.add(SubstepsFeatureMessages.SubstepsLaunchConfigurationTab_error_notFeatureFile);
-            return false;
+            final IFolder folder = project.getFolder(featureFileName);
+            if (!folder.exists()) {
+                errorMessageList.add(SubstepsFeatureMessages.SubstepsLaunchConfigurationTab_error_featurefilenotexists);
+                return false;
+            } else if (!isFeatureFolderPredicate.forModel(folder)) {
+                errorMessageList.add(SubstepsFeatureMessages.SubstepsLaunchConfigurationTab_error_featurefilenotexists);
+                return false;
+            }
         }
         return true;
+    }
+
+
+    private boolean isFileName(final String featureFileName) {
+        return featureFileName.indexOf('.') > -1;
     }
 }
