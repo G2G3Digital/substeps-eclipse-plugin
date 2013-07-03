@@ -19,6 +19,7 @@ package com.technophobia.substeps.junit.launcher.tab;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -35,6 +36,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import com.technophobia.eclipse.transformer.Callback;
+import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.junit.launcher.DefaultSubstepsLocationFinder;
 import com.technophobia.substeps.junit.launcher.model.LaunchModelFactory;
 import com.technophobia.substeps.junit.launcher.model.SubstepsLaunchModel;
@@ -43,6 +45,8 @@ import com.technophobia.substeps.junit.launcher.tab.component.FeatureFileCompone
 import com.technophobia.substeps.junit.launcher.tab.component.ProjectComponent;
 import com.technophobia.substeps.junit.launcher.tab.component.SubstepsFileComponent;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
+import com.technophobia.substeps.predicate.IsFeatureFolderPredicate;
+import com.technophobia.substeps.supplier.Predicate;
 
 public class SubstepsArgumentTab extends AbstractLaunchConfigurationTab {
 
@@ -58,9 +62,11 @@ public class SubstepsArgumentTab extends AbstractLaunchConfigurationTab {
 
         final Callback onChangeCallback = onChange();
         final ProjectComponent pc = new ProjectComponent(onChangeCallback);
+        final Predicate<IFolder> isFeatureFolderPredicate = new IsFeatureFolderPredicate(FeatureEditorPlugin.instance()
+                .projectManager());
 
         this.projectComponent = pc;
-        this.featureFileComponent = new FeatureFileComponent(onChangeCallback, pc);
+        this.featureFileComponent = new FeatureFileComponent(onChangeCallback, pc, isFeatureFolderPredicate);
         this.substepsComponent = new SubstepsFileComponent(onChangeCallback, pc);
 
         projectComponent.addDependentTabComponent(featureFileComponent);

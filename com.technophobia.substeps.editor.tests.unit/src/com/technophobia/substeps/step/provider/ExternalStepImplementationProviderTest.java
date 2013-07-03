@@ -38,6 +38,7 @@ import org.junit.runner.RunWith;
 
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
+import com.technophobia.substeps.nature.SubstepsNature;
 import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Transformer;
 
@@ -254,6 +255,9 @@ public class ExternalStepImplementationProviderTest {
             {
                 exactly(stepImplLoads).of(stepImplementationLoader).from(project);
                 will(returnValue(Arrays.asList(stepImplementations)));
+
+                allowing(project).hasNature(SubstepsNature.NATURE_ID);
+                will(returnValue(true));
 
                 oneOf(project).isAccessible();
                 will(returnValue(Boolean.TRUE));

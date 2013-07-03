@@ -16,7 +16,9 @@
  ******************************************************************************/
 package com.technophobia.eclipse.project;
 
-public interface ProjectObserver extends ProjectFileChangedListener, ProjectPreferencesChangedListener {
+
+public interface ProjectObserver extends ProjectFileChangedListener, ProjectChangedListener,
+        ProjectPreferencesChangedListener {
 
     void workspaceLoaded();
 

@@ -20,6 +20,12 @@ import com.technophobia.eclipse.preference.PreferenceLookup;
 
 public enum SubstepsPreferences {
 
+    PROJECT_NATURE("project.substeps.nature") {
+        @Override
+        protected void setDefault(final PreferenceLookup lookup) {
+            lookup.setDefault(key(), false);
+        }
+    },
     ENABLE_PROBLEMS("enable.problems") {
         @Override
         protected void setDefault(final PreferenceLookup lookup) {
