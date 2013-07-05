@@ -1,6 +1,7 @@
 package com.technophobia.substeps.document.content.view.hover;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.BadLocationException;
@@ -16,6 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.document.content.view.hover.model.HoverModel;
+import com.technophobia.substeps.document.content.view.hover.model.StepImplementationHoverModel;
 import com.technophobia.substeps.document.content.view.hover.model.SubstepHoverModel;
 import com.technophobia.substeps.model.ParentStep;
 import com.technophobia.substeps.model.StepImplementation;
@@ -54,8 +56,24 @@ public class SubstepsTextHover implements ITextHover, ITextHoverExtension {
         final List<ParentStep> substeps = substepsForLine(line, syntax);
         if (substeps != null && !substeps.isEmpty()) {
             return new SubstepHoverModel(substeps.get(0));
-        } else if (isStepImpl(line, syntax)) {
-            // return stepImplInfo(line, syntax);
+        }
+
+        final StepImplementation stepImplementation = findStepImpl(line, syntax);
+        if (stepImplementation != null) {
+            return new StepImplementationHoverModel(stepImplementation);
+        }
+        return null;
+    }
+
+
+    private StepImplementation findStepImpl(final String line, final Syntax syntax) {
+        final List<StepImplementation> stepImplementations = syntax.getStepImplementations();
+        for (final StepImplementation stepImplementation : stepImplementations) {
+            final String stepImplValue = stepImplementation.getValue();
+
+            if (Pattern.matches(stepImplValue, line)) {
+                return stepImplementation;
+            }
         }
         return null;
     }
@@ -83,11 +101,6 @@ public class SubstepsTextHover implements ITextHover, ITextHoverExtension {
 
     private List<ParentStep> substepsForLine(final String line, final Syntax syntax) {
         return syntax.getSubStepsMap().get(line);
-    }
-
-
-    private boolean isStepImpl(final String line, final Syntax syntax) {
-        return syntax.getStepImplementationMap().containsKey(line);
     }
 
 
