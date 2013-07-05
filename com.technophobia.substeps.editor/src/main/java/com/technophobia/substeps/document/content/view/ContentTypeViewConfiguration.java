@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
@@ -36,11 +37,13 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.editors.text.TextEditor;
 
+import com.technophobia.eclipse.supplier.CurrentProjectSupplier;
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
 import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.assist.ContentAssistantFactory;
 import com.technophobia.substeps.document.content.feature.FeatureColour;
+import com.technophobia.substeps.document.content.view.hover.SubstepsTextHover;
 import com.technophobia.substeps.document.formatting.ContextAwareContentFormatter;
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
 import com.technophobia.substeps.document.formatting.strategy.NullFormattingStrategy;
@@ -99,6 +102,12 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
 
         setDamagerRepairer(IDocument.DEFAULT_CONTENT_TYPE, defaultDamageRepairer(), reconciler);
         return reconciler;
+    }
+
+
+    @Override
+    public ITextHover getTextHover(final ISourceViewer sourceViewer, final String contentType) {
+        return new SubstepsTextHover(new CurrentProjectSupplier());
     }
 
 
