@@ -115,13 +115,13 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
             final ParentStep parentStep = findParent(syntax, currentLine);
             if (parentStep != null) {
                 // Open the user defined Substep file.
-                // OpenSubstepsEditor.open(page,
-                // PROJECT_TRANSFORMER.from(project), parentStep);
+                OpenSubstepsEditor.open(page,
+                PROJECT_TRANSFORMER.from(project), parentStep);
             } else {
                 final StepImplementation stepImplementation = findStep(syntax, currentLine);
                 if (stepImplementation != null) {
-                    // OpenJavaEditor.open(PROJECT_TRANSFORMER.from(project),
-                    // stepImplementation.getMethod());
+                     OpenJavaEditor.open(PROJECT_TRANSFORMER.from(project),
+                     stepImplementation.getMethod());
                 }
             }
         }
