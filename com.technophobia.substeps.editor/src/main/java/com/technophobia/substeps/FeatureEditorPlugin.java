@@ -45,10 +45,12 @@ import com.technophobia.eclipse.project.ProjectObserver;
 import com.technophobia.eclipse.project.PropertyBasedProjectManager;
 import com.technophobia.eclipse.project.cache.CacheAwareProjectManager;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
+import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.preferences.SubstepsProjectPreferenceLookupFactory;
 import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
+import com.technophobia.substeps.step.ProjectStepDescriptorProvider;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
 import com.technophobia.substeps.step.ProjectStepImplementationProvider;
 import com.technophobia.substeps.step.ProjectSuggestionProvider;
@@ -188,6 +190,23 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         }
 
         return Collections.unmodifiableList(stepClasses);
+    }
+
+
+    public List<StepDescriptor> externalStepDescriptorsForClassInProject(final String className, final IProject project) {
+        final Collection<ProjectSuggestionProvider> providers = ((ProvidedSuggestionManager) getSuggestionManager())
+                .providersOfSource(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION);
+
+        final List<StepDescriptor> stepDescriptors = new ArrayList<StepDescriptor>();
+        if (providers != null) {
+            for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
+                if (projectSuggestionProvider instanceof ProjectStepDescriptorProvider) {
+                    stepDescriptors.addAll(((ProjectStepDescriptorProvider) projectSuggestionProvider)
+                            .stepDescriptorsFor(project, className));
+                }
+            }
+        }
+        return Collections.unmodifiableList(stepDescriptors);
     }
 
 

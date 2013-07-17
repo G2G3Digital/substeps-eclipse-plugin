@@ -15,6 +15,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import com.technophobia.eclipse.javadoc.ProjectJavaDocLocator;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.document.content.view.hover.model.HoverModel;
 import com.technophobia.substeps.document.content.view.hover.model.StepImplementationHoverModel;
@@ -29,10 +30,13 @@ import com.technophobia.substeps.supplier.Supplier;
 public class SubstepsTextHover implements ITextHover, ITextHoverExtension {
 
     private final Supplier<IProject> currentProjectSupplier;
+    private final ProjectJavaDocLocator<StepImplementation> javadocLocator;
 
 
-    public SubstepsTextHover(final Supplier<IProject> currentProjectSupplier) {
+    public SubstepsTextHover(final Supplier<IProject> currentProjectSupplier,
+            final ProjectJavaDocLocator<StepImplementation> javadocLocator) {
         this.currentProjectSupplier = currentProjectSupplier;
+        this.javadocLocator = javadocLocator;
     }
 
 
@@ -60,7 +64,7 @@ public class SubstepsTextHover implements ITextHover, ITextHoverExtension {
 
         final StepImplementation stepImplementation = findStepImpl(line, syntax);
         if (stepImplementation != null) {
-            return new StepImplementationHoverModel(stepImplementation);
+            return new StepImplementationHoverModel(stepImplementation, currentProject(), javadocLocator);
         }
         return null;
     }
@@ -101,16 +105,6 @@ public class SubstepsTextHover implements ITextHover, ITextHoverExtension {
 
     private List<ParentStep> substepsForLine(final String line, final Syntax syntax) {
         return syntax.getSubStepsMap().get(line);
-    }
-
-
-    private String stepImplInfo(final String line, final Syntax syntax) {
-        final List<StepImplementation> list = syntax.getStepImplementationMap().get(line).get(line);
-        final StringBuilder sb = new StringBuilder();
-        for (final StepImplementation step : list) {
-            sb.append(step.getImplementedIn().getName());
-        }
-        return sb.toString();
     }
 
 

@@ -37,6 +37,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.editors.text.TextEditor;
 
+import com.technophobia.eclipse.javadoc.ProjectJavaDocLocator;
 import com.technophobia.eclipse.supplier.CurrentProjectSupplier;
 import com.technophobia.substeps.colour.ColourManager;
 import com.technophobia.substeps.document.content.ContentTypeDefinition;
@@ -44,11 +45,14 @@ import com.technophobia.substeps.document.content.ContentTypeDefinitionFactory;
 import com.technophobia.substeps.document.content.assist.ContentAssistantFactory;
 import com.technophobia.substeps.document.content.feature.FeatureColour;
 import com.technophobia.substeps.document.content.view.hover.SubstepsTextHover;
+import com.technophobia.substeps.document.content.view.hover.model.javadoc.JavaDocForStepImplementationLocator;
+import com.technophobia.substeps.document.content.view.hover.model.javadoc.StepDescriptorToStringTransformer;
 import com.technophobia.substeps.document.formatting.ContextAwareContentFormatter;
 import com.technophobia.substeps.document.formatting.FormattingContextFactory;
 import com.technophobia.substeps.document.formatting.strategy.NullFormattingStrategy;
 import com.technophobia.substeps.document.partition.PartitionContext;
 import com.technophobia.substeps.document.text.rule.word.AnySingleWordDetector;
+import com.technophobia.substeps.model.StepImplementation;
 import com.technophobia.substeps.supplier.Supplier;
 
 /**
@@ -68,6 +72,8 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
     private final ContentAssistantFactory contentAssistantFactory;
     private final Supplier<PartitionContext> partitionContextSupplier;
 
+    private final ProjectJavaDocLocator<StepImplementation> javadocLocator;
+
 
     public ContentTypeViewConfiguration(final ColourManager colourManager,
             final ContentTypeDefinitionFactory contentTypeDefinitionFactory,
@@ -79,6 +85,7 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
         this.formattingContextFactory = formattingContextFactory;
         this.contentAssistantFactory = contentAssistantFactory;
         this.partitionContextSupplier = partitionContextSupplier;
+        this.javadocLocator = new JavaDocForStepImplementationLocator(new StepDescriptorToStringTransformer());
     }
 
 
@@ -107,7 +114,7 @@ public class ContentTypeViewConfiguration extends SourceViewerConfiguration {
 
     @Override
     public ITextHover getTextHover(final ISourceViewer sourceViewer, final String contentType) {
-        return new SubstepsTextHover(new CurrentProjectSupplier());
+        return new SubstepsTextHover(new CurrentProjectSupplier(), javadocLocator);
     }
 
 
