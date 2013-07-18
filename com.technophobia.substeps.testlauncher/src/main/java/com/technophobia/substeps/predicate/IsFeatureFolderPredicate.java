@@ -22,6 +22,8 @@ public class IsFeatureFolderPredicate implements Predicate<IFolder> {
         final IProject project = folder.getProject();
         final IPath featureFolderPath = featureFolderForProject(project);
 
+        System.out.println("Feature folder path " + featureFolderPath + ", folder location: " + folder.getLocation());
+
         return featureFolderPath != null ? isDescendantOf(folder.getLocation(), featureFolderPath) : false;
     }
 
