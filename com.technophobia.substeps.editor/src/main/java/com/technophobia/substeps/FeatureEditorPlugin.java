@@ -45,10 +45,12 @@ import com.technophobia.eclipse.project.ProjectObserver;
 import com.technophobia.eclipse.project.PropertyBasedProjectManager;
 import com.technophobia.eclipse.project.cache.CacheAwareProjectManager;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
+import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.preferences.SubstepsProjectPreferenceLookupFactory;
 import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
+import com.technophobia.substeps.step.ProjectStepDescriptorProvider;
 import com.technophobia.substeps.step.ProjectStepImplementationLoader;
 import com.technophobia.substeps.step.ProjectStepImplementationProvider;
 import com.technophobia.substeps.step.ProjectSuggestionProvider;
@@ -111,7 +113,8 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         }
 
         projectObserver.registerFrameworkListeners();
-        // addSuggestionProviders();
+
+        addSuggestionProviders();
     }
 
 
@@ -136,10 +139,14 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     }
 
 
+    public ProjectManager projectManager() {
+        return projectManager;
+    }
+
+
     public ContextualSuggestionManager getSuggestionManager() {
         if (suggestionManager == null) {
             suggestionManager = new ProvidedSuggestionManager(new ResourceToProjectTransformer());
-            addSuggestionProviders();
 
             // New suggestion providers means syntax should now have changed, re
             // update it
@@ -173,14 +180,33 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         final Collection<ProjectSuggestionProvider> providers = ((ProvidedSuggestionManager) getSuggestionManager())
                 .providersOfSource(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION);
         final List<String> stepClasses = new ArrayList<String>();
-        for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
-            if (projectSuggestionProvider instanceof ProjectStepImplementationProvider) {
-                stepClasses.addAll(((ProjectStepImplementationProvider) projectSuggestionProvider)
-                        .stepImplementationClasses(project));
+        if (providers != null) {
+            for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
+                if (projectSuggestionProvider instanceof ProjectStepImplementationProvider) {
+                    stepClasses.addAll(((ProjectStepImplementationProvider) projectSuggestionProvider)
+                            .stepImplementationClasses(project));
+                }
             }
         }
 
         return Collections.unmodifiableList(stepClasses);
+    }
+
+
+    public List<StepDescriptor> externalStepDescriptorsForClassInProject(final String className, final IProject project) {
+        final Collection<ProjectSuggestionProvider> providers = ((ProvidedSuggestionManager) getSuggestionManager())
+                .providersOfSource(SuggestionSource.EXTERNAL_STEP_IMPLEMENTATION);
+
+        final List<StepDescriptor> stepDescriptors = new ArrayList<StepDescriptor>();
+        if (providers != null) {
+            for (final ProjectSuggestionProvider projectSuggestionProvider : providers) {
+                if (projectSuggestionProvider instanceof ProjectStepDescriptorProvider) {
+                    stepDescriptors.addAll(((ProjectStepDescriptorProvider) projectSuggestionProvider)
+                            .stepDescriptorsFor(project, className));
+                }
+            }
+        }
+        return Collections.unmodifiableList(stepDescriptors);
     }
 
 
@@ -251,6 +277,10 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         projectObserver.addProjectListener(ProjectEventType.ProjectDependenciesChanged, externalSuggestionProvider);
         projectObserver.addProjectListener(ProjectEventType.ProjectInserted, externalSuggestionProvider);
         projectObserver.addProjectListener(ProjectEventType.ProjectRemoved, externalSuggestionProvider);
+        projectObserver.addProjectListener(ProjectEventType.ProjectConfigurationChanged, externalSuggestionProvider);
+        projectObserver.addProjectListener(ProjectEventType.ProjectConfigurationChanged,
+                projectSpecificSuggestionProvider);
+        projectObserver.addProjectListener(ProjectEventType.ProjectConfigurationChanged, substepSuggestionProvider);
 
         projectObserver.addProjectListener(ProjectEventType.SourceFileAnnotationsChanged,
                 projectSpecificSuggestionProvider);

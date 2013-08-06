@@ -1,0 +1,8 @@
+Define: Given I can call method one with <param>
+	CallMethod One with parameter "param"
+	
+Define: And I can call a method that doesn't exist yet
+	CallMethod four
+	
+Define: Then I can do something else
+	CallMethod Two		

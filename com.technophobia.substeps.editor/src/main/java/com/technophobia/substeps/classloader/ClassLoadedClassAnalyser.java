@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.model.SubSteps.AdditionalStepImplementations;
 import com.technophobia.substeps.model.SubSteps.Step;
+import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.runner.syntax.ClassAnalyser;
 
 /**
@@ -43,14 +44,46 @@ public class ClassLoadedClassAnalyser extends ClassAnalyser {
 
 
     @Override
+    public void analyseClass(final Class<?> loadedClass, final Syntax syntax) {
+        try {
+            super.analyseClass(loadedClass, syntax);
+        } catch (final NoClassDefFoundError ex) {
+            // If the eclipse project is not building properly, this class may
+            // not have loaded correctly.
+            // If that's the case, handle this gracefully, rather than breaking
+            FeatureEditorPlugin.instance().error(
+                    "NoClassDefFoundError trying to analyse class " + loadedClass.getName());
+        }
+    }
+
+
+    @Override
     protected boolean isStepMethod(final Method m) {
-        return m.isAnnotationPresent(getLoadedClassFor(Step.class));
+        try {
+            return m.isAnnotationPresent(getLoadedClassFor(Step.class));
+        } catch (final ArrayStoreException ex) {
+            // If the eclipse project is not building properly, this class may
+            // not have loaded correctly.
+            // If that's the case, handle this gracefully, rather than breaking
+            FeatureEditorPlugin.instance().error(
+                    "ArrayStoreException trying to analyse class " + m.getDeclaringClass().getName());
+            return false;
+        }
     }
 
 
     @Override
     protected boolean hasAdditionalStepsAnnotation(final Class<?> loadedClass) {
-        return loadedClass.isAnnotationPresent(getLoadedClassFor(AdditionalStepImplementations.class));
+        try {
+            return loadedClass.isAnnotationPresent(getLoadedClassFor(AdditionalStepImplementations.class));
+        } catch (final ArrayStoreException ex) {
+            // If the eclipse project is not building properly, this class may
+            // not have loaded correctly.
+            // If that's the case, handle this gracefully, rather than breaking
+            FeatureEditorPlugin.instance()
+                    .error("ArrayStoreException trying to analyse class " + loadedClass.getName());
+            return false;
+        }
     }
 
 

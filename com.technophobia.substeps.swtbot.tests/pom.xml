@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright Technophobia Ltd 2012
+  
+  This file is part of the Substeps Eclipse Plugin.
+  
+  The Substeps Eclipse Plugin is free software: you can redistribute it and/or modify
+  it under the terms of the Eclipse Public License v1.0.
+  
+  The Substeps Eclipse Plugin is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  Eclipse Public License for more details.
+  
+  You should have received a copy of the Eclipse Public License
+  along with the Substeps Eclipse Plugin.  If not, see <http://www.eclipse.org/legal/epl-v10.html>.
+-->
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.technophobia.substeps</groupId>
+		<artifactId>com.technophobia.substeps.parent</artifactId>
+		<version>0.2.16-SNAPSHOT</version>
+		<relativePath>../com.technophobia.substeps.parent</relativePath>
+	</parent>
+
+	<artifactId>com.technophobia.substeps.swtbot.tests</artifactId>
+
+	<packaging>eclipse-test-plugin</packaging>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<!--  <appArgLine>-DM2_REPO=/home/ian/.m2/repository</appArgLine> -->
+					<!--debugPort>4001</debugPort -->
+					<argline>-Xdebug
+						--Xrunjdwp:transport=dt_socket,address=4001,server=y,suspend=y</argline>
+					<useUIHarness>true</useUIHarness>
+					<useUIThread>false</useUIThread>
+					 <product>com.technophobia.substeps.editor.substeps_product</product> 
+					<!-- <product>org.eclipse.sdk.ide</product>  
+					<application>org.eclipse.ui.ide.workbench</application> -->
+					<showEclipseLog>true</showEclipseLog>
+					
+					<osgiDataDirectory>${basedir}/target/workspacemvn</osgiDataDirectory> 
+					<surefireProperties>${basedir}/target/surefire.properties</surefireProperties>
+					
+					
+				<!--	<dependencies>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.apache.velocity</artifactId>
+							<version>1.7</version>
+						</dependency>
+					</dependencies> -->
+				</configuration>
+			</plugin>
+		
+		
+		<plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+
+          <execution>
+            <id>add-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/test/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+		
+      </plugins>
+	</build>
+</project>

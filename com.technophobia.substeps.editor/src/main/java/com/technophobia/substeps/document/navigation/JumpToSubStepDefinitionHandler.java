@@ -16,50 +16,32 @@
  ******************************************************************************/
 package com.technophobia.substeps.document.navigation;
 
-import java.io.File;
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import static com.technophobia.substeps.FeatureEditorPlugin.instance;
+
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.part.FileEditorInput;
 
+import com.technophobia.eclipse.transformer.ProjectToJavaProjectTransformer;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.editor.FeatureEditor;
-import com.technophobia.substeps.editor.SubstepsEditor;
 import com.technophobia.substeps.model.ParentStep;
+import com.technophobia.substeps.model.StepImplementation;
 import com.technophobia.substeps.model.Syntax;
 
 /**
@@ -68,6 +50,9 @@ import com.technophobia.substeps.model.Syntax;
  * 
  */
 public class JumpToSubStepDefinitionHandler extends AbstractHandler {
+
+    private static final ProjectToJavaProjectTransformer PROJECT_TRANSFORMER = new ProjectToJavaProjectTransformer();
+
 
     /**
      * {@inheritDoc}
@@ -78,7 +63,7 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
 
         final IWorkbenchPage page = window.getActivePage();
 
-        // textEditor implements IEditorPart
+        // TextEditor implements IEditorPart
         final IEditorPart activeEditor = page.getActiveEditor();
 
         final IEditorInput editorInput = activeEditor.getEditorInput();
@@ -108,191 +93,58 @@ public class JumpToSubStepDefinitionHandler extends AbstractHandler {
                 }
             }
         }
-        // must return null, apparently
+        // Must return null, apparently
         return null;
     }
 
 
     private void jumpToStepDefinition(final IWorkbenchPage page, final IProject project,
             final IDocument currentDocument, final ISelectionProvider selectionProvider) {
-        final ITextSelection iSelection = (ITextSelection) selectionProvider.getSelection();
-
-        final int offset = iSelection.getOffset();
-
-        // get the line from where we are:
-        
+        final int offset = ((ITextSelection) selectionProvider.getSelection()).getOffset();
+        // Get the line from where we are
         final String currentLine = getCurrentLine(currentDocument, offset);
-
         if (currentLine != null) {
+            instance().info("F3 lookup on line: " + currentLine);
 
-            FeatureEditorPlugin.instance().info("F3 lookup on line: " + currentLine);
-
-            // find this in the corresponding substeps file
-
-            // from SubstepSuggestionProvider
+            // Set the Syntax from SubstepSuggestionProvider
             final Syntax syntax = FeatureEditorPlugin.instance().syntaxFor(project);
 
-            final List<ParentStep> substeps = syntax.getSortedRootSubSteps();
-
-            ParentStep substepDefinition = null;
-
-            for (final ParentStep rootSubStep : substeps) {
-                // match on the pattern - take into account any
-                // parameters
-                if (Pattern.matches(rootSubStep.getParent().getPattern(), currentLine)) {
-
-                    substepDefinition = rootSubStep;
-                    break;
-                }
-            }
-
-            IFile substepsIFile = null;
-
-            if (substepDefinition != null) {
-
-                substepsIFile = getSubstepIFile(project, substepDefinition.getParent().getSource());
-
-                final int lineNumber = substepDefinition.getSourceLineNumber();
-
-                FeatureEditorPlugin.instance().info(
-                        "rootSubStep.getSourceLineNumber: " + lineNumber + " for line: "
-                                + substepDefinition.getParent().getLine());
-
-                final IEditorInput input = new FileEditorInput(substepsIFile);
-
-                try {
-                    final IEditorPart substepsEditor = page.openEditor(input,
-                            "com.technophobia.substeps.editor.substepsEditor");
-
-                    selectLineInEditor(lineNumber, substepsEditor);
-
-                } catch (final PartInitException e) {
-                    FeatureEditorPlugin.instance().error("exception opening substep", e);
+            // We can be finding definitions written in either a Substeps file
+            // or an annotated method in a Java class, these correspond to a
+            // ParentStep or a StepImplementation in the Syntax respectively.
+            final ParentStep parentStep = findParent(syntax, currentLine);
+            if (parentStep != null) {
+                // Open the user defined Substep file.
+                OpenSubstepsEditor.open(page,
+                PROJECT_TRANSFORMER.from(project), parentStep);
+            } else {
+                final StepImplementation stepImplementation = findStep(syntax, currentLine);
+                if (stepImplementation != null) {
+                     OpenJavaEditor.open(PROJECT_TRANSFORMER.from(project),
+                     stepImplementation.getMethod());
                 }
             }
         }
     }
 
 
-    private void selectLineInEditor(final int lineNumber, final IEditorPart newEditor) {
-        final ISelectionProvider newSelectionProvider = newEditor.getEditorSite().getSelectionProvider();
-
-        final SubstepsEditor newStepEditor = (SubstepsEditor) newEditor.getAdapter(SubstepsEditor.class);
-
-        // TODO might need to add a
-        // navigationLocation in order to support
-        // the eclipse back buttons
-        // final INavigationLocation
-        // navigationLocation =
-        // newStepEditor.createNavigationLocation();
-
-        final IDocument newDocument = newStepEditor.getCurrentDocument();
-
-        try {
-            // this is zero based
-            final IRegion lineInformation = newDocument.getLineInformation(lineNumber - 1);
-
-            final int newOffset = lineInformation.getOffset();
-
-            final int selectionLength = lineInformation.getLength();
-
-            newSelectionProvider.setSelection(new TextSelection(newDocument, newOffset, selectionLength));
-
-        } catch (final BadLocationException e) {
-            FeatureEditorPlugin.instance().error("BadLocationException@ " + lineNumber, e);
-        }
-    }
-
-
-    private IFile getSubstepIFile(final IProject project, final File substepDefinitionFile) {
-
-        IFile substepsIFile = null;
-        // this file will be on the output path
-        final String substepOutputFile = substepDefinitionFile.getAbsolutePath();
-
-        // we're only interested in the bit after the project
-
-        final IJavaProject javaProject = JavaCore.create(project);
-        final Set<IPath> exclusionSet = new HashSet<IPath>();
-
-        try {
-            final IClasspathEntry[] rawClasspath = javaProject.getRawClasspath();
-
-            for (final IClasspathEntry classpathEntry : rawClasspath) {
-
-                if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-
-                    // outputLocation = workspace relative path
-                    IPath outputLocation = classpathEntry.getOutputLocation();
-
-                    if (outputLocation == null) {
-                        outputLocation = javaProject.getOutputLocation();
-                    }
-
-                    exclusionSet.add(outputLocation);
-                    // We will have searched here.
-
-                    final IPath projPath = project.getFullPath();
-
-                    final int matchSegs = outputLocation.matchingFirstSegments(projPath);
-
-                    final IPath removeFirstSegments = outputLocation.removeFirstSegments(matchSegs);
-
-                    final IFile outputFile = project.getFile(removeFirstSegments);
-
-                    final URI locationURI = outputFile.getLocationURI();
-
-                    if (substepOutputFile.startsWith(locationURI.getPath())) {
-
-                        // this is the ice we're interested in
-                        final String classpathRelativePath = substepOutputFile
-                                .substring(locationURI.getPath().length());
-
-                        final IFolder sourceIFolder = project
-                                .getFolder(classpathEntry.getPath().removeFirstSegments(1));
-                        substepsIFile = sourceIFolder.getFile(classpathRelativePath);
-                        if (substepsIFile.exists()) {
-                            // Might not get a file
-
-                            break;
-                        }
-                    }
-                }
+    private static final ParentStep findParent(final Syntax syntax, final String stepValue) {
+        for (final ParentStep rootSubStep : syntax.getSortedRootSubSteps()) {
+            if (Pattern.matches(rootSubStep.getParent().getPattern(), stepValue)) {
+                return rootSubStep;
             }
-        } catch (final JavaModelException e1) {
-            FeatureEditorPlugin.instance().error("JavaModelException", e1);
         }
-
-        if (substepsIFile == null || !substepsIFile.exists()) {
-            // Get the substeps file by searching.
-            substepsIFile = searchForFile(project, substepDefinitionFile.getName(), substepsIFile, exclusionSet);
-        }
-        return substepsIFile;
+        return null;
     }
 
 
-    private IFile searchForFile(final IProject project, final String filename, IFile substepsIFile,
-            final Set<IPath> exclusionSet) {
-        final File file = new File(project.getLocationURI());
-        final IOFileFilter nameFileFilter = FileFilterUtils.nameFileFilter(filename);
-
-        IOFileFilter dirnameFilter = FileFilterUtils.directoryFileFilter();
-        for (final IPath path : exclusionSet) {
-            dirnameFilter = FileFilterUtils.and(dirnameFilter,
-                    FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter(path.lastSegment())));
+    private static final StepImplementation findStep(final Syntax syntax, final String stepValue) {
+        for (final StepImplementation stepImplementation : syntax.getStepImplementations()) {
+            if (Pattern.matches(stepImplementation.getValue(), stepValue)) {
+                return stepImplementation;
+            }
         }
-
-        final Collection<File> listFiles = FileUtils.listFiles(file, nameFileFilter, dirnameFilter);
-        if (listFiles.size() > 1) {
-            throw new IllegalStateException("more than one file found"); // TODO
-                                                                         // something
-                                                                         // else?
-        } else if (listFiles.size() == 1) {
-
-            substepsIFile = project.getFile(listFiles.iterator().next().getAbsolutePath()
-                    .substring(project.getLocationURI().getRawPath().length()));
-        }
-        return substepsIFile;
+        return null;
     }
 
 

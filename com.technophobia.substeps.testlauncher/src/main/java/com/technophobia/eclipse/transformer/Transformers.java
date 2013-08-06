@@ -17,6 +17,7 @@
 package com.technophobia.eclipse.transformer;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaProject;
@@ -32,6 +33,11 @@ public class Transformers {
 
     public static IFile selectionToFileOrNull(final ISelection selection) {
         return new SelectionToFileOrNullTransformer().from(selection);
+    }
+
+
+    public static IFolder selectionToFolderOrNull(final ISelection selection) {
+        return new SelectionToFolderOrNullTransformer().from(selection);
     }
 
 

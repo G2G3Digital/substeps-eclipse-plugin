@@ -57,6 +57,7 @@ import com.technophobia.substeps.preferences.SubstepsPreferences;
 public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchPropertyPage {
 
     private FieldEditor controlEditor;
+    private FieldEditor hasNatureEditor;
     private final String pluginId;
     private final List<FieldEditor> fieldEditors;
     private final Map<FieldEditor, Composite> fieldToParentMap;
@@ -76,6 +77,7 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
     public boolean performOk() {
         final boolean result = super.performOk();
 
+        hasNatureEditor.store();
         controlEditor.store();
         for (final FieldEditor fieldEditor : fieldEditors) {
             fieldEditor.store();
@@ -101,13 +103,15 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
     protected Control createContents(final Composite parent) {
         final Composite composite = createComposite(parent);
 
+        createProjectNatureControl(composite);
         createProjectOverrideControl(composite);
 
         createProblemsGroup(composite);
         createFoldersGroup(composite);
 
+        final boolean hasNature = getPreferenceStore().getBoolean(SubstepsPreferences.PROJECT_NATURE.key());
         final boolean projectOverride = getPreferenceStore().getBoolean(SubstepsPreferences.PROJECT_OVERRIDE.key());
-        setFieldsEnabled(projectOverride);
+        setFieldsEnabled(hasNature && projectOverride);
 
         return composite;
     }
@@ -131,10 +135,33 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
     }
 
 
+    protected void setFieldsEnabledStatus() {
+        final boolean hasNature = ((BooleanFieldEditor) hasNatureEditor).getBooleanValue();
+        final boolean projectOverride = ((BooleanFieldEditor) controlEditor).getBooleanValue();
+        setFieldsEnabled(hasNature && projectOverride);
+    }
+
+
     protected void setFieldsEnabled(final boolean enabled) {
         for (final FieldEditor field : fieldEditors) {
             field.setEnabled(enabled, fieldToParentMap.get(field));
         }
+    }
+
+
+    private void createProjectNatureControl(final Composite composite) {
+        hasNatureEditor = new BooleanFieldEditor(SubstepsPreferences.PROJECT_NATURE.key(),
+                "&Is this a substeps project?", composite);
+        hasNatureEditor.setPage(this);
+        hasNatureEditor.setPreferenceStore(getPreferenceStore());
+        hasNatureEditor.load();
+        hasNatureEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+            @Override
+            public void propertyChange(final PropertyChangeEvent event) {
+                setFieldsEnabledStatus();
+            }
+        });
+        // addField(hasNatureEditor, composite);
     }
 
 
@@ -146,8 +173,7 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
         controlEditor.setPropertyChangeListener(new IPropertyChangeListener() {
             @Override
             public void propertyChange(final PropertyChangeEvent event) {
-                final boolean isSelected = ((Boolean) event.getNewValue()).booleanValue();
-                setFieldsEnabled(isSelected);
+                setFieldsEnabledStatus();
             }
         });
         controlEditor.load();
@@ -227,15 +253,23 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
 
     private IPersistentPreferenceStore createResourceLocalPreferenceStore(final IProject project,
             final IPersistentPreferenceStore preferenceStore) {
-        return new OverridableProjectLocalPreferenceStore(pluginId, SubstepsPreferences.PROJECT_OVERRIDE.key(), "true",
-                project, preferenceStore);
+        final OverridableProjectLocalPreferenceStore overridableProjectLocalPreferenceStore = new OverridableProjectLocalPreferenceStore(
+                pluginId, SubstepsPreferences.PROJECT_OVERRIDE.key(), "true", project, preferenceStore,
+                SubstepsPreferences.PROJECT_NATURE.key());
+
+        return new SubstepsPreferenceStore(overridableProjectLocalPreferenceStore, getProject());
     }
 
 
     private void updateProject() {
-        final IProject project = (IProject) getElement().getAdapter(IProject.class);
+        final IProject project = getProject();
 
         projectObserver.preferencesChanged(project);
+    }
+
+
+    private IProject getProject() {
+        return (IProject) getElement().getAdapter(IProject.class);
     }
 
 

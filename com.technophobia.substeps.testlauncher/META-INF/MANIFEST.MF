@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SubstepsEclipseRunner
 Bundle-SymbolicName: com.technophobia.substeps.testlauncher;singleton:=true
-Bundle-Version: 0.2.11.qualifier
+Bundle-Version: 0.2.16.qualifier
 Bundle-Activator: com.technophobia.substeps.FeatureRunnerPlugin
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
@@ -28,4 +28,5 @@ Require-Bundle: com.technophobia.substeps.editor;bundle-version="0.0.1",
  org.eclipse.jface;bundle-version="3.8.0",
  org.eclipse.ui.workbench;bundle-version="3.103.0",
  org.eclipse.jdt.debug.ui;bundle-version="3.6.100",
- org.eclipse.ui.workbench.texteditor;bundle-version="3.8.0"
+ org.eclipse.ui.workbench.texteditor;bundle-version="3.8.0",
+ org.eclipse.core.expressions;bundle-version="3.4.401"

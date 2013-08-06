@@ -23,6 +23,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 
+import com.technophobia.eclipse.project.ProjectChangedListener;
 import com.technophobia.eclipse.project.ProjectFileChangedListener;
 import com.technophobia.substeps.model.ParentStep;
 import com.technophobia.substeps.model.Step;
@@ -32,7 +33,7 @@ import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionProvider implements
-        ProjectFileChangedListener {
+        ProjectFileChangedListener, ProjectChangedListener {
 
     private final Transformer<IProject, Syntax> projectToSyntaxTransformer;
 
@@ -44,6 +45,12 @@ public class SubstepSuggestionProvider extends AbstractMultiProjectSuggestionPro
 
     @Override
     public void projectFileChange(final IProject project, final IFile file) {
+        markAsStale(project);
+    }
+
+
+    @Override
+    public void projectChanged(final IProject project) {
         markAsStale(project);
     }
 
