@@ -32,24 +32,25 @@ import com.technophobia.eclipse.project.ProjectChangedListener;
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
 import com.technophobia.substeps.step.PatternSuggestion;
+import com.technophobia.substeps.step.ProjectStepDescriptorProvider;
 import com.technophobia.substeps.step.ProjectStepImplementationProvider;
 import com.technophobia.substeps.step.Suggestion;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class ExternalStepImplementationProvider extends AbstractMultiProjectSuggestionProvider implements
-        ProjectStepImplementationProvider, ProjectChangedListener {
+        ProjectStepImplementationProvider, ProjectStepDescriptorProvider, ProjectChangedListener {
 
     private static final String REGEX = "([^\"]*)";
 
     private final Transformer<IProject, List<StepImplementationsDescriptor>> stepImplementationLoader;
-    private final Map<IProject, Set<String>> externalStepClassesForProject;
+    private final Map<IProject, Collection<StepImplementationsDescriptor>> externalStepDescriptorsForProject;
 
 
     public ExternalStepImplementationProvider(
             final Transformer<IProject, List<StepImplementationsDescriptor>> stepImplementationLoader) {
         super();
         this.stepImplementationLoader = stepImplementationLoader;
-        this.externalStepClassesForProject = new HashMap<IProject, Set<String>>();
+        this.externalStepDescriptorsForProject = new HashMap<IProject, Collection<StepImplementationsDescriptor>>();
     }
 
 
@@ -62,8 +63,15 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
     @Override
     public Collection<String> stepImplementationClasses(final IProject project) {
         clean(project);
-        return externalStepClassesForProject.containsKey(project) ? externalStepClassesForProject.get(project)
-                : Collections.<String> emptyList();
+        return externalStepDescriptorsForProject.containsKey(project) ? asStepClasses(externalStepDescriptorsForProject
+                .get(project)) : Collections.<String> emptyList();
+    }
+
+
+    @Override
+    public List<StepDescriptor> stepDescriptorsFor(final IProject project, final String className) {
+        return externalStepDescriptorsForProject.containsKey(project) ? stepDescriptorsFor(className,
+                externalStepDescriptorsForProject.get(project)) : Collections.<StepDescriptor> emptyList();
     }
 
 
@@ -76,7 +84,7 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
     @Override
     protected void clearStepImplementationsFor(final IProject project) {
         super.clearStepImplementationsFor(project);
-        this.externalStepClassesForProject.remove(project);
+        this.externalStepDescriptorsForProject.remove(project);
     }
 
 
@@ -85,7 +93,6 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
 
         final List<StepImplementationsDescriptor> stepImplementations = stepImplementationLoader.from(project);
         final Set<String> stepImplementationClasses = new HashSet<String>();
-
         final Collection<Suggestion> suggestions = new ArrayList<Suggestion>();
         for (final StepImplementationsDescriptor stepImplementation : stepImplementations) {
             stepImplementationClasses.add(stepImplementation.getClassName());
@@ -98,7 +105,7 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
             }
         }
 
-        externalStepClassesForProject.put(project, stepImplementationClasses);
+        externalStepDescriptorsForProject.put(project, stepImplementations);
 
         return suggestions;
     }
@@ -130,5 +137,25 @@ public class ExternalStepImplementationProvider extends AbstractMultiProjectSugg
         sb.append(currentExpression);
 
         return new PatternSuggestion(sb.toString(), step.getExpression());
+    }
+
+
+    private List<String> asStepClasses(final Collection<StepImplementationsDescriptor> descriptors) {
+        final List<String> stepClasses = new ArrayList<String>(descriptors.size());
+        for (final StepImplementationsDescriptor descriptor : descriptors) {
+            stepClasses.add(descriptor.getClassName());
+        }
+        return Collections.unmodifiableList(stepClasses);
+    }
+
+
+    private List<StepDescriptor> stepDescriptorsFor(final String className,
+            final Collection<StepImplementationsDescriptor> stepImplementationDescriptors) {
+        for (final StepImplementationsDescriptor stepImplementationDescriptor : stepImplementationDescriptors) {
+            if (className.equals(stepImplementationDescriptor.getClassName())) {
+                return stepImplementationDescriptor.getExpressions();
+            }
+        }
+        return Collections.emptyList();
     }
 }

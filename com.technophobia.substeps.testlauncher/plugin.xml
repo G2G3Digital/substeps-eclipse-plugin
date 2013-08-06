@@ -57,28 +57,39 @@
            <enablement>
              <with
                    variable="selection">
-                <count
+                   <count
                       value="1">
                 </count>
-                <iterate>
-                	<or>
-                		<adapt type="org.eclipse.core.resources.IFile">
-                      		<test
-                            	property="org.eclipse.debug.ui.matchesPattern"
-                            	value="*.feature">
-                      		</test>
-                      	</adapt>
-                  <adapt
-                        type="org.eclipse.core.resources.IContainer">
-                        <test
-                              property="com.technophobia.substeps.testlauncher.feature.isFeatureFolder">
-                        </test>
-                  </adapt>
-                	</or>
+                 <iterate>
+                   
+                <and>
+                   <adapt type="org.eclipse.core.resources.IResource">
                       <test
                             property="org.eclipse.core.resources.projectNature"
                             value="com.technophobia.substeps.editor.substepsNature">
                       </test>
+                   </adapt>
+                   <or>
+                      <adapt type="org.eclipse.core.resources.IFile">
+                      	<test
+                                  property="org.eclipse.debug.ui.matchesPattern"
+                                  value="*.feature">
+                            </test>
+                      </adapt>
+                   	  <adapt
+                               type="org.eclipse.core.resources.IContainer">
+                               
+                        	<test forcePluginActivation="true" value="true" property="com.technophobia.substeps.testlauncher.feature.isFeatureFolder">
+                        	</test>                           
+                      </adapt>
+                      <adapt
+                               type="org.eclipse.jdt.core.IPackageFragment">
+                               
+                        	<test forcePluginActivation="true" value="true" property="com.technophobia.substeps.testlauncher.feature.package.isFeatureFolder">
+                        	</test>                           
+                      </adapt>
+                   </or>
+                </and>
                 </iterate>
              </with>
           </enablement>
@@ -157,6 +168,13 @@
             namespace="com.technophobia.substeps.testlauncher.feature"
             properties="isFeatureFolder"
             type="org.eclipse.core.resources.IContainer">
+      </propertyTester>
+      <propertyTester
+            class="com.technophobia.substeps.junit.launcher.model.FeatureFolderPropertyTester"
+            id="com.technophobia.substeps.testlauncher.isFeaturePackageFolderPropertyTester"
+            namespace="com.technophobia.substeps.testlauncher.feature.package"
+            properties="isFeatureFolder"
+            type="org.eclipse.jdt.core.IPackageFragment">
       </propertyTester>
    </extension>
    <extension point="org.eclipse.core.runtime.adapters">
