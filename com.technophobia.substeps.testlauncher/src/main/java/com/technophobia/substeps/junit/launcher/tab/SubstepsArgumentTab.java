@@ -37,7 +37,7 @@ import org.eclipse.ui.PlatformUI;
 
 import com.technophobia.eclipse.transformer.Callback;
 import com.technophobia.substeps.FeatureEditorPlugin;
-import com.technophobia.substeps.junit.launcher.DefaultSubstepsLocationFinder;
+import com.technophobia.substeps.junit.launcher.ProjectManagerSuppliedSubstepsLocationFinder;
 import com.technophobia.substeps.junit.launcher.model.LaunchModelFactory;
 import com.technophobia.substeps.junit.launcher.model.SubstepsLaunchModel;
 import com.technophobia.substeps.junit.launcher.model.SubstepsLaunchModelFactory;
@@ -58,7 +58,7 @@ public class SubstepsArgumentTab extends AbstractLaunchConfigurationTab {
 
 
     public SubstepsArgumentTab() {
-        this.launchModelFactory = new SubstepsLaunchModelFactory(new DefaultSubstepsLocationFinder());
+        this.launchModelFactory = new SubstepsLaunchModelFactory(new ProjectManagerSuppliedSubstepsLocationFinder());
 
         final Callback onChangeCallback = onChange();
         final ProjectComponent pc = new ProjectComponent(onChangeCallback);

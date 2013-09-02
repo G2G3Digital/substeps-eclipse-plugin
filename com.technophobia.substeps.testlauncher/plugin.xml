@@ -183,5 +183,11 @@
 	     <adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
 	  </factory>
 	</extension>
+   <extension
+         point="com.technophobia.substeps.editor.com.technophobia.substeps.monitor.folder.substeps">
+      <observer
+            class="com.technophobia.substeps.junit.launcher.model.UpdateRunConfigurationOnSubstepsFolderChange">
+      </observer>
+   </extension>
   
 </plugin>

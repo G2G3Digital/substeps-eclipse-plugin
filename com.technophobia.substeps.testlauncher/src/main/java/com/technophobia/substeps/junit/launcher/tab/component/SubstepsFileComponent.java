@@ -42,7 +42,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 import com.technophobia.eclipse.transformer.Callback;
 import com.technophobia.substeps.FeatureRunnerPlugin;
-import com.technophobia.substeps.junit.launcher.DefaultSubstepsLocationFinder;
+import com.technophobia.substeps.junit.launcher.ProjectManagerSuppliedSubstepsLocationFinder;
 import com.technophobia.substeps.junit.launcher.model.SubstepsLaunchModel;
 import com.technophobia.substeps.junit.ui.SubstepsFeatureMessages;
 import com.technophobia.substeps.supplier.Supplier;
@@ -57,7 +57,7 @@ public class SubstepsFileComponent extends AbstractTabComponent {
 
 
     public SubstepsFileComponent(final Callback onChangeCallback, final Supplier<IProject> projectSupplier) {
-        this(onChangeCallback, projectSupplier, new DefaultSubstepsLocationFinder());
+        this(onChangeCallback, projectSupplier, new ProjectManagerSuppliedSubstepsLocationFinder());
     }
 
 

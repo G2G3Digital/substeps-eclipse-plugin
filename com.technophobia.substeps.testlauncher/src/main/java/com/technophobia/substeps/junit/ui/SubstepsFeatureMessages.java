@@ -25,6 +25,8 @@ public class SubstepsFeatureMessages {
     public static String SubstepsFeatureLaunchShortcut_message_notests;
     public static String SubstepsFeatureLaunchShortcut_error_launch;
 
+    public static String SubstepsFeatureLaunchShortcut_configs_affected_update_substeps_folder;
+
     public static String SubstepsFeature_choose_config_title;
     public static String SubstepsFeature_choose_config_message;
 
