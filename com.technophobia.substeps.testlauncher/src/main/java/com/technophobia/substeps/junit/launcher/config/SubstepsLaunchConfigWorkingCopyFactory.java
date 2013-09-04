@@ -30,7 +30,7 @@ import com.technophobia.eclipse.transformer.Decorator;
 
 public class SubstepsLaunchConfigWorkingCopyFactory implements LaunchConfigurationWorkingCopyFactory {
 
-    private static final String LAUNCH_CONFIG_ID = "com.technophobia.substeps.junit.launchconfig";
+    public static final String LAUNCH_CONFIG_ID = "com.technophobia.substeps.junit.launchconfig";
 
     private final ILaunchManager launchManager;
 

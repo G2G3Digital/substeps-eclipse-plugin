@@ -26,6 +26,8 @@ import java.util.ResourceBundle;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -45,6 +47,7 @@ import com.technophobia.eclipse.project.ProjectObserver;
 import com.technophobia.eclipse.project.PropertyBasedProjectManager;
 import com.technophobia.eclipse.project.cache.CacheAwareProjectManager;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
+import com.technophobia.substeps.event.SubstepsFolderChangedListener;
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.preferences.SubstepsProjectPreferenceLookupFactory;
@@ -73,6 +76,8 @@ import com.technophobia.substeps.syntax.CachingProjectToSyntaxTransformer;
 public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActivator, PluginLogger {
 
     public static final String PLUGIN_ID = "com.technophobia.substeps.editor";
+
+    private static final String SUBSTEPS_FOLDER_CHANGED_EXTENSION_POINT_ID = "com.technophobia.substeps.editor.folderMonitorSubsteps";
 
     private static FeatureEditorPlugin pluginInstance;
 
@@ -225,6 +230,11 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     }
 
 
+    public Collection<SubstepsFolderChangedListener> substepsFolderChangeListeners() {
+        return createSubstepsFolderChangeListeners();
+    }
+
+
     @Override
     public void info(final String msg) {
         instance().log.log(new Status(IStatus.INFO, PLUGIN_ID, msg));
@@ -293,6 +303,33 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
         for (final IProject project : projects) {
             projectToSyntaxTransformer.refreshCacheFor(project);
+        }
+    }
+
+
+    private Collection<SubstepsFolderChangedListener> createSubstepsFolderChangeListeners() {
+
+        final Collection<SubstepsFolderChangedListener> listeners = new ArrayList<SubstepsFolderChangedListener>();
+
+        final IConfigurationElement[] configurationElements = Platform.getExtensionRegistry()
+                .getConfigurationElementsFor(SUBSTEPS_FOLDER_CHANGED_EXTENSION_POINT_ID);
+        for (final IConfigurationElement configurationElement : configurationElements) {
+            final Object folderChangeListener = folderChangeListenerFor(configurationElement);
+            if (folderChangeListener != null && folderChangeListener instanceof SubstepsFolderChangedListener) {
+                listeners.add((SubstepsFolderChangedListener) folderChangeListener);
+            }
+        }
+        return Collections.unmodifiableCollection(listeners);
+    }
+
+
+    private Object folderChangeListenerFor(final IConfigurationElement configurationElement) {
+        try {
+            return configurationElement.createExecutableExtension("class");
+        } catch (final CoreException ex) {
+            error("Could not create executable extension for configuration element " + configurationElement.getName(),
+                    ex);
+            return null;
         }
     }
 }

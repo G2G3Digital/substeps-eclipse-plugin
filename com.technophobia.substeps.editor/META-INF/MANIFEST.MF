@@ -42,6 +42,7 @@ Export-Package: com.technophobia.eclipse.project,
  com.technophobia.substeps.document.partition,
  com.technophobia.substeps.document.text.rule,
  com.technophobia.substeps.editor,
+ com.technophobia.substeps.event,
  com.technophobia.substeps.render,
  com.technophobia.substeps.step,
  com.technophobia.substeps.supplier
