@@ -2,6 +2,12 @@
 <!-- Copyright Technophobia.Ltd 2012 -->
 <plugin>
    <extension-point id="substepsRunListeners" name="Substeps Run Listeners" schema="schema/substepsRunListeners.exsd"/>
+   <extension
+         point="com.technophobia.substeps.editor.folderMonitorSubsteps">
+      <observer
+            class="com.technophobia.substeps.junit.launcher.model.UpdateRunConfigurationOnSubstepsFolderChange">
+      </observer>
+   </extension>
 	<extension
          point="org.eclipse.ui.views">
       <view
@@ -183,11 +189,5 @@
 	     <adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
 	  </factory>
 	</extension>
-   <extension
-         point="com.technophobia.substeps.editor.com.technophobia.substeps.monitor.folder.substeps">
-      <observer
-            class="com.technophobia.substeps.junit.launcher.model.UpdateRunConfigurationOnSubstepsFolderChange">
-      </observer>
-   </extension>
   
 </plugin>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- Copyright Technophobia.Ltd 2012 -->
 <plugin>
-   <extension-point id="com.technophobia.substeps.monitor.folder.substeps" name="Substeps Folder Monitor" schema="schema/com.technophobia.substeps.exsd"/>
+   <extension-point id="folderMonitorSubsteps" name="Substeps Folder Monitor" schema="schema/com.technophobia.substeps.exsd"/>
 	<!--extension
         point="org.eclipse.ui.actionSets">
      <actionSet

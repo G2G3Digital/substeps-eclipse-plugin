@@ -18,20 +18,25 @@ package com.technophobia.substeps.editor.preferences.page;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.StringButtonFieldEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -52,24 +57,32 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import com.technophobia.eclipse.project.ProjectObserver;
 import com.technophobia.substeps.FeatureEditorPlugin;
 import com.technophobia.substeps.editor.preferences.OverridableProjectLocalPreferenceStore;
+import com.technophobia.substeps.event.SubstepsFolderChangedListener;
 import com.technophobia.substeps.preferences.SubstepsPreferences;
 
 public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchPropertyPage {
 
+    private enum ConfirmationStatus {
+        YES, NO, CANCEL
+    };
+
     private FieldEditor controlEditor;
     private FieldEditor hasNatureEditor;
     private final String pluginId;
-    private final List<FieldEditor> fieldEditors;
+    private final Map<String, FieldEditor> fieldEditorsByKey;
     private final Map<FieldEditor, Composite> fieldToParentMap;
 
     private final ProjectObserver projectObserver;
+    private final Collection<SubstepsFolderChangedListener> substepsFolderChangeListeners;
 
 
     public SubstepsPropertyPage() {
-        this.fieldEditors = new ArrayList<FieldEditor>();
+        this.fieldEditorsByKey = new LinkedHashMap<String, FieldEditor>();
         this.fieldToParentMap = new HashMap<FieldEditor, Composite>();
         this.projectObserver = FeatureEditorPlugin.instance().getProjectObserver();
+        this.substepsFolderChangeListeners = FeatureEditorPlugin.instance().substepsFolderChangeListeners();
         this.pluginId = FeatureEditorPlugin.PLUGIN_ID;
+
     }
 
 
@@ -77,16 +90,21 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
     public boolean performOk() {
         final boolean result = super.performOk();
 
-        hasNatureEditor.store();
-        controlEditor.store();
-        for (final FieldEditor fieldEditor : fieldEditors) {
-            fieldEditor.store();
+        doValidation();
+
+        if (isValid()) {
+            hasNatureEditor.store();
+            controlEditor.store();
+            for (final FieldEditor fieldEditor : fieldEditorsByKey.values()) {
+                oldSubstepsFolderLocation();
+                fieldEditor.store();
+            }
+            savePreferenceStore();
+
+            updateProject();
+            return result;
         }
-        savePreferenceStore();
-
-        updateProject();
-
-        return result;
+        return false;
     }
 
 
@@ -143,7 +161,7 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
 
 
     protected void setFieldsEnabled(final boolean enabled) {
-        for (final FieldEditor field : fieldEditors) {
+        for (final FieldEditor field : fieldEditorsByKey.values()) {
             field.setEnabled(enabled, fieldToParentMap.get(field));
         }
     }
@@ -246,7 +264,7 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
 
 
     private void addField(final FieldEditor field, final Composite parent) {
-        fieldEditors.add(field);
+        fieldEditorsByKey.put(field.getPreferenceName(), field);
         fieldToParentMap.put(field, parent);
     }
 
@@ -321,5 +339,79 @@ public class SubstepsPropertyPage extends PropertyPage implements IWorkbenchProp
      */
     protected String projectLocalisedPathFor(final IResource resource) {
         return resource.getFullPath().removeFirstSegments(1).toOSString();
+    }
+
+
+    private void doValidation() {
+        setValid(isSafeSubstepsFolderChange());
+    }
+
+
+    private boolean isSafeSubstepsFolderChange() {
+        final IPath previousPath = oldSubstepsFolderLocation();
+        final IPath newPath = newSubstepsFolderLocation();
+
+        final Collection<SubstepsFolderChangedListener> listenersRequiringConfirmationAction = new ArrayList<SubstepsFolderChangedListener>();
+        boolean cancelled = false;
+
+        if (!previousPath.equals(newPath)) {
+            for (final SubstepsFolderChangedListener folderChangeListener : substepsFolderChangeListeners) {
+                final ConfirmationStatus confirmationStatus = handleFolderChanged(previousPath, newPath,
+                        folderChangeListener);
+
+                if (ConfirmationStatus.YES.equals(confirmationStatus)) {
+                    listenersRequiringConfirmationAction.add(folderChangeListener);
+                } else if (ConfirmationStatus.CANCEL.equals(confirmationStatus)) {
+                    listenersRequiringConfirmationAction.clear();
+                    cancelled = true;
+                    break;
+                }
+            }
+        }
+
+        for (final SubstepsFolderChangedListener folderChangedListener : listenersRequiringConfirmationAction) {
+            folderChangedListener.onConfirmation(previousPath, newPath);
+        }
+
+        return !cancelled;
+    }
+
+
+    private IPath oldSubstepsFolderLocation() {
+        final IProject project = getProject();
+        return project.getFolder(getPreferenceStore().getString(SubstepsPreferences.SUBSTEPS_FOLDER.key()))
+                .getFullPath().removeFirstSegments(1);
+    }
+
+
+    private IPath newSubstepsFolderLocation() {
+        final IProject project = getProject();
+        return project
+                .getFolder(
+                        ((StringFieldEditor) fieldEditorsByKey.get(SubstepsPreferences.SUBSTEPS_FOLDER.key()))
+                                .getStringValue()).getFullPath().removeFirstSegments(1);
+    }
+
+
+    private ConfirmationStatus handleFolderChanged(final IPath previousPath, final IPath newPath,
+            final SubstepsFolderChangedListener folderChangeListener) {
+
+        final boolean confirmationRequired = folderChangeListener.isConfirmationRequired(previousPath, newPath);
+        if (confirmationRequired) {
+            return getConfirmationStatus(previousPath, newPath, folderChangeListener);
+        }
+        return ConfirmationStatus.NO;
+    }
+
+
+    private ConfirmationStatus getConfirmationStatus(final IPath previousPath, final IPath newPath,
+            final SubstepsFolderChangedListener folderChangeListener) {
+        final MessageDialog messageDialog = new MessageDialog(getShell(), "Confirm", null,
+                folderChangeListener.confirmationMessage(previousPath, newPath), MessageDialog.QUESTION_WITH_CANCEL,
+                new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL },
+                0);
+        final int status = messageDialog.open();
+
+        return ConfirmationStatus.values()[status];
     }
 }
