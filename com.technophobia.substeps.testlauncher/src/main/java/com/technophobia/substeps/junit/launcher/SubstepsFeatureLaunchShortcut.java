@@ -160,7 +160,7 @@ public class SubstepsFeatureLaunchShortcut implements ILaunchShortcut2 {
     private Collection<Decorator<ILaunchConfigurationWorkingCopy, IResource>> workingCopyDecorators(
             final ExceptionReporter exceptionReporter) {
         return Arrays.asList(new SubstepsLaunchConfigWorkingCopyDecorator(new SubstepsLaunchModelFactory(
-                new DefaultSubstepsLocationFinder())), new ResourceMappingDecorator(exceptionReporter));
+                new ProjectManagerSuppliedSubstepsLocationFinder())), new ResourceMappingDecorator(exceptionReporter));
     }
 
 
