@@ -349,7 +349,7 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
                         return new ProjectLocalPreferenceStore(PLUGIN_ID, project,
                                 (IPersistentPreferenceStore) getPreferenceStore());
                     }
-                });
+                }, projectToSyntaxTransformer);
 
         job.setRule(ResourcesPlugin.getWorkspace().getRoot());
         job.setPriority(Job.SHORT);

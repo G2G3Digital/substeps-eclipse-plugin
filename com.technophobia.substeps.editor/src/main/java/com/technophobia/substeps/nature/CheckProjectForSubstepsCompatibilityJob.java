@@ -17,19 +17,24 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 
 import com.technophobia.substeps.editor.message.SubstepsEditorMessages;
+import com.technophobia.substeps.model.Syntax;
+import com.technophobia.substeps.supplier.CachingResultTransformer;
 import com.technophobia.substeps.supplier.Transformer;
 
 public class CheckProjectForSubstepsCompatibilityJob extends Job {
 
     private final Transformer<IProject, IPersistentPreferenceStore> projectToPreferenceLookup;
     private final IWorkbench workbench;
+    private final CachingResultTransformer<IProject, Syntax> projectToSyntaxTransformer;
 
 
     public CheckProjectForSubstepsCompatibilityJob(final IWorkbench workbench,
-            final Transformer<IProject, IPersistentPreferenceStore> projectToPreferenceLookup) {
+            final Transformer<IProject, IPersistentPreferenceStore> projectToPreferenceLookup,
+            final CachingResultTransformer<IProject, Syntax> projectToSyntaxTransformer) {
         super("Checking Projects for Substeps compatibility");
         this.workbench = workbench;
         this.projectToPreferenceLookup = projectToPreferenceLookup;
+        this.projectToSyntaxTransformer = projectToSyntaxTransformer;
     }
 
 
@@ -51,6 +56,7 @@ public class CheckProjectForSubstepsCompatibilityJob extends Job {
                                         project.getName()))) {
 
                             SubstepsNature.ensureProjectHasNature(project);
+                            projectToSyntaxTransformer.refreshCacheFor(project);
                         }
 
                         compatibilityChecker.markProjectAsCompatibilityChecked(project);
