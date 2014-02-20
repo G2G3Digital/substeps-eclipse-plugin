@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -47,9 +48,11 @@ import com.technophobia.eclipse.project.ProjectObserver;
 import com.technophobia.eclipse.project.PropertyBasedProjectManager;
 import com.technophobia.eclipse.project.cache.CacheAwareProjectManager;
 import com.technophobia.eclipse.transformer.ResourceToProjectTransformer;
+import com.technophobia.substeps.editor.preferences.ProjectLocalPreferenceStore;
 import com.technophobia.substeps.event.SubstepsFolderChangedListener;
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.model.Syntax;
+import com.technophobia.substeps.nature.CheckProjectForSubstepsCompatibilityJob;
 import com.technophobia.substeps.preferences.SubstepsProjectPreferenceLookupFactory;
 import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
@@ -64,6 +67,7 @@ import com.technophobia.substeps.step.provider.ProjectSpecificSuggestionProvider
 import com.technophobia.substeps.step.provider.SubstepSuggestionProvider;
 import com.technophobia.substeps.supplier.CachingResultTransformer;
 import com.technophobia.substeps.supplier.Supplier;
+import com.technophobia.substeps.supplier.Transformer;
 import com.technophobia.substeps.syntax.CachingProjectToSyntaxTransformer;
 
 /**
@@ -120,6 +124,8 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
         projectObserver.registerFrameworkListeners();
 
         addSuggestionProviders();
+
+        doProjectCompabitilityTesting();
     }
 
 
@@ -331,5 +337,24 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
                     ex);
             return null;
         }
+    }
+
+
+    private void doProjectCompabitilityTesting() {
+
+        final Job job = new CheckProjectForSubstepsCompatibilityJob(getWorkbench(),
+                new Transformer<IProject, IPersistentPreferenceStore>() {
+                    @Override
+                    public IPersistentPreferenceStore from(final IProject project) {
+                        return new ProjectLocalPreferenceStore(PLUGIN_ID, project,
+                                (IPersistentPreferenceStore) getPreferenceStore());
+                    }
+                });
+
+        job.setRule(ResourcesPlugin.getWorkspace().getRoot());
+        job.setPriority(Job.SHORT);
+
+        job.schedule(200);
+
     }
 }
