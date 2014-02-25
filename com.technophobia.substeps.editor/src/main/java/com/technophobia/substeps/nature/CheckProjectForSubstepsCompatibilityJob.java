@@ -1,12 +1,9 @@
 package com.technophobia.substeps.nature;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -18,21 +15,22 @@ import org.eclipse.ui.IWorkbench;
 import com.technophobia.substeps.editor.message.SubstepsEditorMessages;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.supplier.CachingResultTransformer;
+import com.technophobia.substeps.supplier.Supplier;
 
 public class CheckProjectForSubstepsCompatibilityJob extends Job {
 
-    // private final Transformer<IProject, IPersistentPreferenceStore>
-    // projectToPreferenceLookup;
-    private final IWorkbench workbench;
-    private final SubstepsCompatibilityChecker compatibilityChecker;
+    private final Supplier<IWorkbench> workbenchSupplier;
+    private final CompatibilityChecker<IProject> compatibilityChecker;
     private final CachingResultTransformer<IProject, Syntax> projectToSyntaxTransformer;
+    private final Supplier<List<IProject>> projectSupplier;
 
 
-    public CheckProjectForSubstepsCompatibilityJob(final IWorkbench workbench,
-            final SubstepsCompatibilityChecker compatibilityChecker,
+    public CheckProjectForSubstepsCompatibilityJob(final Supplier<IWorkbench> workbenchSupplier,
+            final Supplier<List<IProject>> projectSupplier, final CompatibilityChecker<IProject> compatibilityChecker,
             final CachingResultTransformer<IProject, Syntax> projectToSyntaxTransformer) {
         super("Checking Projects for Substeps compatibility");
-        this.workbench = workbench;
+        this.workbenchSupplier = workbenchSupplier;
+        this.projectSupplier = projectSupplier;
         this.compatibilityChecker = compatibilityChecker;
         this.projectToSyntaxTransformer = projectToSyntaxTransformer;
     }
@@ -41,14 +39,13 @@ public class CheckProjectForSubstepsCompatibilityJob extends Job {
     @Override
     protected IStatus run(final IProgressMonitor monitor) {
 
-        final Collection<IProject> allProjects = allOpenProjects();
-        for (final IProject project : allProjects) {
-            if (compatibilityChecker.isCandidateForAddingNature(project)) {
+        for (final IProject project : projectSupplier.get()) {
+            if (compatibilityChecker.isCompatible(project)) {
                 Display.getDefault().syncExec(new Runnable() {
                     @Override
                     public void run() {
                         if (MessageDialog.openQuestion(
-                                workbench.getDisplay().getActiveShell(),
+                                workbenchSupplier.get().getDisplay().getActiveShell(),
                                 SubstepsEditorMessages.SubstepsProjectCompatibility_Title,
                                 MessageFormat.format(SubstepsEditorMessages.SubstepsProjectCompatibility_Body,
                                         project.getName()))) {
@@ -57,24 +54,12 @@ public class CheckProjectForSubstepsCompatibilityJob extends Job {
                             projectToSyntaxTransformer.refreshCacheFor(project);
                         }
 
-                        compatibilityChecker.markProjectAsCompatibilityChecked(project);
+                        compatibilityChecker.markResourceAsCompatibilityChecked(project);
                     }
                 });
             }
         }
 
         return Status.OK_STATUS;
-    }
-
-
-    private Collection<IProject> allOpenProjects() {
-        final Collection<IProject> openProjects = new ArrayList<IProject>();
-        final IProject[] allProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-        for (final IProject project : allProjects) {
-            if (project.isOpen()) {
-                openProjects.add(project);
-            }
-        }
-        return Collections.unmodifiableCollection(openProjects);
     }
 }
