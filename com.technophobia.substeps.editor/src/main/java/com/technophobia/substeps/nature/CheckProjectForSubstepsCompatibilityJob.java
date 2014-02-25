@@ -12,36 +12,34 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 
 import com.technophobia.substeps.editor.message.SubstepsEditorMessages;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.supplier.CachingResultTransformer;
-import com.technophobia.substeps.supplier.Transformer;
 
 public class CheckProjectForSubstepsCompatibilityJob extends Job {
 
-    private final Transformer<IProject, IPersistentPreferenceStore> projectToPreferenceLookup;
+    // private final Transformer<IProject, IPersistentPreferenceStore>
+    // projectToPreferenceLookup;
     private final IWorkbench workbench;
+    private final SubstepsCompatibilityChecker compatibilityChecker;
     private final CachingResultTransformer<IProject, Syntax> projectToSyntaxTransformer;
 
 
     public CheckProjectForSubstepsCompatibilityJob(final IWorkbench workbench,
-            final Transformer<IProject, IPersistentPreferenceStore> projectToPreferenceLookup,
+            final SubstepsCompatibilityChecker compatibilityChecker,
             final CachingResultTransformer<IProject, Syntax> projectToSyntaxTransformer) {
         super("Checking Projects for Substeps compatibility");
         this.workbench = workbench;
-        this.projectToPreferenceLookup = projectToPreferenceLookup;
+        this.compatibilityChecker = compatibilityChecker;
         this.projectToSyntaxTransformer = projectToSyntaxTransformer;
     }
 
 
     @Override
     protected IStatus run(final IProgressMonitor monitor) {
-        final SubstepsCompatibilityChecker compatibilityChecker = new SubstepsCompatibilityChecker(
-                projectToPreferenceLookup);
 
         final Collection<IProject> allProjects = allOpenProjects();
         for (final IProject project : allProjects) {

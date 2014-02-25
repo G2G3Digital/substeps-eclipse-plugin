@@ -53,6 +53,7 @@ import com.technophobia.substeps.event.SubstepsFolderChangedListener;
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.model.Syntax;
 import com.technophobia.substeps.nature.CheckProjectForSubstepsCompatibilityJob;
+import com.technophobia.substeps.nature.SubstepsCompatibilityChecker;
 import com.technophobia.substeps.preferences.SubstepsProjectPreferenceLookupFactory;
 import com.technophobia.substeps.render.ParameterisedStepImplementationRenderer;
 import com.technophobia.substeps.step.ContextualSuggestionManager;
@@ -96,6 +97,8 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     private final ProjectManager projectManager;
 
     private final PreferenceLookupFactory<IProject> preferenceLookupFactory;
+
+    private SubstepsCompatibilityChecker compatibilityChecker;
 
 
     @SuppressWarnings("unchecked")
@@ -241,6 +244,11 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
     }
 
 
+    public void checkSubstepsCompatibilityFor(final IProject project) {
+        compatibilityChecker.isCandidateForAddingNature(project);
+    }
+
+
     @Override
     public void info(final String msg) {
         instance().log.log(new Status(IStatus.INFO, PLUGIN_ID, msg));
@@ -341,15 +349,17 @@ public class FeatureEditorPlugin extends AbstractUIPlugin implements BundleActiv
 
 
     private void doProjectCompabitilityTesting() {
-
-        final Job job = new CheckProjectForSubstepsCompatibilityJob(getWorkbench(),
+        this.compatibilityChecker = new SubstepsCompatibilityChecker(
                 new Transformer<IProject, IPersistentPreferenceStore>() {
                     @Override
                     public IPersistentPreferenceStore from(final IProject project) {
                         return new ProjectLocalPreferenceStore(PLUGIN_ID, project,
                                 (IPersistentPreferenceStore) getPreferenceStore());
                     }
-                }, projectToSyntaxTransformer);
+                });
+
+        final Job job = new CheckProjectForSubstepsCompatibilityJob(getWorkbench(), compatibilityChecker,
+                projectToSyntaxTransformer);
 
         job.setRule(ResourcesPlugin.getWorkspace().getRoot());
         job.setPriority(Job.SHORT);
