@@ -58,7 +58,7 @@ public class CacheAwareProjectManager implements ProjectObserver {
 
     private final Collection<IElementChangedListener> javaListeners;
 
-    private final IResourceChangeListener featureSubstepFileChangeListener;
+    private final Collection<IResourceChangeListener> resourceChangeListeners;
 
 
     public CacheAwareProjectManager(final CacheMonitor<IProject>... cacheMonitors) {
@@ -66,14 +66,17 @@ public class CacheAwareProjectManager implements ProjectObserver {
         this.substepsChangeListeners = new HashSet<ProjectFileChangedListener>();
         this.featureChangeListeners = new HashSet<ProjectFileChangedListener>();
         this.projectChangeListeners = new HashMap<ProjectEventType, Set<ProjectChangedListener>>();
+        this.resourceChangeListeners = new HashSet<IResourceChangeListener>();
 
         this.javaListeners = new ArrayList<IElementChangedListener>();
         this.javaListeners.add(createClassFilesChangedListener());
         this.javaListeners.add(createClasspathChangedListener());
         this.javaListeners.add(createProjectCreatedListener());
         this.javaListeners.add(createProjectDeletedListener());
+        this.javaListeners.add(createCheckSubstepsCompatabilityOnProjectCreationListener());
 
-        this.featureSubstepFileChangeListener = createSubstepsFileChangedListener();
+        this.resourceChangeListeners.add(createSubstepsFileChangedListener());
+
     }
 
 
@@ -83,8 +86,10 @@ public class CacheAwareProjectManager implements ProjectObserver {
             JavaCore.addElementChangedListener(listener);
         }
 
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(featureSubstepFileChangeListener,
-                IResourceChangeEvent.POST_CHANGE);
+        for (final IResourceChangeListener resourceChangeListener : resourceChangeListeners) {
+            ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener,
+                    IResourceChangeEvent.POST_CHANGE);
+        }
     }
 
 
@@ -94,7 +99,9 @@ public class CacheAwareProjectManager implements ProjectObserver {
             JavaCore.removeElementChangedListener(listener);
         }
 
-        ResourcesPlugin.getWorkspace().removeResourceChangeListener(featureSubstepFileChangeListener);
+        for (final IResourceChangeListener resourceChangeListener : resourceChangeListeners) {
+            ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceChangeListener);
+        }
     }
 
 
@@ -217,6 +224,16 @@ public class CacheAwareProjectManager implements ProjectObserver {
     private IResourceChangeListener createSubstepsFileChangedListener() {
         return new FileWithExtensionChangedListener(updateProjectCachesCallback(ProjectEventType.FeatureFileChanged),
                 "feature", "substeps");
+    }
+
+
+    private IElementChangedListener createCheckSubstepsCompatabilityOnProjectCreationListener() {
+        return new ProjectCreatedListener(new Callback1<IProject>() {
+            @Override
+            public void doCallback(final IProject t) {
+                FeatureEditorPlugin.instance().checkSubstepsCompatibilityFor(t);
+            }
+        });
     }
 
 

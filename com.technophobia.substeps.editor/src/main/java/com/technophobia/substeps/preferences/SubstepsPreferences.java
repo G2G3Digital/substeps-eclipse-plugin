@@ -49,6 +49,12 @@ public enum SubstepsPreferences {
         protected void setDefault(final PreferenceLookup lookup) {
             lookup.setDefault(key(), "");
         }
+    },
+    SUBSTEPS_COMPATIBILITY_CHECKED("substeps.compatibility.checked") {
+        @Override
+        protected void setDefault(final PreferenceLookup lookup) {
+            lookup.setDefault(key(), false);
+        }
     };
 
     private final String key;
